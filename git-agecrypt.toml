@@ -1,0 +1,10 @@
+[config]
+"global.nix" = [
+    "age1yubikey1qw8ddwxjsp2zdrajc5kk2m3ccv83f74yu3cjujfs8kfq823vqv6k2zyta6a",
+    "age1yubikey1q0wmqzjaxwgndf94hd7t37dx7wd45qwwk0r7zfytkasd6f5lvc70w89lwgg",
+]
+# TODO: Make a PR to allow wildcards in the filter
+"hosts/nixos/demeter/disk-config.secret.nix" = [
+    "age1yubikey1qw8ddwxjsp2zdrajc5kk2m3ccv83f74yu3cjujfs8kfq823vqv6k2zyta6a",
+    "age1yubikey1q0wmqzjaxwgndf94hd7t37dx7wd45qwwk0r7zfytkasd6f5lvc70w89lwgg",
+]

@@ -1,0 +1,2 @@
+/global.nix filter=git-agecrypt diff=git-agecrypt
+*.secret.nix filter=git-agecrypt diff=git-agecrypt

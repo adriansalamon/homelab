@@ -1,0 +1,65 @@
+{ globals, ... }:
+let
+  port = 2283;
+in
+{
+
+  environment.persistence."/persist".directories = [
+    {
+      directory = "/media/immich-data";
+      user = "immich";
+      group = "immich";
+      mode = "0700";
+    }
+    {
+      directory = "/var/lib/redis-immich";
+      user = "redis-immich";
+      group = "redis-immich";
+      mode = "0700";
+    }
+  ];
+
+  environment.persistence."/state".directories = [
+    {
+      directory = "/var/cache/immich/";
+      user = "immich";
+      group = "immich";
+      mode = "0700";
+    }
+  ];
+
+  fileSystems."/mnt/freenas02/adrian_bilder" = {
+    device = "freenas02.service.consul:/mnt/tank02/ds2/important/adrian/Bilder";
+    fsType = "nfs";
+  };
+
+  fileSystems."/mnt/freenas03/adrian_bilder" = {
+    device = "freenas02.service.consul:/mnt/tank02/ds3/adrian/Images";
+    fsType = "nfs";
+  };
+
+  services.immich = {
+    inherit port;
+    enable = true;
+    host = "0.0.0.0";
+    mediaLocation = "/media/immich-data";
+  };
+
+  consul.services.immich = {
+    inherit port;
+    tags = [
+      "traefik.enable=true"
+      "traefik.external=true"
+      "traefik.http.routers.immich.rule=Host(`immich.${globals.domains.main}`)"
+      "traefik.http.routers.immich.entrypoints=websecure"
+    ];
+  };
+
+  globals.nebula.mesh.hosts.zeus.firewall.inbound = [
+    {
+      port = builtins.toString port;
+      proto = "tcp";
+      group = "reverse-proxy";
+    }
+  ];
+}

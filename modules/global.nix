@@ -1,0 +1,233 @@
+{ lib, options, ... }:
+let
+
+  inherit (lib) mkOption types;
+
+  networkOptions = netSubmod: {
+    cidrv4 = mkOption {
+      type = types.net.cidrv4;
+      description = "IPv4 CIDR block for this network";
+      example = "10.1.10.0/24";
+    };
+
+    hosts = mkOption {
+      default = { };
+      type = types.attrsOf (
+        types.submodule (hostSubmod: {
+          options = {
+            id = mkOption {
+              type = types.ints.between 1 254;
+              description = "Host ID within the network (1-254)";
+            };
+
+            mac = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "MAC address of the host";
+              example = "aa:bb:cc:dd:ee:ff";
+            };
+
+            ipv4 = mkOption {
+              type = types.nullOr types.str;
+              description = "The IPv4 of the host. Generated";
+              readOnly = true;
+              default =
+                if netSubmod.config.cidrv4 == null then
+                  null
+                else
+                  lib.net.cidr.host hostSubmod.config.id netSubmod.config.cidrv4;
+            };
+
+            cidrv4 = mkOption {
+              type = types.nullOr types.str;
+              description = "The IPv4 of this host including CIDR mask";
+              readOnly = true;
+              default =
+                if netSubmod.config.cidrv4 == null then
+                  null
+                else
+                  lib.net.cidr.hostCidr hostSubmod.config.id netSubmod.config.cidrv4;
+            };
+          };
+        })
+      );
+    };
+  };
+
+in
+{
+
+  options = {
+    globals = mkOption {
+      default = { };
+      type = types.submodule {
+        options = {
+          nebula = mkOption {
+            default = { };
+            type = types.attrsOf (
+              types.submodule (
+                { config, ... }:
+                let
+                  globalCfg = config;
+                in
+                {
+                  options = {
+                    cidrv4 = mkOption {
+                      type = types.net.cidrv4;
+                      description = "IPv4 nebula overlay network";
+                    };
+                    hosts = mkOption {
+                      default = { };
+                      description = "Attrset of hostname to nebula config";
+                      type = types.attrsOf (
+                        types.submodule (
+                          { config, ... }:
+                          {
+                            options = {
+                              lighthouse = mkOption {
+                                type = types.bool;
+                                description = "Set this node as lighthouse node";
+                                default = false;
+                              };
+
+                              id = mkOption {
+                                type = types.int;
+                                description = ''
+                                  ID of the node. Used to derive the Nebula IP address.
+                                  Has to be smaller than the size of the overlay network.
+                                '';
+                              };
+
+                              ipv4 = mkOption {
+                                type = types.nullOr types.net.ipv4;
+                                default = if (globalCfg.cidrv4 == null) then null else lib.net.cidr.host config.id globalCfg.cidrv4;
+                                readOnly = true;
+                                description = "The IPv4 of this host. Automatically computed from the {option}`id`";
+                              };
+
+                              routeSubnets = mkOption {
+                                type = types.listOf types.net.cidrv4;
+                                default = [ ];
+                                description = ''
+                                  List of unsafe_routes to be added to the nodes certificate.
+                                  You will need to regenerate the node's keys after adding this.
+                                '';
+                              };
+
+                              groups = mkOption {
+                                type = types.listOf types.str;
+                                default = [ ];
+                                description = ''
+                                  List of groups to be added to the nodes certificate.
+                                  You will need to regenerate the node's keys after adding this.
+                                '';
+                              };
+
+                              firewall = mkOption {
+                                default = { };
+                                type = types.submodule {
+                                  options = {
+                                    inbound = mkOption {
+                                      type = types.listOf types.attrs;
+                                      default = [ ];
+                                      description = "List of inbound firewall rules";
+                                    };
+
+                                    outbound = mkOption {
+                                      type = types.listOf types.attrs;
+                                      default = [ ];
+                                      description = "List of outbound firewall rules";
+                                    };
+                                  };
+                                };
+                              };
+
+                              # gets passed to services.nebula.<name> options
+                              config = mkOption {
+                                type = types.attrs;
+                                default = { };
+                                description = "Extra configuration for the nebula service. See the `services.nebula.networks.<name>` for more information.";
+                              };
+                            };
+                          }
+                        )
+                      );
+                    };
+                  };
+                }
+              )
+            );
+          };
+
+          sites = mkOption {
+            default = { };
+
+            type = types.attrsOf (
+              types.submodule (siteSubmod: {
+                options = networkOptions siteSubmod // {
+                  airvpn = mkOption {
+                    type = types.submodule {
+                      options = {
+                        port = mkOption {
+                          type = types.ints.between 1 65535;
+                          description = "Port for the AirVPN tunnel";
+                          default = null;
+                        };
+
+                        local-cidrv4 = mkOption {
+                          type = types.net.cidrv4;
+                          description = "Local IPv4 address for the AirVPN tunnel";
+                          default = null;
+                        };
+                      };
+                    };
+                  };
+
+                  default = networkOptions siteSubmod;
+
+                  vlans = mkOption {
+                    type = types.attrsOf (
+                      types.submodule (vlanSubmod: {
+                        options = networkOptions vlanSubmod // {
+                          id = mkOption {
+                            type = types.ints.between 1 4094;
+                            description = "VLAN ID (1-4094)";
+                          };
+
+                          name = mkOption {
+                            description = "The name of this VLAN";
+                            default = vlanSubmod.config._module.args.name;
+                            type = types.str;
+                          };
+                        };
+                      })
+                    );
+                  };
+                };
+              })
+            );
+          };
+
+          loki-secrets = mkOption {
+            default = [ ];
+            description = "Secrets to be aggregated for loki basic auth";
+            type = types.listOf types.attrs;
+          };
+
+          domains = mkOption {
+            default = { };
+            type = types.attrsOf types.str;
+          };
+        };
+      };
+    };
+
+    _globalsDefs = mkOption {
+      type = types.unspecified;
+      default = options.globals.definitions;
+      readOnly = true;
+      internal = true;
+    };
+  };
+
+}
