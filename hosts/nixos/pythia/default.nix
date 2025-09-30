@@ -55,10 +55,10 @@
     inherit (nodes.athena.config.age.secrets.cloudflare-dns-api-token) rekeyFile;
   };
 
-  services.cfdyndns = {
+  services.cloudflare-dyndns = {
     enable = true;
     apiTokenFile = config.age.secrets.cloudflare-dns-api-token.path;
-    records = [ "delphi.site.${globals.domains.main}" ];
+    domains = [ "delphi.site.${globals.domains.main}" ];
   };
 
   system.stateVersion = "25.05";

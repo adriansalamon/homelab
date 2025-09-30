@@ -125,10 +125,10 @@ in
     cloudflare-dns-api-token.rekeyFile = ./secrets/cloudflare-dns-api-token.age;
   };
 
-  services.cfdyndns = {
+  services.cloudflare-dyndns = {
     enable = true;
     apiTokenFile = config.age.secrets.cloudflare-dns-api-token.path;
-    records = [ "olympus.site.${globals.domains.main}" ];
+    domains = [ "olympus.site.${globals.domains.main}" ];
   };
 
   # TODO: Add zrepl
