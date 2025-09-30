@@ -11,8 +11,6 @@
         nameValuePair
         ;
 
-      deployCfg = builtins.fromJSON (builtins.readFile ../deploy.json);
-
       mkHost =
         name: hostConfig:
         let
@@ -110,15 +108,16 @@
         name: cfg:
         let
           system = "x86_64-linux";
+          deployCfg = config.globals.deploy.${name};
         in
         {
-          hostname = deployCfg.${name}.ip;
+          hostname = deployCfg.ip;
           profiles.system = {
             user = "root";
             sshUser = "nixos";
             path = inputs.deploy-rs.lib.${system}.activate.nixos cfg;
           };
-          sshOpts = deployCfg.${name}.sshOpts or [ ];
+          sshOpts = deployCfg.sshOpts or [ ];
           deploy.remoteBuild = true;
         }
       );

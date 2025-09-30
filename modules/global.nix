@@ -218,6 +218,26 @@ in
             default = { };
             type = types.attrsOf types.str;
           };
+
+          deploy = mkOption {
+            type = types.attrsOf (
+              types.submodule {
+                options = {
+                  ip = mkOption {
+                    type = types.str;
+                    description = "IP address of the node";
+                  };
+                  sshOpts = mkOption {
+                    type = types.listOf types.str;
+                    description = "Options to pass to ssh";
+                    default = [ ];
+                  };
+                };
+              }
+            );
+            default = { };
+            description = "Nodes to deploy";
+          };
         };
       };
     };
@@ -228,6 +248,7 @@ in
       readOnly = true;
       internal = true;
     };
+
   };
 
 }

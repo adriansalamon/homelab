@@ -42,6 +42,7 @@
             nebula
             loki-secrets
             domains
+            deploy
             ;
         };
     };

@@ -122,7 +122,7 @@ in
     port = 8191;
   };
 
-  networking.firewall.allowedTCPPorts = [ globals.sites.olympus.site.airvpn.port ];
+  networking.firewall.allowedTCPPorts = [ globals.sites.olympus.airvpn.port ];
 
   consul.services = {
     radarr = {
