@@ -46,6 +46,10 @@
       shellAliases = {
         la = "ls --color -lha";
       };
+
+      initContent = ''
+        export PATH="$HOME/.cargo/bin:$PATH"
+      '';
     };
   };
 }

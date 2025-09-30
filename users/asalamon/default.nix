@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 {
   imports = [
     ./zsh.nix
@@ -12,6 +12,9 @@
     sessionVariables = {
       EDITOR = "vim";
     };
-  };
 
+    packages = with pkgs; [
+      rustup
+    ];
+  };
 }
