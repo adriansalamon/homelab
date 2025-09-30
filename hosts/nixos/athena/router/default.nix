@@ -134,7 +134,8 @@ in
       };
     };
   }
-  // flip concatMapAttrs site.vlans (
+  # note: we use custom rules for external-vpn because of routing rules, see external-vpn.nix
+  // flip concatMapAttrs (lib.removeAttrs site.vlans [ "external-vpn" ]) (
     name: vlanCfg: {
       "40-vlan-${name}" = {
         matchConfig.Name = name;

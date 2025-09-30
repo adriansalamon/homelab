@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   globals,
   ...
 }:
@@ -27,7 +28,7 @@ in
     networks."50-external-vpn" = {
       matchConfig.Name = "external-vpn";
       networkConfig = {
-        Address = site.vlans.external-vpn.cidrv4;
+        Address = (lib.net.cidr.hostCidr 1 site.vlans.external-vpn.cidrv4);
         DHCP = "no";
         IPv6PrivacyExtensions = "kernel";
       };
