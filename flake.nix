@@ -54,6 +54,11 @@
     };
 
     flake-parts.url = "github:hercules-ci/flake-parts";
+
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -68,6 +73,7 @@
         ./nix/hosts.nix
         ./nix/agenix.nix
         ./nix/pkgs.nix
+        ./nix/iso.nix
         ./nix/global.nix
       ];
     };

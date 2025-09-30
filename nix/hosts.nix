@@ -94,7 +94,6 @@
     in
     hosts
     // {
-
       guestConfigs = flip concatMapAttrs config.nixosConfigurations (
         _: node:
         flip mapAttrs' (node.config.guests or { }) (
