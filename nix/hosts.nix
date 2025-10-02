@@ -89,6 +89,7 @@
         (mkHost "icarus" { })
         (mkHost "charon" { })
         (mkHost "pythia" { })
+        (mkHost "hermes" { })
         (mkDarwin "atlas" inputs.nixpkgs-darwin [ ])
       ];
     in
