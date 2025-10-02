@@ -10,8 +10,6 @@ let
 in
 {
   # NAS/storage server
-  #
-  #
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     ./disk-config.nix
@@ -23,7 +21,7 @@ in
     ../../../config/optional/hardware.nix
   ];
 
-  networking.hostId = "4e98920d";
+  networking.hostId = "b8d0bfb2";
 
   age.secrets."consul-acl.json" = {
     rekeyFile = inputs.self.outPath + "/secrets/consul/agent.acl.json.age";

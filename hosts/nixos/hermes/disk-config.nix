@@ -1,5 +1,6 @@
 { lib, ... }:
 let
+  satadom = "ata-SuperMicro_SSD_SMC0515D90717A894641";
   ssd1 = "ata-SAMSUNG_MZ7LH480HAHQ-00005_S45PNE0M306774";
   ssd2 = "ata-SAMSUNG_MZ7LM480HMHQ-00005_S2UJNX0J404189";
 in
@@ -10,9 +11,9 @@ in
 
   disko.devices = {
     disk = {
-      ssd1 = {
+      satadom = {
         type = "disk";
-        device = "/dev/disk/by-id/${ssd1}";
+        device = "/dev/disk/by-id/${satadom}";
         content = {
           type = "gpt";
           partitions = {
@@ -26,6 +27,15 @@ in
                 mountOptions = [ "umask=0077" ];
               };
             };
+          };
+        };
+      };
+      ssd1 = {
+        type = "disk";
+        device = "/dev/disk/by-id/${ssd1}";
+        content = {
+          type = "gpt";
+          partitions = {
             zfs = {
               size = "100%";
               content = {
@@ -42,15 +52,6 @@ in
         content = {
           type = "gpt";
           partitions = {
-            ESP = {
-              size = "512M";
-              type = "EF00";
-              content = {
-                type = "filesystem";
-                format = "vfat";
-                mountpoint = null;
-              };
-            };
             zfs = {
               size = "100%";
               content = {
