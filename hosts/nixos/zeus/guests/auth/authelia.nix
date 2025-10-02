@@ -16,8 +16,8 @@ let
   mkOidcSecrets = name: {
     "${name}-oidc-client-secret" = {
       rekeyFile = ./secrets/oidc/${name}-oidc-client-secret.txt.age;
-      owner = "root"; # this server is not supposed to be able to read this
-      mode = "400";
+      # this server is not supposed to have this file
+      intermediary = true;
       generator.script =
         { pkgs, file, ... }:
         ''
@@ -45,7 +45,6 @@ let
         '';
     };
   };
-
 in
 {
 

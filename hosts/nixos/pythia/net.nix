@@ -137,11 +137,12 @@ in
           }
         ];
 
+      # Sent to the kea-ddns-consul service, that will publish these as services in consul
       dhcp-ddns = {
         enable-updates = true;
         server-ip = "127.0.0.1";
         server-port = 53010;
-        sender-ip = "0.0.0.0";
+        sender-ip = "";
         sender-port = 0;
         max-queue-size = 1024;
         ncr-protocol = "UDP";
@@ -150,9 +151,10 @@ in
 
       ddns-send-updates = true;
       ddns-override-no-update = true;
+      ddns-override-client-update = true;
       ddns-replace-client-name = "never";
       ddns-qualifying-suffix = "";
-      ddns-update-on-renew = false;
+      ddns-update-on-renew = true;
     };
   };
 
@@ -253,7 +255,7 @@ in
         masquerade-firezone = {
           from = [ "firezone" ];
           to = [ "vlan-lan" ];
-          masquerade = true;
+          # masquerade = true;
           late = true; # Only accept after any rejects have been processed
           verdict = "accept";
         };
@@ -280,29 +282,22 @@ in
         };
       };
 
-      postrouting = {
-        "masquerade-internet" = {
-          after = [ "hook" ];
-          late = true;
-          rules =
-            lib.forEach
-              [
-                "lan"
-                "vlan-lan"
-                "vlan-server"
-                "vlan-guest"
-                "vlan-iot"
-              ]
-              (
-                zone:
-                lib.concatStringsSep " " [
-                  (lib.head config.networking.nftables.firewall.zones.${zone}.ingressExpression)
-                  (lib.head config.networking.nftables.firewall.zones.wan.egressExpression)
-                  "masquerade"
-                ]
-              );
-        };
-      };
+      postrouting =
+        let
+          inherit (config.helpers.nftables) mkMasqueradeRule;
+        in
+        lib.mkMerge [
+          (mkMasqueradeRule "masquerade-internet"
+            [
+              "vlan-lan"
+              "vlan-server"
+              "vlan-guest"
+              "vlan-iot"
+            ]
+            [ "wan" ]
+          )
+          (mkMasqueradeRule "masquerade-firezone" [ "firezone" ] [ "vlan-lan" ])
+        ];
     };
   };
 

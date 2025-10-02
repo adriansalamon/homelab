@@ -55,13 +55,24 @@ This repo uses OpenTofu and NixOS to manage the infrastructure. Most of the conf
 
 TODO/add:
 
+- Migrate Hermes to Nix
 - Backup system!!! (restic)
 - Git server (Forgejo/Gitea)
 - A simple cluster to learn about orchestration (k8s, k3s or nomad)
-- Local LLM agent
 - Ad blocking DNS
 - Dashboard (glance/homepage)
-- Migrate Hermes to Nix
+
+### Secrets 🔐
+
+All secrets, e.g. passwords, API tokens, etc. are stored as age encrypted files. These are encrypted using two YubiKeys (one offline backup). Using [`agenix-rekey`](https://github.com/oddlama/agenix-rekey), secrets are rekeyed/encrypted per host/server. Please see
+the documentation for the library for more information.
+
+Semi-secret data, like domain names, email addresses, and IP addresses, which are not secrets in the traditional sense (I'm fine if they are in the Nix store) but I would still like to keep hidden publicly on GitHub, are encrypted using [`git-agecrypt`](https://github.com/vlaci/git-agecrypt). To set up after cloning repo, use:
+
+```bash
+git-agecrypt init
+git-agecrypt config -i secrets/yubikey-identity.pub
+```
 
 ### Provisioning hosts
 
@@ -71,24 +82,10 @@ Boot into a NixOS live ISO, or try your luck with `nixos-anywhere`. Using `nixos
 nix run github:nix-community/nixos-anywhere -- --flake #name <user>@<host> --build-on-remote
 ```
 
-If you want to do it manually (eg. there might be some data already there, and you want to be careful). Read on.
-
-Get this repo to the host.
-
-One way is to use:
+If you want to do it manually (e.g. there might be some data already there, and you want to be careful). Read on. You can build a NixOS live ISO with preconfigured ssh keys:
 
 ```bash
-#on the host
-sudo passwd root
-mkdir config && cd config && git init
-
-#from your machine
-ssh-copy-id nixos@<host>
-git remote add nixos git@<host>:/home/nixos/config
-git push nixos
-
-#on the host
-git checkout main
+nix build --print-out-paths --no-link github:adriansalamon/homelab#live-iso
 ```
 
 Then on the host run:
@@ -96,8 +93,8 @@ Then on the host run:
 ```bash
 export host=<name>
 nix-shell -p disko
-sudo disko -m disko --flake .#$host
-sudo nixos-install --root /mnt --no-root-password --flake .#$host
+sudo disko -m disko --flake github:adriansalamon/homelab#$host
+sudo nixos-install --root /mnt --no-root-password --flake github:adriansalamon/homelab#$host
 # Important! If the system has a zfs pool, otherwise it will fail to import on boot
 sudo umount -l /mnt && sudo zpool export -a
 ```

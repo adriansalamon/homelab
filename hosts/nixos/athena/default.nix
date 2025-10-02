@@ -86,6 +86,7 @@ in
 
     routeSubnets = [
       site.vlans.lan.cidrv4
+      site.vlans.management.cidrv4
     ];
 
     config.settings = {
@@ -113,6 +114,13 @@ in
         proto = "any";
         cidr = globals.sites.delphi.vlans.lan.cidrv4;
         local_cidr = site.vlans.lan.cidrv4;
+      }
+      # Allow admins to access management network
+      {
+        port = "any";
+        proto = "any";
+        group = "network-admin";
+        local_cidr = site.vlans.management.cidrv4;
       }
     ];
   };
