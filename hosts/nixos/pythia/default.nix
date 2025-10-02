@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   globals,
   nodes,
@@ -19,33 +18,8 @@
     ../../../config/optional/zfs.nix
     ../../../config/optional/impermanence.nix
     ../../../config/optional/hardware.nix
+    ../../../config/optional/consul-client.nix
   ];
-
-  age.secrets."consul-acl.json" = {
-    rekeyFile = inputs.self.outPath + "/secrets/consul/agent.acl.json.age";
-    owner = "consul";
-  };
-
-  services.consul = {
-    enable = true;
-    extraConfig = {
-      server = false;
-      bind_addr = globals.nebula.mesh.hosts.pythia.ipv4;
-      retry_join = [
-        globals.nebula.mesh.hosts.icarus.ipv4
-        globals.nebula.mesh.hosts.athena.ipv4
-      ];
-
-      acl = {
-        enabled = true;
-        default_policy = "deny";
-      };
-    };
-
-    extraConfigFiles = [
-      config.age.secrets."consul-acl.json".path
-    ];
-  };
 
   meta.vector.enable = true;
   meta.prometheus.enable = true;

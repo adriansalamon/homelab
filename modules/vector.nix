@@ -15,6 +15,8 @@ in
 
   config = lib.mkIf (cfg.enable) {
     age.secrets.vector-loki-basic-auth-password = {
+      # we don't need this file on the server
+      intermediary = true;
       generator.script = "alnum";
     };
 

@@ -1,44 +1,15 @@
 {
-  inputs,
   config,
-  globals,
-  lib,
   ...
 }:
-let
-  node = config.node;
-in
 {
-  # All nodes definetely want to be in the nebula mesh.
-  globals.nebula.mesh.hosts.${node.name} = {
-    inherit (node) id;
-    groups = [ "consul-client" ];
+  # All nodes definetely want to be in the nebula mesh, and part of consul cluster
+  imports = [
+    ../../../../config/optional/consul-client.nix
+  ];
 
-    firewall.inbound = lib.nebula-firewall.consul-client;
-  };
-
-  # Assumes that every node wants Consul agent. Probably true.
-  services.consul = {
-    enable = true;
-    extraConfig = {
-      server = false;
-      bind_addr = globals.nebula.mesh.hosts.${node.name}.ipv4;
-      retry_join = [ "consul.service.consul" ];
-
-      acl = {
-        enabled = true;
-        default_policy = "deny";
-      };
-    };
-
-    extraConfigFiles = [
-      config.age.secrets."consul-acl.json".path
-    ];
-  };
-
-  age.secrets."consul-acl.json" = {
-    rekeyFile = inputs.self.outPath + "/secrets/consul/agent.acl.json.age";
-    owner = "consul";
+  globals.nebula.mesh.hosts.${config.node.name} = {
+    inherit (config.node) id;
   };
 
   # we all want vector logging :P

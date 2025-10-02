@@ -12,12 +12,13 @@
     group = "grafana";
   };
 
-  globals.loki-secrets = [ config.age.secrets.grafana-loki-basic-auth-password ];
   age.secrets.grafana-loki-basic-auth-password = {
     generator.script = "alnum";
     mode = "440";
     group = "grafana";
   };
+
+  globals.loki-secrets = [ config.age.secrets.grafana-loki-basic-auth-password ];
 
   # Mirror the original oidc secret
   age.secrets.grafana-oidc-client-secret = {

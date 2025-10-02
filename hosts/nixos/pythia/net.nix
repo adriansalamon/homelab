@@ -322,7 +322,6 @@ in
     };
 
     groups = [
-      "consul-client"
       "reverse-proxy"
     ];
 
