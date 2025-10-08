@@ -238,6 +238,12 @@ in
             default = { };
             description = "Nodes to deploy";
           };
+
+          users = mkOption {
+            default = [ ];
+            type = types.listOf types.str;
+            description = "List of users";
+          };
         };
       };
     };

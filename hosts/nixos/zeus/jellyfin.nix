@@ -1,4 +1,8 @@
-{ pkgs, globals, ... }:
+{
+  pkgs,
+  globals,
+  ...
+}:
 let
   port = 8096;
 in
@@ -6,8 +10,10 @@ in
 
   boot.supportedFilesystems = [ "nfs" ];
 
+  users.users.jellyfin.extraGroups = [ "media" ];
+
   fileSystems."/mnt/PlexMedia" = {
-    device = "freenas02.service.consul:/mnt/tank02/ds2/replaceable/media";
+    device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/media";
     fsType = "nfs";
   };
 

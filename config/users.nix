@@ -1,7 +1,5 @@
 { ... }:
 {
-  nix.settings.trusted-users = [ "nixos" ];
-
   users.users.nixos = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];

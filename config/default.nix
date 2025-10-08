@@ -11,6 +11,7 @@
     ./users.nix
     ./nftables.nix
     ./boot.nix
+    ./nix.nix
     ../modules
   ];
 
@@ -29,18 +30,4 @@
     lshw
     tcpdump
   ];
-
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
-  nix.settings.auto-optimise-store = true;
-
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
-  };
-
 }

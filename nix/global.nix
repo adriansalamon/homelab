@@ -43,6 +43,7 @@
             loki-secrets
             domains
             deploy
+            users
             ;
         };
     };

@@ -18,7 +18,13 @@ in
   microvm.mem = 1024 * 4;
   microvm.vcpu = 4;
 
-  users.groups.multimedia = { };
+  imports = [
+    ../../../../config/optional/storage-users.nix
+  ];
+
+  users.users.radarr.extraGroups = [ "media" ];
+  users.users.sonarr.extraGroups = [ "media" ];
+  users.users.deluge.extraGroups = [ "media" ];
 
   environment.persistence."/persist".directories = [
     {
@@ -49,22 +55,22 @@ in
 
   boot.supportedFilesystems = [ "nfs" ];
 
+  globals.nebula.mesh.hosts.zeus-arr.groups = [ "nfs-client" ];
+
   fileSystems."/mnt/media" = {
-    device = "freenas02.service.consul:/mnt/tank02/ds2/replaceable/media";
+    device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/media";
     fsType = "nfs";
     options = [
-      "nfsvers=3"
+      "nfsvers=4"
       "x-systemd.automount"
       "noauto"
     ];
   };
 
-  systemd.tmpfiles.rules = [ "d /mnt/media 0775 root multimedia -" ];
-
   services.radarr = {
     enable = true;
     user = "radarr";
-    group = "multimedia";
+    group = "media";
     settings = {
       auth.method = "External";
       server.port = ports.radarr;
@@ -77,7 +83,7 @@ in
   services.sonarr = {
     enable = true;
     user = "sonarr";
-    group = "multimedia";
+    group = "media";
     settings = {
       auth.method = "External";
       server.port = ports.sonarr;
@@ -110,7 +116,7 @@ in
   services.deluge = {
     enable = true;
     user = "deluge";
-    group = "multimedia";
+    group = "media";
     web = {
       enable = true;
       port = ports.deluge;

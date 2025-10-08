@@ -1,9 +1,10 @@
 {
+  config,
   modulesPath,
   ...
 }:
 let
-  host = "hermes";
+  host = config.node.name;
 in
 {
   # NAS/storage server
@@ -12,11 +13,14 @@ in
     ./disk-config.nix
     ./hw.nix
     ./net.nix
+    ./nfs.nix
+    ./smb.nix
     ../../../config
     ../../../config/optional/zfs.nix
     ../../../config/optional/impermanence.nix
     ../../../config/optional/hardware.nix
     ../../../config/optional/consul-client.nix
+    ../../../config/optional/storage-users.nix
   ];
 
   networking.hostId = "b8d0bfb2";

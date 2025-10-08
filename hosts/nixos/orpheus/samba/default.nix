@@ -1,15 +1,13 @@
-{ pkgs, ... }:
+{
+  config,
+  globals,
+  pkgs,
+  ...
+}:
 {
 
-  users.extraUsers.asalamon = {
-    isNormalUser = true;
-    uid = 1000;
-    extraGroups = [ "wheel" ];
-    shell = pkgs.bashInteractive;
-  };
-
   services.samba = {
-    package = pkgs.samba4Full;
+    package = pkgs.samba4;
     enable = true;
     openFirewall = true;
     settings = {
@@ -19,8 +17,7 @@
       };
 
       "adrian" = {
-        path = "/mnt/tank03/ds03/adrian/";
-        "force user" = "asalamon";
+        path = "/mnt/tank03/adrian/";
         "browseable" = "yes";
         "writable" = "yes";
         "guest ok" = "no";
@@ -29,7 +26,31 @@
     };
   };
 
-  systemd.tmpfiles.rules = [ "d /mnt/tank03/ds03/adrian 0755 asalamon users -" ];
+  systemd.tmpfiles.rules = [ "d /mnt/tank03/adrian 0755 asalamon users -" ];
+
+  age.secrets."adrian-smb-password" = {
+    generator.script = "passphrase";
+  };
+
+  system.activationScripts.samba-init-passwords.text =
+    let
+      secretPath = config.age.secrets."adrian-smb-password".path;
+      user = "adrian";
+    in
+    ''
+      if [ -f ${secretPath} ]; then
+          echo "Setting smb password for ${user}"
+          smb_pass=$(cat ${secretPath})
+          echo -e "$smb_pass\n$smb_pass" | ${config.services.samba.package}/bin/smbpasswd -s -a ${user}
+          rm ${secretPath} # clean up, we don't need it anymore
+      fi
+    '';
+
+  consul.services."orpheus-files" = {
+    address = globals.sites.erebus.vlans.lan.hosts.orpheus.ipv4;
+    port = 445;
+    tags = [ "kea-ddns" ]; # hack to make orpheus-files.internal to resolve here
+  };
 
   services.samba-wsdd = {
     enable = true;

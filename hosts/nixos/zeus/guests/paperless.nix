@@ -14,6 +14,10 @@ in
   microvm.mem = 1024 * 3;
   microvm.vcpu = 4;
 
+  imports = [
+    ../../../../config/optional/storage-users.nix
+  ];
+
   environment.persistence."/persist".directories = [
     {
       directory = "/var/lib/paperless";
@@ -42,11 +46,13 @@ in
     group = "paperless";
   };
 
+  globals.nebula.mesh.hosts.zeus-paperless.groups = [ "nfs-client" ];
+
   fileSystems."/paperless" = {
-    device = "freenas02.service.consul:/mnt/tank02/ds2/important/scanning/paperless";
+    device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/shared/scanning/paperless";
     fsType = "nfs";
     options = [
-      "nfsvers=3"
+      "nfsvers=4"
       "x-systemd.automount"
       "noauto"
     ];

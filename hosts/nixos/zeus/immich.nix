@@ -29,12 +29,7 @@ in
   ];
 
   fileSystems."/mnt/freenas02/adrian_bilder" = {
-    device = "freenas02.service.consul:/mnt/tank02/ds2/important/adrian/Bilder";
-    fsType = "nfs";
-  };
-
-  fileSystems."/mnt/freenas03/adrian_bilder" = {
-    device = "freenas02.service.consul:/mnt/tank02/ds3/adrian/Images";
+    device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/homes/adrian/Bilder";
     fsType = "nfs";
   };
 

@@ -40,9 +40,10 @@
       mountpoint = "/mnt/tank03";
 
       datasets = {
-        "ds03/adrian" = {
+        "adrian" = {
           type = "zfs_fs";
-          mountpoint = "/mnt/tank03/ds03/adrian";
+          mountpoint = "/mnt/tank03/adrian";
+          options.mountpoint = "legacy";
         };
       };
     };

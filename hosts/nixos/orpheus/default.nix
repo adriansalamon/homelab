@@ -18,10 +18,10 @@ in
     ./net.nix
     ./samba
     ./snapserver
-    ./firezone.nix
     ./ai.nix
     ../../../config
     ../../../config/optional/zfs.nix
+    ../../../config/optional/storage-users.nix
     ../../../config/optional/hardware.nix
   ];
 
@@ -41,18 +41,6 @@ in
       retry_join = with globals.nebula.mesh.hosts; [
         demeter.ipv4
         icarus.ipv4
-      ];
-      services = [
-        {
-          id = "snapcast";
-          name = "snapcast";
-          port = 1780;
-          tags = [
-            "traefik.enable=true"
-            "traefik.http.routers.snapcast.rule=Host(`snapcast.local.${globals.domains.main}`)"
-            "traefik.http.routers.snapcast.entrypoints=websecure"
-          ];
-        }
       ];
       acl = {
         enabled = true;

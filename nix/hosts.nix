@@ -58,11 +58,11 @@
             };
             modules = [
               inputs.agenix.darwinModules.default
-              # { nix.linux-builder.enable = true; }
+              #{ nix.linux-builder.enable = true; }
               inputs.nix-rosetta-builder.darwinModules.default
               {
                 nix-rosetta-builder.onDemand = true;
-                nix-rosetta-builder.enable = false;
+                nix-rosetta-builder.enable = true;
               }
               ../hosts/darwin
               ../hosts/darwin/atlas
@@ -90,7 +90,7 @@
         (mkHost "charon" { })
         (mkHost "pythia" { })
         (mkHost "hermes" { })
-        (mkDarwin "atlas" inputs.nixpkgs-darwin [ ])
+        (mkDarwin "atlas" inputs.nixpkgs [ ])
       ];
     in
     hosts

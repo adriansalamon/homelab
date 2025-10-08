@@ -24,6 +24,7 @@ in
     ../../../config/optional/zfs.nix
     ../../../config/optional/impermanence.nix
     ../../../config/optional/hardware.nix
+    ../../../config/optional/storage-users.nix
   ];
 
   networking.hostId = "49e32584";
@@ -133,7 +134,10 @@ in
 
   globals.nebula.mesh.hosts.zeus = {
     id = 5;
-    groups = [ "consul-server" ];
+    groups = [
+      "consul-server"
+      "nfs-client"
+    ];
 
     firewall.inbound = lib.nebula-firewall.consul-server ++ [
       {

@@ -4,8 +4,9 @@ let
     flip
     concatMapAttrs
     ;
+  site = globals.sites.olympus;
 
-  vlans = lib.keepAttrs globals.sites.olympus.vlans [
+  vlans = lib.keepAttrs site.vlans [
     "lan"
     "server"
   ];
@@ -55,20 +56,22 @@ in
         VLAN = builtins.attrNames vlans;
       };
     };
-  }
-  // flip concatMapAttrs vlans (
-    name: _: {
-      "30-vlan-${name}" = {
-        matchConfig.Name = name;
-        networkConfig = {
-          DHCP = "yes";
-        };
-      };
-    }
-  );
 
-  networking.nftables.firewall.zones.untrusted.interfaces = [
-    "lan"
-    "server"
-  ];
+    "30-vlan-lan" = {
+      matchConfig.Name = "lan";
+      networkConfig = {
+        DHCP = "no";
+        Address = site.vlans.lan.hosts.hermes.cidrv4; # Static IP here
+      };
+    };
+
+    "30-vlan-server" = {
+      matchConfig.Name = "server";
+      networkConfig = {
+        DHCP = "yes";
+      };
+    };
+  };
+
+  networking.nftables.firewall.zones.untrusted.interfaces = builtins.attrNames vlans;
 }
