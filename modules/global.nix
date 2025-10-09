@@ -244,6 +244,40 @@ in
             type = types.listOf types.str;
             description = "List of users";
           };
+
+          hetzner.storageboxes = mkOption {
+            default = { };
+            type = types.attrsOf (
+              types.submodule {
+                options = {
+                  mainUser = mkOption {
+                    type = types.str;
+                    description = "Username of the storage box";
+                  };
+
+                  users = mkOption {
+                    default = { };
+                    description = "Subusers";
+                    type = types.attrsOf (
+                      types.submodule {
+                        options = {
+                          subUid = mkOption {
+                            type = types.int;
+                            description = "The subuser id";
+                          };
+
+                          path = mkOption {
+                            type = types.str;
+                            description = "The home path for this subuser (i.e. backup destination)";
+                          };
+                        };
+                      }
+                    );
+                  };
+                };
+              }
+            );
+          };
         };
       };
     };

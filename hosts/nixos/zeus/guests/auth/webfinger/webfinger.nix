@@ -8,7 +8,7 @@ buildGoModule {
   vendorHash = null;
 
   meta = with lib; {
-    description = "Simple WebFinger server for @${globals.domains.alt}";
+    description = "Simple WebFinger server";
     license = licenses.mit;
     platforms = platforms.all;
   };

@@ -1,5 +1,11 @@
-{ lib, ... }:
+{
+  config,
+  lib,
+  globals,
+  ...
+}:
 let
+  host = config.node.name;
   satadom = "ata-SuperMicro_SSD_SMC0515D90717A894641";
   ssd1 = "ata-SAMSUNG_MZ7LH480HAHQ-00005_S45PNE0M306774";
   ssd2 = "ata-SAMSUNG_MZ7LM480HMHQ-00005_S2UJNX0J404189";
@@ -77,4 +83,74 @@ in
       };
     };
   };
+
+  # We are a zfs replication sink
+  services.zrepl = {
+    enable = true;
+    settings = {
+      global = {
+        logging = [
+          {
+            type = "stdout";
+            level = "info";
+            format = "human";
+          }
+        ];
+
+        monitoring = [
+          {
+            type = "prometheus";
+            listen = "${globals.nebula.mesh.hosts.${host}.ipv4}:9811";
+            listen_freebind = true;
+          }
+        ];
+      };
+
+      jobs = [
+        {
+          name = "sink";
+          type = "sink";
+          serve = {
+            type = "tcp";
+            listen = "${globals.nebula.mesh.hosts.${host}.ipv4}:8888";
+            listen_freebind = true;
+            clients = lib.flip lib.mapAttrs' globals.nebula.mesh.hosts (
+              name: hostCfg: {
+                name = hostCfg.ipv4;
+                value = name;
+              }
+            );
+          };
+
+          recv.placeholder.encryption = "off";
+
+          root_fs = "tank02/backups";
+        }
+      ];
+    };
+  };
+
+  # Backup to Hezner
+  meta.backups.storageboxes."cloud-backups" = {
+    subuser = "hermes-files";
+    paths = [
+      "/data/tank02/homes"
+      "/data/tank02/shared"
+    ];
+  };
+
+  # register metrics in Consul
+  consul.services."${host}-zrepl-metrics" = {
+    port = 9811;
+    tags = [ "prometheus.scrape=true" ];
+  };
+
+  # allow the prometheus scrape server to access
+  globals.nebula.mesh.hosts.${host}.firewall.inbound = [
+    {
+      port = "9811";
+      proto = "tcp";
+      host = "zeus-prometheus";
+    }
+  ];
 }

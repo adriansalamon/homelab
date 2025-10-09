@@ -139,6 +139,5 @@ in
     domains = [ "olympus.site.${globals.domains.main}" ];
   };
 
-  # TODO: Add zrepl
   system.stateVersion = "24.11";
 }

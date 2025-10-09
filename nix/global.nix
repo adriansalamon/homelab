@@ -44,6 +44,7 @@
             domains
             deploy
             users
+            hetzner
             ;
         };
     };

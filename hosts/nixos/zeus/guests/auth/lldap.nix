@@ -26,6 +26,7 @@ in
       ldap_base_dn = "dc=salamon,dc=xyz";
       ldap_user_email = "admin@${globals.domains.alt}";
       http_url = "https://lldap.local.${globals.domains.main}";
+      force_ldap_user_pass_reset = "always";
     };
     environment = {
       LLDAP_JWT_SECRET_FILE = config.age.secrets.jwt-secret.path;

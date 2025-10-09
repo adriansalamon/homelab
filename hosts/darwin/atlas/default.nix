@@ -31,7 +31,14 @@
     nebula
     git-agecrypt
     typst
+    backrest
+    restic
   ];
+
+  launchd.user.agents.backrest = {
+    serviceConfig.ProgramArguments = [ "${pkgs.backrest}/bin/backrest" ];
+    serviceConfig.KeepAlive = true;
+  };
 
   system.stateVersion = 5;
 }

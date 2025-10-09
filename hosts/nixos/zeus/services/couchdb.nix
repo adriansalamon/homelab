@@ -24,6 +24,8 @@ in
     }
   ];
 
+  # TODO: explicit backups
+
   age.secrets.couchdb-password = {
     generator.script = "alnum";
     owner = "couchdb";

@@ -21,7 +21,7 @@ This repo uses OpenTofu and NixOS to manage the infrastructure. Most of the conf
 | 🖥️  | server | athena    | Dell R210 II<br>E3-1230v2, 8gb RAM               | Firewall/router. DHCP and DNS server. Internal reverse proxy and VPN gateway.          |
 | 🖥️  | server | orpheus   | Supermicro 1U X9SCM<br>E3-1230, 16gb RAM         | Backup NAS/storage server. Runs not much currently.                                    |
 | 🖥️  | server | zeus      | Supermicro X10DRU-i+<br>2xE5-2620v4, 64gb RAM    | Main VM and services host. Runs most of my services.                                   |
-| 🖥️  | server | hermes    | Supermicro 2U X11SSH-LN4F<br>E3-1240v6, 32gb RAM | Storage server/NAS running Truenas CORE. Has a 16TB ZFS storage pool.                  |
+| 🖥️  | server | hermes    | Supermicro 2U X11SSH-LN4F<br>E3-1240v6, 32gb RAM | Storage server/NAS. Has a 16TB ZFS storage pool.                                       |
 | 🖥️  | server | orpheus   | ASUS PN51<br>Ryzen 5 5500U, 16gb RAM             | Edge server at Erebus. Runs some services and VMs and acts as a local NAS at the site. |
 | 🖥️  | server | proxmox01 | Dell R610<br>2x5690, 96gb RAM                    | Decommissioned. Very good at heating a home.                                           |
 | ☁️  | VPS    | icarus    | Hetzner Cloud server                             | Proxy for local services. Nebula lighthouse, (soon) Firezone server.                   |
@@ -33,31 +33,34 @@ This repo uses OpenTofu and NixOS to manage the infrastructure. Most of the conf
 | 🪪 SSO                | Authelia               | Single-Sign-On for hosted services. Uses lldap as an LDAP backend.                                                 |
 | 📷 Photos             | Immich                 | Self hosted Google Images alternative. My phone backs up here via the Immich app.                                  |
 | 📄 Documents          | Paperless              | Manager for physical and digital documents. Automatically ingests scans from my HP printer/scanner via Samba.      |
-| 🌐 VPN                | Firezone               | Wireguard based VPN with SSO authentication. Used to remotely access internal services.                            |
+| 🌐 VPN                | Firezone               | Wireguard based VPN with SSO authentication. Used to remotely access internal services. (does not work well)       |
 | 🏠 Home Automation    | Home Assistant         | Manages things (mostly IoT devices) in my home.                                                                    |
 | 🍿 Media Server       | Jellyfin               | Used to view movies and TV series.                                                                                 |
 | 🎞️ Media Management   | Radarr/Sonarr/Prowlarr | Used to automatically keep media in sync.                                                                          |
 | 🗃️ Download client    | Deluge                 | Download client to download and cache files.                                                                       |
-| 🛡️ Reverse Proxy      | Traefik                | Reverse proxy to secure acces to services, uses Consul for dynamic service discovery.                              |
+| 🛡️ Reverse Proxy      | Traefik                | Reverse proxy to secure access to services, uses Consul for dynamic service discovery.                             |
 | 🗂️ Network Management | UniFi Controller       | Central network controller for all UniFi devices across all sites.                                                 |
 | 📔 Notes              | Obsidian Livesync      | Synchronizes all my Obsidian clients, where I keep most of my digital notes.                                       |
 | 🔊 Music              | Snapserver             | Acts as a streaming device from Spotify or AirPlay, and syncs multiroom audio. I run Raspberry Pis as snapclients. |
+| 📂 File Server        | Samba                  | NAS file storage for clients on local network.                                                                     |
 
 #### System
 
-|                      | system     | description                                                                                                                                                                  |
-| -------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📁 Service Discovery | Consul     | Consul cluster to manage service registrations. I also put DHCP leases as consul services and use the built in destributed Consul DNS.                                       |
-| 🌐 Networking        | Nebula     | Overlay encrypted mesh network. All services are connected and communicate over Nebula, and use groups and use strict Nebula firewall rules.                                 |
-| 🔐 Secrets           | Age        | All secrets are stored in this repo, but encrypted using Age. Two YubiKeys (one offline backup) used for decryption. Agenix Rekey enables me to encrypt per-service secrets. |
-| 📃 Logs              | Loki       | Journald logs are sent to Loki, using vector. They can be queried using Grafana.                                                                                             |
-| ⏱️ Metrics           | Prometheus | Metrics are collected using Prometheus and visualized using Grafana.                                                                                                         |
+|                      | system     | description                                                                                                                                                                    |
+| -------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 📁 Service Discovery | Consul     | Consul cluster to manage service registrations. I also put DHCP leases as consul services and use the built-in distributed Consul DNS.                                         |
+| 🌐 Networking        | Nebula     | Overlay encrypted mesh network. All services are connected and communicate over Nebula, and use groups and use strict Nebula firewall rules.                                   |
+| 🔐 Secrets           | Age        | All secrets are stored in this repo, but encrypted using Age. Two YubiKeys (one offline backup) used for decryption. `agenix-rekey` enables me to encrypt per-service secrets. |
+| 📃 Logs              | Loki       | Journald logs are sent to Loki, using vector. They can be queried using Grafana.                                                                                               |
+| ⏱️ Metrics           | Prometheus | Metrics are collected using Prometheus and visualized using Grafana.                                                                                                           |
+| ⛈️ Backups           | Restic     | Automatic backups off all my data to Hetzner Storage Boxes via restic.                                                                                                         |
 
 TODO/add:
 
-- Migrate Hermes to Nix
-- Backup system!!! (restic)
+- Notifications/alerts
+- Backup metrics/alerts
 - Git server (Forgejo/Gitea)
+- Make firezone actually work (how?)
 - A simple cluster to learn about orchestration (k8s, k3s or nomad)
 - Ad blocking DNS
 - Dashboard (glance/homepage)
@@ -75,6 +78,8 @@ git-agecrypt config -i secrets/yubikey-identity.pub
 ```
 
 ### Provisioning hosts
+
+TODO: figure out how to make this work with `git-agecrypt`.
 
 Boot into a NixOS live ISO, or try your luck with `nixos-anywhere`. Using `nixos-anywhere`:
 
@@ -101,7 +106,7 @@ sudo umount -l /mnt && sudo zpool export -a
 
 ## Credits
 
-This configuration is heavily inspired by [oddlama's](https://github.com/oddlama/nix-config) configuration, with many parts taken directly (and some modified and simplified). Huge thanks for all them!
+This configuration is heavily inspired by [oddlama's](https://github.com/oddlama/nix-config) awesome configuration, with many parts taken directly (and some modified and simplified). Huge thanks to them!
 
 Other sources of inspiration:
 

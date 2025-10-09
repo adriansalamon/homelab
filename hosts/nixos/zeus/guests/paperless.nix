@@ -27,6 +27,8 @@ in
     }
   ];
 
+  # TODO: explicit backups
+
   age.secrets.paperless-admin-password = {
     generator.script = "alnum";
     mode = "440";

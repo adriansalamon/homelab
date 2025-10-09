@@ -63,7 +63,5 @@ in
     groups = [ "consul-server" ];
   };
 
-  # TODO: Add zrepl
-
   system.stateVersion = "24.11";
 }

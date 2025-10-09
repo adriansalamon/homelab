@@ -68,4 +68,12 @@ in
       };
     };
   };
+
+  meta.zrepl = {
+    enable = true;
+    target = "hermes";
+    filesystems = {
+      "zroot/safe<" = true;
+    };
+  };
 }

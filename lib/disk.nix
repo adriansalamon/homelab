@@ -23,13 +23,13 @@ _inputs: final: prev: {
         };
 
         impermanenceDatasets = {
-          local = unmountable;
+          "local" = unmountable;
           "local/root" = filesystem "/" // {
             postCreateHook = "zfs snapshot zroot/local/root@blank";
           };
           "local/nix" = filesystem "/nix";
           "local/state" = filesystem "/state";
-          safe = unmountable;
+          "safe" = unmountable;
           "safe/persist" = filesystem "/persist";
         };
 

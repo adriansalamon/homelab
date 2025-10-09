@@ -263,6 +263,5 @@ in
   meta.vector.enable = true;
   meta.prometheus.enable = true;
 
-  # TODO: Add zrepl
   system.stateVersion = "24.11";
 }

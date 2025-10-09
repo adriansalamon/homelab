@@ -37,12 +37,18 @@
 
     zpool.tank03 = {
       type = "zpool";
-      mountpoint = "/mnt/tank03";
+      mountpoint = null;
 
       datasets = {
         "adrian" = {
           type = "zfs_fs";
           mountpoint = "/mnt/tank03/adrian";
+          options.mountpoint = "legacy";
+        };
+
+        "media" = {
+          type = "zfs_fs";
+          mountpoint = "/mnt/tank03/media";
           options.mountpoint = "legacy";
         };
       };
@@ -64,5 +70,18 @@
         };
       };
     };
+  };
+
+  meta.zrepl = {
+    enable = true;
+    target = "hermes";
+    filesystems = {
+      "tank03/adrian" = true;
+    };
+  };
+
+  meta.backups.storageboxes."cloud-backups" = {
+    subuser = "orpheus-files";
+    paths = [ "/mnt/tank03/adrian/" ];
   };
 }

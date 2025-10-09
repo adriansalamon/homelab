@@ -23,10 +23,16 @@
         "guest ok" = "no";
         "read only" = "no";
       };
+
+      "media" = {
+        path = "/mnt/tank03/media/";
+        "browseable" = "yes";
+        "writable" = "yes";
+        "guest ok" = "no";
+        "read only" = "no";
+      };
     };
   };
-
-  systemd.tmpfiles.rules = [ "d /mnt/tank03/adrian 0755 asalamon users -" ];
 
   age.secrets."adrian-smb-password" = {
     generator.script = "passphrase";

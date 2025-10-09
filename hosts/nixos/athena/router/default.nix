@@ -222,9 +222,6 @@ in
     firewall = {
       zones = {
         firezone.interfaces = [ "tun-firezone" ];
-        samba.ipv4Addresses = [
-          (net.cidr.host 2 site.vlans.server.cidrv4)
-        ];
         wan.interfaces = [ "wan0" ];
         airvpn.interfaces = [ "wg0" ];
         deluge.ipv4Addresses = [ hosts.zeus-arr.ipv4 ];
@@ -336,15 +333,6 @@ in
           extraLines = [
             "tcp dport 22 drop"
           ];
-        };
-
-        allow-samba = {
-          from = [
-            "vlan-lan"
-            "firezone"
-          ];
-          to = [ "samba" ];
-          allowedTCPPorts = [ 445 ]; # Todo: do we need more ports for samba?
         };
 
         allow-management-to-all = {

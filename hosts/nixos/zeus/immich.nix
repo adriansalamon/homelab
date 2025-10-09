@@ -57,4 +57,9 @@ in
       group = "reverse-proxy";
     }
   ];
+
+  meta.backups.storageboxes."cloud-backups" = {
+    subuser = "immich";
+    paths = [ "/media/immich-data" ];
+  };
 }
