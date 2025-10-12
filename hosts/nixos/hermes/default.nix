@@ -15,6 +15,7 @@ in
     ./net.nix
     ./nfs.nix
     ./smb.nix
+    ./metrics.nix
     ../../../config
     ../../../config/optional/zfs.nix
     ../../../config/optional/impermanence.nix

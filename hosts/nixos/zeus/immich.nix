@@ -33,6 +33,11 @@ in
     fsType = "nfs";
   };
 
+  fileSystems."/mnt/freenas03/adrian_bilder" = {
+    device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank03/adrian/Images";
+    fsType = "nfs";
+  };
+
   services.immich = {
     inherit port;
     enable = true;

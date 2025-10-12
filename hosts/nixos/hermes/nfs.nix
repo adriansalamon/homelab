@@ -20,7 +20,8 @@ in
       /data/tank02/shared/scanning ${globals.nebula.mesh.cidrv4}(rw,sync,no_subtree_check,no_root_squash,anonuid=${getUid "paperless"},anongid=${getGid "scanning"})
 
       # adrian images
-      /data/tank02/homes/adrian/Bilder ${globals.nebula.mesh.cidrv4}(ro,sync,no_subtree_check,no_root_squash,anonuid=${getUid "immich"},anongid=${getGid "adrian-photos"})
+      /data/tank02/homes/adrian/Bilder ${globals.nebula.mesh.hosts.zeus.ipv4}(ro,sync,no_subtree_check,no_root_squash,anonuid=${getUid "immich"},anongid=${getGid "adrian-photos"})
+      /data/tank03/adrian/Images ${globals.nebula.mesh.hosts.zeus.ipv4}(ro,sync,no_subtree_check,no_root_squash,anonuid=${getUid "immich"},anongid=${getGid "adrian-photos"})
     '';
   };
 

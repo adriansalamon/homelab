@@ -94,11 +94,18 @@ in
           }
         );
 
+        groups.main = {
+          name = "main";
+          members = [
+            "admin"
+          ];
+        };
+
         policies = flip concatMapAttrs globals.sites (
           site: siteCfg: {
             "allow-everyone-to-${site}-lan" = {
               resource = "${site}-lan";
-              group = "everyone";
+              group = "main";
               description = "Allow everyone to ${site}-lan";
             };
           }
@@ -117,8 +124,12 @@ in
     openFirewall = true;
   };
 
-  # Defaults to 8080, but we are using it for traefik
-  systemd.services.firezone-relay.environment."HEALTH_CHECK_ADDR" = "0.0.0.0:8083";
+  systemd.services.firezone-relay = {
+    after = [ "firezone-server-api.service" ];
+    wants = [ "firezone-server-api.service" ];
+    # Defaults to 8080, but we are using it for traefik
+    environment."HEALTH_CHECK_ADDR" = "0.0.0.0:8083";
+  };
 
   consul.services.firezone = {
     port = config.services.firezone.server.web.port;

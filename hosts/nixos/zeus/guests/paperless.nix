@@ -18,6 +18,8 @@ in
     ../../../../config/optional/storage-users.nix
   ];
 
+  users.users."paperless".extraGroups = [ "scanning" ];
+
   environment.persistence."/persist".directories = [
     {
       directory = "/var/lib/paperless";

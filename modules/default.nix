@@ -9,6 +9,7 @@
     ./nftables.nix
     ./node.nix
     ./restic-hetzner.nix
+    ./rustic-exporter.nix
     ./vector.nix
     ./prometheus.nix
     ./zrepl.nix

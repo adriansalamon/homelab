@@ -6,8 +6,8 @@
 }:
 {
   age.secrets = with nodes.athena.config.age; {
-    # use the same tokens
-    cloudflare-dns-api-token.rekeyFile = secrets.cloudflare-dns-api-token.rekeyFile;
+    # use the same tokens as athena
+    "cloudflare-dns-api-token.env".rekeyFile = secrets."cloudflare-dns-api-token.env".rekeyFile;
     "traefik-token.env".rekeyFile = secrets."traefik-token.env".rekeyFile;
   };
 
@@ -15,7 +15,7 @@
     enable = true;
 
     environmentFiles = [
-      config.age.secrets.cloudflare-dns-api-token.path
+      config.age.secrets."cloudflare-dns-api-token.env".path
       config.age.secrets."traefik-token.env".path
     ];
 
