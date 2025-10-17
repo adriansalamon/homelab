@@ -123,14 +123,14 @@ in
 
   # register metrics in Consul
   consul.services."${host}-rustic-exporter" = {
-    port = config.services.prometheus.exporters.rustic;
+    inherit (config.services.prometheus.exporters.rustic) port;
     tags = [ "prometheus.scrape=true" ];
   };
 
   # allow the prometheus scrape server to access
   globals.nebula.mesh.hosts.${host}.firewall.inbound = [
     {
-      port = toString config.services.prometheus.exporters.rustic;
+      port = toString config.services.prometheus.exporters.rustic.port;
       proto = "tcp";
       host = "zeus-prometheus";
     }

@@ -2,6 +2,7 @@
   config,
   globals,
   pkgs,
+  lib,
   ...
 }:
 {
@@ -11,6 +12,30 @@
     enable = true;
     openFirewall = true;
     settings = {
+
+      global = {
+        "bind interfaces only" = "yes";
+        "interfaces" = "lo ${globals.sites.erebus.vlans.lan.hosts.orpheus.ipv4}";
+        "workgroup" = "${globals.domains.alt}";
+        "server string" = "%h";
+        "security" = "user";
+        "map to guest" = "bad user";
+        "guest account" = "nobody";
+        "invalid users" = [ "root" ];
+        "logging" = "systemd";
+        "store dos attributes" = "yes";
+        "map hidden" = "no";
+        "map system" = "no";
+        "map archive" = "no";
+        "inherit acls" = "yes";
+        "map acl inherit" = "yes";
+        "encrypt passwords" = "yes";
+        "hosts allow" = "localhost 127.0.0.1 100.64.0.0/10 ${
+          lib.concatMapAttrsStringSep " " (_: siteCfg: siteCfg.vlans.lan.cidrv4) globals.sites
+        }";
+        "hosts deny" = "0.0.0.0/0";
+      };
+
       server = {
         "min protocol" = "SMB3_00";
         "smb encrypt" = "required";

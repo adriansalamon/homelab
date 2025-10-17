@@ -37,7 +37,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-
     users = lib.mkIf (cfg.user != defaultUser) {
       groups.rustic-exporter = { };
       users.${defaultUser} = {
