@@ -126,8 +126,15 @@ in
   };
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
-
+  meta.telegraf = {
+    enable = true;
+    # monitor connectivity to external and internal services + internet connectivity
+    avilableMonitoringNetworks = [
+      "external"
+      "internal"
+      "internet"
+    ];
+  };
   # Dynamic dns
   age.secrets = {
     cloudflare-dns-api-token.rekeyFile = ./secrets/cloudflare-dns-api-token.age;

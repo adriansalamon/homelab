@@ -59,7 +59,11 @@ in
   };
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
+  meta.telegraf = {
+    enable = true;
+    # monitor connectivity to external services
+    avilableMonitoringNetworks = [ "external" ];
+  };
 
   system.stateVersion = "25.05";
 }

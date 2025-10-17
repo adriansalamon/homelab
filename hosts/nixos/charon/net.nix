@@ -2,6 +2,7 @@
   config,
   lib,
   globals,
+  nodes,
   ...
 }:
 let
@@ -155,6 +156,7 @@ in
           ];
         };
         firezone.interfaces = [ "tun-firezone" ];
+        tailscale.interfaces = [ "tailscale0" ];
       }
       // lib.concatMapAttrs (vlanName: _: {
         "vlan-${vlanName}".interfaces = [ vlanName ];
@@ -185,6 +187,7 @@ in
             "vlan-server"
             "vlan-guest"
             "vlan-iot"
+            "tailscale"
           ];
           to = [ "local" ];
           allowedTCPPorts = [ 53 ];
@@ -196,6 +199,7 @@ in
           from = [
             "vlan-lan"
             "vlan-server"
+            "tailscale"
           ];
           to = [ "local" ];
           allowedTCPPorts = [
@@ -245,6 +249,19 @@ in
         forward-outgoing-firezone-traffic = {
           from = [ "vlan-lan" ];
           to = [ "firezone" ];
+          verdict = "accept";
+        };
+
+        # tailscale
+        allow-tailscale-to-lan = {
+          from = [ "tailscale" ];
+          to = [ "vlan-lan" ];
+          verdict = "accept";
+        };
+
+        allow-lan-to-tailscale = {
+          from = [ "vlan-lan" ];
+          to = [ "tailscale" ];
           verdict = "accept";
         };
       };
@@ -315,5 +332,23 @@ in
         local_cidr = site.vlans.lan.cidrv4;
       }
     ];
+  };
+
+  age.secrets.tailscale-auth-key = {
+    inherit (nodes.athena.config.age.secrets.tailscale-auth-key) rekeyFile;
+  };
+
+  services.tailscale = {
+    enable = true;
+    interfaceName = "tailscale0";
+    useRoutingFeatures = "server";
+
+    extraUpFlags = [
+      "--advertise-routes=${site.vlans.lan.cidrv4}"
+      "--accept-routes=false"
+      "--accept-dns=false"
+    ];
+
+    authKeyFile = config.age.secrets.tailscale-auth-key.path;
   };
 }

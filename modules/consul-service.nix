@@ -14,7 +14,8 @@ let
       service = {
         id = name;
         name = name;
-      } // attrs;
+      }
+      // attrs;
     };
   };
 in

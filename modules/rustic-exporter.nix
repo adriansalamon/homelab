@@ -5,12 +5,12 @@
   ...
 }:
 let
-  cfg = config.services.rustic-exporter;
+  cfg = config.services.prometheus.exporters.rustic;
   defaultUser = "rustic-exporter";
 in
 {
 
-  options.services.rustic-exporter = {
+  options.services.prometheus.exporters.rustic = {
     enable = lib.mkEnableOption "rustic-exporter";
 
     package = lib.mkPackageOption pkgs "rustic-exporter" { };
@@ -46,7 +46,7 @@ in
       };
     };
 
-    systemd.services.rustic-exporter = {
+    systemd.services."prometheus-rustic-exporter" = {
       description = "Prometheus exporter for restic/rustic repos";
       wants = [ "network-online.target" ];
       after = [ "network-online.target" ];

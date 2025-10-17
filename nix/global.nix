@@ -45,6 +45,7 @@
             deploy
             users
             hetzner
+            monitoring
             ;
         };
     };

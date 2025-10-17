@@ -54,6 +54,13 @@ let
     };
   };
 
+  defaultMonitorOptions = {
+    network = mkOption {
+      type = types.str;
+      description = "The network which this resource is monitored by.";
+    };
+  };
+
 in
 {
 
@@ -206,6 +213,70 @@ in
                 };
               })
             );
+          };
+
+          monitoring = {
+            ping = mkOption {
+              type = types.attrsOf (
+                types.submodule {
+                  options = defaultMonitorOptions // {
+                    ipv4addr = mkOption {
+                      type = types.str;
+                      description = "The IP/hostname to ping via ipv4.";
+                    };
+                  };
+                }
+              );
+            };
+
+            http = mkOption {
+              type = types.attrsOf (
+                types.submodule {
+                  options = defaultMonitorOptions // {
+                    url = mkOption {
+                      type = types.either (types.listOf types.str) types.str;
+                      description = "The url to connect to.";
+                    };
+
+                    expectedStatus = mkOption {
+                      type = types.int;
+                      default = 200;
+                      description = "The HTTP status code to expect.";
+                    };
+
+                    expectedBodyRegex = mkOption {
+                      type = types.nullOr types.str;
+                      description = "A regex pattern to expect in the body.";
+                      default = null;
+                    };
+                  };
+                }
+              );
+            };
+
+            dns = mkOption {
+              type = types.attrsOf (
+                types.submodule {
+                  options = defaultMonitorOptions // {
+                    server = mkOption {
+                      type = types.str;
+                      description = "The DNS server to query.";
+                    };
+
+                    domain = mkOption {
+                      type = types.str;
+                      description = "The domain to query.";
+                    };
+
+                    recordType = mkOption {
+                      type = types.str;
+                      description = "The record type to query.";
+                      default = "A";
+                    };
+                  };
+                }
+              );
+            };
           };
 
           loki-secrets = mkOption {

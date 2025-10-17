@@ -12,7 +12,6 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     ./disk-config.nix
     ./hw.nix
-    ./monitoring.nix
     ../../../config
     ../../../config/optional/zfs.nix
     ../../../config/optional/impermanence.nix
@@ -79,21 +78,6 @@
 
   networking.nftables.firewall.zones.untrusted.interfaces = [ "serverBr" ];
 
-  services.microbin = {
-    enable = true;
-  };
-
-  consul.services.microbin = {
-    port = 8080;
-    tags = [
-      "traefik.enable=true"
-      "traefik.external=true"
-      "traefik.http.routers.microbin.rule=Host(`microbin.${globals.domains.main}`)"
-      "traefik.http.routers.microbin.entrypoints=websecure"
-      "traefik.http.routers.microbin.middlewares=authelia"
-    ];
-  };
-
   age.secrets."consul-acl.json" = {
     rekeyFile = inputs.self.outPath + "/secrets/consul/server.acl.json.age";
     owner = "consul";
@@ -124,25 +108,11 @@
 
     groups = [ "consul-server" ];
 
-    config.settings = {
-      config.settings = {
-        preferred_ranges = [
-          "185.81.109.88"
-        ];
-      };
-    };
-
-    firewall.inbound = lib.nebula-firewall.consul-server ++ [
-      {
-        port = "8080"; # microbin
-        proto = "tcp";
-        group = "reverse-proxy";
-      }
-    ];
+    firewall.inbound = lib.nebula-firewall.consul-server;
   };
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
+  meta.telegraf.enable = true;
 
   system.stateVersion = "24.11";
 }

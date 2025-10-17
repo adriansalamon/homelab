@@ -1,6 +1,7 @@
 ## Homelab
 
-This is a place for all infra stuff at home. There are currently three sites + a cloud environment.
+This is a place for all infra stuff at home. There are currently three sites + a
+cloud environment.
 
 - Olympus (G29)
 - Erebus (B22)
@@ -11,7 +12,8 @@ With the main infra at Olympus.
 
 ### Infra
 
-This repo uses OpenTofu and NixOS to manage the infrastructure. Most of the configuration is done using Nix.
+This repo uses OpenTofu and NixOS to manage the infrastructure. Most of the
+configuration is done using Nix.
 
 #### Hosts
 
@@ -67,10 +69,17 @@ TODO/add:
 
 ### Secrets 🔐
 
-All secrets, e.g. passwords, API tokens, etc. are stored as age encrypted files. These are encrypted using two YubiKeys (one offline backup). Using [`agenix-rekey`](https://github.com/oddlama/agenix-rekey), secrets are rekeyed/encrypted per host/server. Please see
-the documentation for the library for more information.
+All secrets, e.g. passwords, API tokens, etc. are stored as age encrypted files.
+These are encrypted using two YubiKeys (one offline backup). Using
+[`agenix-rekey`](https://github.com/oddlama/agenix-rekey), secrets are
+rekeyed/encrypted per host/server. Please see the documentation for the library
+for more information.
 
-Semi-secret data, like domain names, email addresses, and IP addresses, which are not secrets in the traditional sense (I'm fine if they are in the Nix store) but I would still like to keep hidden publicly on GitHub, are encrypted using [`git-agecrypt`](https://github.com/vlaci/git-agecrypt). To set up after cloning repo, use:
+Semi-secret data, like domain names, email addresses, and IP addresses, which
+are not secrets in the traditional sense (I'm fine if they are in the Nix store)
+but I would still like to keep hidden publicly on GitHub, are encrypted using
+[`git-agecrypt`](https://github.com/vlaci/git-agecrypt). To set up after cloning
+repo, use:
 
 ```bash
 git-agecrypt init
@@ -81,13 +90,16 @@ git-agecrypt config -i secrets/yubikey-identity.pub
 
 TODO: figure out how to make this work with `git-agecrypt`.
 
-Boot into a NixOS live ISO, or try your luck with `nixos-anywhere`. Using `nixos-anywhere`:
+Boot into a NixOS live ISO, or try your luck with `nixos-anywhere`. Using
+`nixos-anywhere`:
 
 ```
 nix run github:nix-community/nixos-anywhere -- --flake #name <user>@<host> --build-on-remote
 ```
 
-If you want to do it manually (e.g. there might be some data already there, and you want to be careful). Read on. You can build a NixOS live ISO with preconfigured ssh keys:
+If you want to do it manually (e.g. there might be some data already there, and
+you want to be careful). Read on. You can build a NixOS live ISO with
+preconfigured ssh keys:
 
 ```bash
 nix build --print-out-paths --no-link github:adriansalamon/homelab#live-iso
@@ -104,11 +116,28 @@ sudo nixos-install --root /mnt --no-root-password --flake github:adriansalamon/h
 sudo umount -l /mnt && sudo zpool export -a
 ```
 
+### OpenTofu
+
+Some things are managed using OpenTofu, e.g. Cloudflare DNS, Hetzner Cloud,
+Tailscale, and Consul. Some of the inputs are to be generated from the Nix
+config. So to run, use:
+
+```bash
+nix run #tofu <command, e.g. plan|apply>
+```
+
+This also automatically sets up a tunnel to a Consul server.
+
 ## Credits
 
-This configuration is heavily inspired by [oddlama's](https://github.com/oddlama/nix-config) awesome configuration, with many parts taken directly (and some modified and simplified). Huge thanks to them!
+This configuration is heavily inspired by
+[oddlama's](https://github.com/oddlama/nix-config) awesome configuration, with
+many parts taken directly (and some modified and simplified). Huge thanks to
+them!
 
 Other sources of inspiration:
 
-- [notthebee](https://github.com/notthebee/nix-config/) - His YouTube video pushed me to finally move to a NixOS based setup.
-- [PopeRigby](https://codeberg.org/PopeRigby/config) - Authelia setup is based on his config.
+- [notthebee](https://github.com/notthebee/nix-config/) - His YouTube video
+  pushed me to finally move to a NixOS based setup. -
+  [PopeRigby](https://codeberg.org/PopeRigby/config) - Authelia setup is based
+  on his config.

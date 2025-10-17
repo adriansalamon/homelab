@@ -131,6 +131,18 @@ in
     environment."HEALTH_CHECK_ADDR" = "0.0.0.0:8083";
   };
 
+  globals.monitoring.http.firezone = {
+    url = "https://firezone.${globals.domains.main}/";
+    network = "external";
+    expectedBodyRegex = "Welcome to Firezone";
+  };
+
+  globals.monitoring.http.firezone-api = {
+    url = "https://firezone-api.${globals.domains.main}/healthz";
+    network = "external";
+    expectedBodyRegex = "ok";
+  };
+
   consul.services.firezone = {
     port = config.services.firezone.server.web.port;
     tags = [

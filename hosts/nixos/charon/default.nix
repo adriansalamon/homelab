@@ -22,7 +22,11 @@
   ];
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
+  meta.telegraf = {
+    enable = true;
+    # monitor internet connectivity
+    avilableMonitoringNetworks = [ "internet" ];
+  };
 
   # Dynamic dns
   age.secrets.cloudflare-dns-api-token = {

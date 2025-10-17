@@ -40,5 +40,13 @@
     serviceConfig.KeepAlive = true;
   };
 
+  launchd.user.agents.nebula = {
+    serviceConfig.ProgramArguments = [
+      "${pkgs.nebula}/bin/nebula"
+      "-config /etc/nebula/nebula.yml"
+    ];
+    serviceConfig.KeepAlive = true;
+  };
+
   system.stateVersion = 5;
 }

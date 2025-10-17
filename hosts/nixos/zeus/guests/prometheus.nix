@@ -12,14 +12,6 @@
   services.prometheus = {
     enable = true;
 
-    exporters = {
-      node = {
-        port = 9001;
-        enabledCollectors = [ "systemd" ];
-        enable = true;
-      };
-    };
-
     scrapeConfigs = [
       {
         job_name = "consul";
@@ -62,13 +54,6 @@
       "traefik.enable=true"
       "traefik.http.routers.prometheus.rule=Host(`prometheus.local.${globals.domains.main}`)"
       "traefik.http.routers.prometheus.middlewares=authelia"
-    ];
-  };
-
-  consul.services.prometheus-node-exporter = {
-    inherit (config.services.prometheus.exporters.node) port;
-    tags = [
-      "prometheus.scrape=true"
     ];
   };
 }

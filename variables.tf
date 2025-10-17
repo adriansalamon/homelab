@@ -25,3 +25,12 @@ variable "domain" {
   type        = string
   description = "Domain name"
 }
+
+variable "tailscale_api_key" {
+  type      = string
+  sensitive = false
+}
+
+variable "tailnet" {
+  type = string
+}

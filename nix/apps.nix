@@ -11,5 +11,10 @@
         nixosConfigurations = inputs.self.nodes;
         decryptIdentity = (builtins.head inputs.self.secretsConfig.masterIdentities).identity;
       };
+
+      apps.tofu = import ../apps/tofu.nix {
+        inherit pkgs;
+        inherit (inputs.self) globals;
+      };
     };
 }

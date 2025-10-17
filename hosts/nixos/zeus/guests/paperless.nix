@@ -120,6 +120,12 @@ in
     )
   '';
 
+  globals.monitoring.http.paperless = {
+    url = "https://paperless.local.${globals.domains.main}/";
+    expectedBodyRegex = "Paperless-ngx";
+    network = "internal";
+  };
+
   consul.services = {
     paperless = {
       inherit port;

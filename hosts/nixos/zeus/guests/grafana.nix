@@ -105,6 +105,12 @@
     };
   };
 
+  globals.monitoring.http.grafana = {
+    url = "https://grafana.local.${globals.domains.main}/api/health";
+    expectedBodyRegex = "ok";
+    network = "internal";
+  };
+
   consul.services.grafana = {
     port = 3001;
     tags = [

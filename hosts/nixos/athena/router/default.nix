@@ -225,6 +225,7 @@ in
         wan.interfaces = [ "wan0" ];
         airvpn.interfaces = [ "wg0" ];
         deluge.ipv4Addresses = [ hosts.zeus-arr.ipv4 ];
+        # Todo, generate this
         other-sites-lan = {
           ingressExpression = [
             "iifname nebula.mesh ip saddr ${globals.sites.erebus.vlans.lan.cidrv4}"
@@ -236,6 +237,7 @@ in
           ];
         };
         nebula.interfaces = [ "nebula.mesh" ];
+        tailscale.interfaces = [ "tailscale0" ];
       }
       // lib.concatMapAttrs (vlanName: _: {
         "vlan-${vlanName}".interfaces = [ vlanName ];
@@ -287,6 +289,7 @@ in
             "vlan-guest"
             "vlan-iot"
             "vlan-management"
+            "tailscale"
           ];
           to = [ "local" ];
           allowedTCPPorts = [ 53 ];
@@ -300,6 +303,7 @@ in
             "vlan-server"
             "vlan-management"
             "vlan-external-vpn"
+            "tailscale"
           ];
           to = [ "local" ];
           allowedTCPPorts = [
@@ -372,6 +376,19 @@ in
           to = [ "other-sites-lan" ];
           verdict = "accept";
         };
+
+        # tailscale
+        allow-tailscale-to-lan = {
+          from = [ "tailscale" ];
+          to = [ "vlan-lan" ];
+          verdict = "accept";
+        };
+
+        allow-lan-to-tailscale = {
+          from = [ "vlan-lan" ];
+          to = [ "tailscale" ];
+          verdict = "accept";
+        };
       };
     };
 
@@ -433,10 +450,21 @@ in
     ];
   };
 
-  # TODO: yeet
+  age.secrets.tailscale-auth-key = {
+    rekeyFile = config.node.secretsDir + "/tailscale-auth-key.age";
+  };
+
   services.tailscale = {
     enable = true;
-    interfaceName = "userspace-networking";
+    interfaceName = "tailscale0";
     useRoutingFeatures = "server";
+
+    extraUpFlags = [
+      "--advertise-routes=${site.vlans.lan.cidrv4}"
+      "--accept-routes=false"
+      "--accept-dns=false"
+    ];
+
+    authKeyFile = config.age.secrets.tailscale-auth-key.path;
   };
 }

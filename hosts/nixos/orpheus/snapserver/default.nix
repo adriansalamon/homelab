@@ -39,6 +39,12 @@ in
     };
   };
 
+  globals.monitoring.http.snapserver = {
+    url = "https://snapcast.local.${globals.domains.main}/";
+    network = "internal";
+    expectedBodyRegex = "Snapcast web client";
+  };
+
   consul.services.snapcast = {
     port = config.services.snapserver.settings.http.port;
     tags = [

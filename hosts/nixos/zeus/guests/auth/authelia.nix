@@ -310,6 +310,12 @@ in
     (mkOidcSecrets "open-webui")
   ];
 
+  globals.monitoring.http.authelia = {
+    url = "https://auth.${globals.domains.main}/api/health";
+    network = "external";
+    expectedBodyRegex = "OK";
+  };
+
   consul.services.authelia = {
     inherit port;
     tags = [

@@ -43,6 +43,12 @@ in
 
   services.jellyfin.enable = true;
 
+  globals.monitoring.http.jellyfin = {
+    url = "https://jellyfin.${globals.domains.main}/health";
+    network = "external";
+    expectedBodyRegex = "Healthy";
+  };
+
   consul.services.jellyfin = {
     inherit port;
     tags = [

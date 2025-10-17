@@ -93,7 +93,7 @@ in
     }
   );
 
-  services.rustic-exporter = {
+  services.prometheus.exporters.rustic = {
     enable = true;
     port = 6780;
     host = globals.nebula.mesh.hosts.${host}.ipv4;
@@ -123,14 +123,14 @@ in
 
   # register metrics in Consul
   consul.services."${host}-rustic-exporter" = {
-    port = config.services.rustic-exporter.port;
+    port = config.services.prometheus.exporters.rustic;
     tags = [ "prometheus.scrape=true" ];
   };
 
   # allow the prometheus scrape server to access
   globals.nebula.mesh.hosts.${host}.firewall.inbound = [
     {
-      port = toString config.services.rustic-exporter.port;
+      port = toString config.services.prometheus.exporters.rustic;
       proto = "tcp";
       host = "zeus-prometheus";
     }

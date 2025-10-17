@@ -125,7 +125,8 @@ in
           host = "any";
           cidr = "0.0.0.0/0";
         }
-      ] ++ hostCfg.firewall.outbound;
+      ]
+      ++ hostCfg.firewall.outbound;
 
       # Default to allow icmp + ssh
       firewall.inbound = [
@@ -141,7 +142,8 @@ in
           host = "any";
           cidr = "0.0.0.0/0";
         }
-      ] ++ hostCfg.firewall.inbound;
+      ]
+      ++ hostCfg.firewall.inbound;
     }
     // hostCfg.config
   );

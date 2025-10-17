@@ -88,6 +88,12 @@ in
     partOf = [ "couchdb.service" ];
   };
 
+  globals.monitoring.http.obsidian = {
+    url = "https://obsidian.${globals.domains.main}";
+    network = "external";
+    expectedStatus = 401; # We are not authenticated, so we get a 401
+  };
+
   consul.services.couchdb = {
     inherit port;
     tags = [

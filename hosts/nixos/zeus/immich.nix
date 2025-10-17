@@ -45,6 +45,12 @@ in
     mediaLocation = "/media/immich-data";
   };
 
+  globals.monitoring.http.immich = {
+    url = "https://immich.${globals.domains.main}/";
+    network = "external";
+    expectedBodyRegex = "To use Immich";
+  };
+
   consul.services.immich = {
     inherit port;
     tags = [

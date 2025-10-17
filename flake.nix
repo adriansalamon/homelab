@@ -68,8 +68,8 @@
         ./nix/agenix.nix
         ./nix/pkgs.nix
         ./nix/iso.nix
+        ./nix/apps.nix
         ./nix/global.nix
-        ./nix/hetzner-storage-boxes.nix
       ];
     };
 }

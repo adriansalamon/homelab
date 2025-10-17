@@ -67,6 +67,11 @@ in
     };
   };
 
+  globals.monitoring.http.lldap = {
+    url = "https://lldap.local.${globals.domains.main}/health";
+    network = "internal";
+  };
+
   consul.services.lldap = {
     inherit port;
     tags = [

@@ -13,6 +13,12 @@
     enable = true;
   };
 
+  globals.monitoring.http.unifi = {
+    url = "https://unifi.${globals.domains.main}/";
+    network = "external";
+    expectedBodyRegex = "UniFi Network";
+  };
+
   consul.services = {
     unifi = {
       port = 8443;

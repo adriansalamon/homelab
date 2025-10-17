@@ -130,23 +130,17 @@ in
 
   networking.firewall.allowedTCPPorts = [ globals.sites.olympus.airvpn.port ];
 
+  globals.monitoring.http =
+    let
+      mkArr = name: {
+        url = "https://${name}.local.${globals.domains.main}/ping";
+        expectedBodyRegex = "OK";
+        network = "todo_internal";
+      };
+    in
+    lib.genAttrs [ "radarr" "sonarr" "prowlarr" ] mkArr;
+
   consul.services = {
-    radarr = {
-      port = ports.radarr;
-      tags = [
-        "traefik.enable=true"
-        "traefik.http.routers.radarr.rule=Host(`radarr.local.${globals.domains.main}`)"
-        "traefik.http.routers.radarr.middlewares=authelia"
-      ];
-    };
-    sonarr = {
-      port = ports.sonarr;
-      tags = [
-        "traefik.enable=true"
-        "traefik.http.routers.sonarr.rule=Host(`sonarr.local.${globals.domains.main}`)"
-        "traefik.http.routers.sonarr.middlewares=authelia"
-      ];
-    };
     deluge = {
       port = ports.deluge;
       tags = [
@@ -155,15 +149,17 @@ in
         "traefik.http.routers.deluge.middlewares=authelia"
       ];
     };
-    prowlarr = {
-      port = ports.prowlarr;
-      tags = [
-        "traefik.enable=true"
-        "traefik.http.routers.prowlarr.rule=Host(`prowlarr.local.${globals.domains.main}`)"
-        "traefik.http.routers.prowlarr.middlewares=authelia"
-      ];
-    };
-  };
+  }
+  // lib.genAttrs [ "radarr" "sonarr" "prowlarr" ] (name: {
+    port = ports.${name};
+    tags = [
+      "traefik.enable=true"
+      "traefik.http.routers.${name}.rule=Host(`${name}.local.${globals.domains.main}`)"
+      # for health checks, no auth
+      "traefik.http.routers.${name}-ping.rule=Host(`${name}.local.${globals.domains.main}` && Path(`/ping`))"
+      "traefik.http.routers.${name}.middlewares=authelia"
+    ];
+  });
 
   globals.nebula.mesh.hosts.zeus-arr = {
     config.settings = {
