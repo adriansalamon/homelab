@@ -28,8 +28,15 @@ in
     inherit (nodes.zeus-auth.config.age.secrets.firezone-oidc-client-secret) rekeyFile;
   };
 
+  environment.persistence."/persist".directories = [
+    {
+      directory = "/var/lib/private/firezone";
+      mode = "0700";
+    }
+  ];
+
   services.firezone.server = {
-    enable = true;
+    enable = false;
     enableLocalDB = true;
 
     smtp = {
@@ -53,7 +60,7 @@ in
     };
 
     provision = {
-      enable = true;
+      enable = false;
 
       accounts.main = {
         name = "Salamon";
@@ -115,7 +122,7 @@ in
   };
 
   services.firezone.relay = {
-    enable = true;
+    enable = false;
     name = "icarus";
     apiUrl = "wss://firezone-api.${globals.domains.main}/";
     tokenFile = config.age.secrets.firezone-relay-token.path;
@@ -124,55 +131,55 @@ in
     openFirewall = true;
   };
 
-  systemd.services.firezone-relay = {
-    after = [ "firezone-server-api.service" ];
-    wants = [ "firezone-server-api.service" ];
-    # Defaults to 8080, but we are using it for traefik
-    environment."HEALTH_CHECK_ADDR" = "0.0.0.0:8083";
-  };
+  # systemd.services.firezone-relay = {
+  #   after = [ "firezone-server-api.service" ];
+  #   wants = [ "firezone-server-api.service" ];
+  #   # Defaults to 8080, but we are using it for traefik
+  #   environment."HEALTH_CHECK_ADDR" = "0.0.0.0:8083";
+  # };
 
-  globals.monitoring.http.firezone = {
-    url = "https://firezone.${globals.domains.main}/";
-    network = "external";
-    expectedBodyRegex = "Welcome to Firezone";
-  };
+  # globals.monitoring.http.firezone = {
+  #   url = "https://firezone.${globals.domains.main}/";
+  #   network = "external";
+  #   expectedBodyRegex = "Welcome to Firezone";
+  # };
 
-  globals.monitoring.http.firezone-api = {
-    url = "https://firezone-api.${globals.domains.main}/healthz";
-    network = "external";
-    expectedBodyRegex = "ok";
-  };
+  # globals.monitoring.http.firezone-api = {
+  #   url = "https://firezone-api.${globals.domains.main}/healthz";
+  #   network = "external";
+  #   expectedBodyRegex = "ok";
+  # };
 
-  consul.services.firezone = {
-    port = config.services.firezone.server.web.port;
-    tags = [
-      "traefik.enable=true"
-      "traefik.external=true"
-      "traefik.http.routers.firezone.rule=Host(`firezone.${globals.domains.main}`) && PathPrefix(`/`)"
-      "traefik.http.routers.firezone.entrypoints=websecure"
-    ];
-  };
+  # consul.services.firezone = {
+  #   port = config.services.firezone.server.web.port;
+  #   tags = [
+  #     "traefik.enable=true"
+  #     "traefik.external=true"
+  #     "traefik.http.routers.firezone.rule=Host(`firezone.${globals.domains.main}`) && PathPrefix(`/`)"
+  #     "traefik.http.routers.firezone.entrypoints=websecure"
+  #   ];
+  # };
 
-  consul.services.firezone-api = {
-    port = config.services.firezone.server.api.port;
-    tags = [
-      "traefik.enable=true"
-      "traefik.external=true"
-      "traefik.http.routers.firezone-api.rule=Host(`firezone-api.${globals.domains.main}`)"
-      "traefik.http.routers.firezone-api.entrypoints=websecure"
-    ];
-  };
+  # consul.services.firezone-api = {
+  #   port = config.services.firezone.server.api.port;
+  #   tags = [
+  #     "traefik.enable=true"
+  #     "traefik.external=true"
+  #     "traefik.http.routers.firezone-api.rule=Host(`firezone-api.${globals.domains.main}`)"
+  #     "traefik.http.routers.firezone-api.entrypoints=websecure"
+  #   ];
+  # };
 
-  globals.nebula.mesh.hosts.icarus.firewall.inbound = [
-    {
-      "port" = builtins.toString config.services.firezone.server.web.port;
-      "proto" = "tcp";
-      "group" = "reverse-proxy";
-    }
-    {
-      "port" = builtins.toString config.services.firezone.server.api.port;
-      "proto" = "tcp";
-      "group" = "reverse-proxy";
-    }
-  ];
+  # globals.nebula.mesh.hosts.icarus.firewall.inbound = [
+  #   {
+  #     "port" = builtins.toString config.services.firezone.server.web.port;
+  #     "proto" = "tcp";
+  #     "group" = "reverse-proxy";
+  #   }
+  #   {
+  #     "port" = builtins.toString config.services.firezone.server.api.port;
+  #     "proto" = "tcp";
+  #     "group" = "reverse-proxy";
+  #   }
+  # ];
 }

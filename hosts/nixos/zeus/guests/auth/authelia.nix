@@ -22,7 +22,7 @@ let
         { pkgs, file, ... }:
         ''
           # Generate an rfc3986 secret
-          secret=$(${pkgs.openssl}/bin/openssl rand -base64 54 | tr '/+' '_-' | tr -d '=\\n' | cut -c1-72)
+          secret=$(${pkgs.openssl}/bin/openssl rand -base64 54 | tr -d '\n' | tr '+/' '-_' | tr -d '=' | cut -c1-72)
 
           # Generate a pbkdf2 hash, and store in plaintext file
           hashed=$(echo $secret | ${pkgs.python3}/bin/python3 -c "
@@ -38,9 +38,7 @@ let
           key_b64 = encode_base64_adapted(key)
           print(f'\$pbkdf2-sha512\''${310000}\''${salt_b64}\''${key_b64}')")
 
-          echo "$hashed" > ${
-            lib.escapeShellArg (lib.removeSuffix "-client-secret.txt.age" file + "-hash.txt")
-          }
+          echo "$hashed" > ${lib.escapeShellArg (lib.removeSuffix "-secret.txt.age" file + "-hash.txt")}
           echo "$secret"
         '';
     };
@@ -60,7 +58,7 @@ in
 
   age.generators.rfc3986 =
     { pkgs, ... }:
-    "${pkgs.openssl}/bin/openssl rand -base64 54 | tr '/+' '_-' | tr -d '=\\n' | cut -c1-72";
+    "${pkgs.openssl}/bin/openssl rand -base64 54 | tr -d '\n' | tr '+/' '-_' | tr -d '=' | cut -c1-72";
 
   services.authelia.instances.default = {
     enable = true;
@@ -183,6 +181,24 @@ in
             token_endpoint_auth_method = "client_secret_basic";
           }
           {
+            # https://www.authelia.com/integration/openid-connect/clients/headscale/
+            client_name = "Headscale";
+            client_id = "headscale";
+            client_secret = lib.readFile ./secrets/oidc/headscale-oidc-client-hash.txt;
+            pre_configured_consent_duration = "1 month";
+            redirect_uris = [
+              "https://headscale.${globals.domains.main}/oidc/callback"
+            ];
+            scopes = [
+              "openid"
+              "email"
+              "profile"
+              "groups"
+            ];
+            userinfo_signed_response_alg = "none";
+            token_endpoint_auth_method = "client_secret_post";
+          }
+          {
             client_name = "Paperless";
             client_id = "paperless";
             client_secret = lib.readFile ./secrets/oidc/paperless-oidc-client-hash.txt;
@@ -256,6 +272,7 @@ in
             userinfo_signed_response_alg = "none";
             token_endpoint_auth_method = "client_secret_basic";
           }
+
         ];
       };
 
@@ -304,6 +321,7 @@ in
     (mkOidcSecrets "immich")
     (mkOidcSecrets "jellyfin")
     (mkOidcSecrets "tailscale")
+    (mkOidcSecrets "headscale")
     (mkOidcSecrets "paperless")
     (mkOidcSecrets "grafana")
     (mkOidcSecrets "firezone")

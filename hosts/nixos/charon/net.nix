@@ -334,8 +334,8 @@ in
     ];
   };
 
-  age.secrets.tailscale-auth-key = {
-    inherit (nodes.athena.config.age.secrets.tailscale-auth-key) rekeyFile;
+  age.secrets.headscale-auth-key = {
+    inherit (nodes.athena.config.age.secrets.headscale-auth-key) rekeyFile;
   };
 
   services.tailscale = {
@@ -347,8 +347,9 @@ in
       "--advertise-routes=${site.vlans.lan.cidrv4}"
       "--accept-routes=false"
       "--accept-dns=false"
+      "--login-server=https://headscale.${globals.domains.main}"
     ];
 
-    authKeyFile = config.age.secrets.tailscale-auth-key.path;
+    authKeyFile = config.age.secrets.headscale-auth-key.path;
   };
 }

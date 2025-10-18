@@ -46,4 +46,12 @@ in
   boot.loader.grub = {
     enable = true;
   };
+
+  meta.zrepl = {
+    enable = true;
+    target = "hermes";
+    filesystems = {
+      "zroot/safe<" = true;
+    };
+  };
 }

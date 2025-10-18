@@ -454,6 +454,10 @@ in
     rekeyFile = config.node.secretsDir + "/tailscale-auth-key.age";
   };
 
+  age.secrets.headscale-auth-key = {
+    rekeyFile = config.node.secretsDir + "/headscale-auth-key.age";
+  };
+
   services.tailscale = {
     enable = true;
     interfaceName = "tailscale0";
