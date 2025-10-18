@@ -250,7 +250,7 @@ in
         };
       };
 
-      postrouting = [
+      postrouting = lib.mkMerge [
         (config.helpers.nftables.mkMasqueradeRule "masquerade-internet"
           [
             "vlan-lan"
@@ -272,6 +272,7 @@ in
     ];
 
     config.settings = {
+      # TODO: DRY, generate this.
       tun.unsafe_routes = [
         {
           route = globals.sites.olympus.vlans.lan.cidrv4;

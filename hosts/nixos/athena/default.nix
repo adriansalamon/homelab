@@ -89,6 +89,7 @@ in
     ];
 
     config.settings = {
+      # TODO: DRY, generate this.
       tun.unsafe_routes = [
         {
           route = globals.sites.erebus.vlans.lan.cidrv4;
@@ -134,6 +135,7 @@ in
       "internet"
     ];
   };
+
   # Dynamic dns
   age.secrets = {
     cloudflare-dns-api-token.rekeyFile = ./secrets/cloudflare-dns-api-token.age;

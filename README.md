@@ -61,6 +61,7 @@ TODO/add:
 
 - Git server (Forgejo/Gitea)
 - A simple cluster to learn about orchestration (k8s, k3s or nomad)
+- Some simple object storage (always useful)
 - Ad blocking DNS
 - Dashboard (glance/homepage)
 
