@@ -26,7 +26,7 @@ configuration is done using Nix.
 | 🖥️  | server | hermes    | Supermicro 2U X11SSH-LN4F<br>E3-1240v6, 32gb RAM | Storage server/NAS. Has a 16TB ZFS storage pool.                                       |
 | 🖥️  | server | orpheus   | ASUS PN51<br>Ryzen 5 5500U, 16gb RAM             | Edge server at Erebus. Runs some services and VMs and acts as a local NAS at the site. |
 | 🖥️  | server | proxmox01 | Dell R610<br>2x5690, 96gb RAM                    | Decommissioned. Very good at heating a home.                                           |
-| ☁️  | VPS    | icarus    | Hetzner Cloud server                             | Proxy for local services. Nebula lighthouse, (soon) Firezone server.                   |
+| ☁️  | VPS    | icarus    | Hetzner Cloud server                             | Proxy for local services. Nebula lighthouse, Headscale server.                         |
 
 #### Services
 
@@ -35,7 +35,7 @@ configuration is done using Nix.
 | 🪪 SSO                | Authelia               | Single-Sign-On for hosted services. Uses lldap as an LDAP backend.                                                 |
 | 📷 Photos             | Immich                 | Self hosted Google Images alternative. My phone backs up here via the Immich app.                                  |
 | 📄 Documents          | Paperless              | Manager for physical and digital documents. Automatically ingests scans from my HP printer/scanner via Samba.      |
-| 🌐 VPN                | Firezone               | Wireguard based VPN with SSO authentication. Used to remotely access internal services. (does not work well)       |
+| 🌐 VPN                | Headscale              | Use as classic VPN for remote access with SSO login. Used to remotely access internal services.                    |
 | 🏠 Home Automation    | Home Assistant         | Manages things (mostly IoT devices) in my home.                                                                    |
 | 🍿 Media Server       | Jellyfin               | Used to view movies and TV series.                                                                                 |
 | 🎞️ Media Management   | Radarr/Sonarr/Prowlarr | Used to automatically keep media in sync.                                                                          |
@@ -59,10 +59,7 @@ configuration is done using Nix.
 
 TODO/add:
 
-- Notifications/alerts
-- Backup metrics/alerts
 - Git server (Forgejo/Gitea)
-- Make firezone actually work (how?)
 - A simple cluster to learn about orchestration (k8s, k3s or nomad)
 - Ad blocking DNS
 - Dashboard (glance/homepage)
@@ -118,9 +115,8 @@ sudo umount -l /mnt && sudo zpool export -a
 
 ### OpenTofu
 
-Some things are managed using OpenTofu, e.g. Cloudflare DNS, Hetzner Cloud,
-Tailscale, and Consul. Some of the inputs are to be generated from the Nix
-config. So to run, use:
+Some things are managed using OpenTofu, e.g. Cloudflare DNS, Hetzner Cloud, and Consul.
+To run, use:
 
 ```bash
 nix run #tofu <command, e.g. plan|apply>

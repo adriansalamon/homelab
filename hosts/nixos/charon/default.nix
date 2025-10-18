@@ -18,7 +18,6 @@
     ./net.nix
     ./dns.nix
     ./traefik.nix
-    ./firezone.nix
   ];
 
   meta.vector.enable = true;

@@ -231,22 +231,6 @@ in
             userinfo_signed_response_alg = "none";
           }
           {
-            client_name = "Firezone";
-            client_id = "firezone";
-            client_secret = lib.readFile ./secrets/oidc/firezone-oidc-client-hash.txt;
-            pre_configured_consent_duration = "1 month";
-            redirect_uris = [
-              "https://firezone.${globals.domains.main}/9debab95-2caa-4220-83de-a6a95a0bc825/sign_in/providers/1cb03132-27f1-4e28-95a3-135d798c7c10/handle_callback"
-              "https://firezone.${globals.domains.main}/9debab95-2caa-4220-83de-a6a95a0bc825/settings/identity_providers/openid_connect/1cb03132-27f1-4e28-95a3-135d798c7c10/handle_callback"
-            ];
-            scopes = [
-              "openid"
-              "email"
-              "profile"
-            ];
-            token_endpoint_auth_method = "client_secret_post";
-          }
-          {
             client_name = "Open WebUI";
             client_id = "open-webui";
             client_secret = lib.readFile ./secrets/oidc/open-webui-oidc-client-hash.txt;
@@ -324,7 +308,6 @@ in
     (mkOidcSecrets "headscale")
     (mkOidcSecrets "paperless")
     (mkOidcSecrets "grafana")
-    (mkOidcSecrets "firezone")
     (mkOidcSecrets "open-webui")
   ];
 

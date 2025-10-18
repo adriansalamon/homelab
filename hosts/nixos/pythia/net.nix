@@ -176,7 +176,6 @@ in
             "oifname nebula.mesh ip daddr ${globals.sites.erebus.vlans.lan.cidrv4}"
           ];
         };
-        firezone.interfaces = [ "tun-firezone" ];
         tailscale.interfaces = [ "tailscale0" ];
       }
       // lib.concatMapAttrs (vlanName: _: {
@@ -234,14 +233,14 @@ in
           ];
         };
 
-        # disallow-wan-ssh = {
-        #   from = [ "wan" ];
-        #   to = [ "local" ];
-        #   early = true;
-        #   extraLines = [
-        #     "tcp dport 22 drop"
-        #   ];
-        # };
+        disallow-wan-ssh = {
+          from = [ "wan" ];
+          to = [ "local" ];
+          early = true;
+          extraLines = [
+            "tcp dport 22 drop"
+          ];
+        };
 
         allow-server-communication = {
           from = [ "vlan-server" ];
@@ -252,27 +251,6 @@ in
         allow-site-to-site-lan = {
           from = [ "vlan-lan" ];
           to = [ "other-sites-lan" ];
-          verdict = "accept";
-        };
-
-        # firezone
-        masquerade-firezone = {
-          from = [ "firezone" ];
-          to = [ "vlan-lan" ];
-          # masquerade = true;
-          late = true; # Only accept after any rejects have been processed
-          verdict = "accept";
-        };
-
-        forward-incoming-firezone-traffic = {
-          from = [ "firezone" ];
-          to = [ "vlan-lan" ];
-          verdict = "accept";
-        };
-
-        forward-outgoing-firezone-traffic = {
-          from = [ "vlan-lan" ];
-          to = [ "firezone" ];
           verdict = "accept";
         };
 
@@ -299,22 +277,17 @@ in
         };
       };
 
-      postrouting =
-        let
-          inherit (config.helpers.nftables) mkMasqueradeRule;
-        in
-        lib.mkMerge [
-          (mkMasqueradeRule "masquerade-internet"
-            [
-              "vlan-lan"
-              "vlan-server"
-              "vlan-guest"
-              "vlan-iot"
-            ]
-            [ "wan" ]
-          )
-          (mkMasqueradeRule "masquerade-firezone" [ "firezone" ] [ "vlan-lan" ])
-        ];
+      postrouting = [
+        (config.helpers.nftables.mkMasqueradeRule "masquerade-internet"
+          [
+            "vlan-lan"
+            "vlan-server"
+            "vlan-guest"
+            "vlan-iot"
+          ]
+          [ "wan" ]
+        )
+      ];
     };
   };
 
@@ -358,8 +331,8 @@ in
     ];
   };
 
-  age.secrets.tailscale-auth-key = {
-    inherit (nodes.athena.config.age.secrets.tailscale-auth-key) rekeyFile;
+  age.secrets.headscale-auth-key = {
+    inherit (nodes.athena.config.age.secrets.headscale-auth-key) rekeyFile;
   };
 
   services.tailscale = {
@@ -371,8 +344,9 @@ in
       "--advertise-routes=${site.vlans.lan.cidrv4}"
       "--accept-routes=false"
       "--accept-dns=false"
+      "--login-server=https://headscale.${globals.domains.main}"
     ];
 
-    authKeyFile = config.age.secrets.tailscale-auth-key.path;
+    authKeyFile = config.age.secrets.headscale-auth-key.path;
   };
 }

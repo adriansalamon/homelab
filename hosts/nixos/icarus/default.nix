@@ -16,7 +16,6 @@ in
     ../../../config/optional/zfs.nix
     ../../../config/optional/impermanence.nix
     ./traefik.nix
-    ./firezone.nix
     ./headscale.nix
     ./net.nix
   ];

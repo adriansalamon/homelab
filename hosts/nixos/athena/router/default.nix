@@ -213,15 +213,11 @@ in
     };
   };
 
-  # TODO: is this safe?
-  networking.firewall.trustedInterfaces = [ "tun-firezone" ];
-
   networking.nftables = {
     enable = true;
 
     firewall = {
       zones = {
-        firezone.interfaces = [ "tun-firezone" ];
         wan.interfaces = [ "wan0" ];
         airvpn.interfaces = [ "wg0" ];
         deluge.ipv4Addresses = [ hosts.zeus-arr.ipv4 ];
@@ -257,25 +253,6 @@ in
           # nebula has a hard time to establish connections with it enabled
           # masquerade = true;
           late = true; # Only accept after any rejects have been processed
-          verdict = "accept";
-        };
-
-        # Firezone rules
-        forward-incoming-firezone-traffic = {
-          from = [ "firezone" ];
-          to = [
-            "vlan-lan"
-            "vlan-management"
-          ];
-          verdict = "accept";
-        };
-
-        forward-outgoing-firezone-traffic = {
-          from = [
-            "vlan-lan"
-            "vlan-management"
-          ];
-          to = [ "firezone" ];
           verdict = "accept";
         };
 
@@ -433,7 +410,6 @@ in
             ]
             [ "wan" ]
           )
-          (mkMasqueradeRule "masquerade-firezone" [ "firezone" ] [ "vlan-lan" "vlan-management" ])
           (mkMasqueradeRule "masquerade-airvpn" [ "vlan-external-vpn" ] [ "airvpn" ])
           (mkMasqueradeRule "masquerade-nebula-mgmt" [ "nebula" ] [ "vlan-management" ])
         ];
@@ -450,10 +426,6 @@ in
     ];
   };
 
-  age.secrets.tailscale-auth-key = {
-    rekeyFile = config.node.secretsDir + "/tailscale-auth-key.age";
-  };
-
   age.secrets.headscale-auth-key = {
     rekeyFile = config.node.secretsDir + "/headscale-auth-key.age";
   };
@@ -467,8 +439,9 @@ in
       "--advertise-routes=${site.vlans.lan.cidrv4}"
       "--accept-routes=false"
       "--accept-dns=false"
+      "--login-server=https://headscale.${globals.domains.main}"
     ];
 
-    authKeyFile = config.age.secrets.tailscale-auth-key.path;
+    authKeyFile = config.age.secrets.headscale-auth-key.path;
   };
 }

@@ -18,7 +18,6 @@ in
     ./hardware-config.nix
     ./disk-config.nix
     ./traefik.nix
-    ./firezone.nix
     ../../../config
     ../../../config/optional/zfs.nix
     ../../../config/optional/hardware.nix

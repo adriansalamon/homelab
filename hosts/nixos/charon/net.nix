@@ -136,9 +136,6 @@ in
     };
   };
 
-  # TODO: is this safe?
-  networking.firewall.trustedInterfaces = [ "tun-firezone" ];
-
   networking.nftables = {
     enable = true;
 
@@ -155,7 +152,6 @@ in
             "oifname nebula.mesh ip daddr ${globals.sites.delphi.vlans.lan.cidrv4}"
           ];
         };
-        firezone.interfaces = [ "tun-firezone" ];
         tailscale.interfaces = [ "tailscale0" ];
       }
       // lib.concatMapAttrs (vlanName: _: {
@@ -231,27 +227,6 @@ in
           verdict = "accept";
         };
 
-        # firezone
-        masquerade-firezone = {
-          from = [ "firezone" ];
-          to = [ "vlan-lan" ];
-          # masquerade = true;
-          late = true; # Only accept after any rejects have been processed
-          verdict = "accept";
-        };
-
-        forward-incoming-firezone-traffic = {
-          from = [ "firezone" ];
-          to = [ "vlan-lan" ];
-          verdict = "accept";
-        };
-
-        forward-outgoing-firezone-traffic = {
-          from = [ "vlan-lan" ];
-          to = [ "firezone" ];
-          verdict = "accept";
-        };
-
         # tailscale
         allow-tailscale-to-lan = {
           from = [ "tailscale" ];
@@ -275,22 +250,17 @@ in
         };
       };
 
-      postrouting =
-        let
-          inherit (config.helpers.nftables) mkMasqueradeRule;
-        in
-        lib.mkMerge [
-          (mkMasqueradeRule "masquerade-internet"
-            [
-              "vlan-lan"
-              "vlan-server"
-              "vlan-guest"
-              "vlan-iot"
-            ]
-            [ "wan" ]
-          )
-          (mkMasqueradeRule "masquerade-firezone" [ "firezone" ] [ "vlan-lan" ])
-        ];
+      postrouting = [
+        (config.helpers.nftables.mkMasqueradeRule "masquerade-internet"
+          [
+            "vlan-lan"
+            "vlan-server"
+            "vlan-guest"
+            "vlan-iot"
+          ]
+          [ "wan" ]
+        )
+      ];
     };
   };
 
