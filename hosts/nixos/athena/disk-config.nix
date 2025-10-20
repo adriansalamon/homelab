@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 let
   main = "ata-INTEL_SSDSC2BB120G6K_PHWA638100EE120CGN";
   mirror = "ata-INTEL_SSDSC2BB120G6K_PHWA640200HG120CGN";
@@ -59,71 +59,11 @@ in
       };
     };
     zpool = {
-      zroot = {
-        type = "zpool";
+      zroot = lib.disk.zfs.mkZpool {
         mode = "mirror";
-        options = {
-          ashift = "12";
-          autotrim = "on";
-        };
-        rootFsOptions = {
-          acltype = "posixacl";
-          canmount = "off";
-          compression = "zstd";
-          dnodesize = "auto";
-          normalization = "formD";
-          relatime = "on";
-          xattr = "sa";
-          "com.sun:auto-snapshot" = "false";
-        };
-        mountpoint = "/";
-        postCreateHook = "zfs list -t snapshot -H -o name | grep -E '^zroot@blank$' || zfs snapshot zroot@blank";
 
-        datasets = {
-          nixos = {
-            type = "zfs_fs";
-            options.mountpoint = "none";
-          };
-          "nixos/var" = {
-            type = "zfs_fs";
-            options.mountpoint = "none";
-          };
-          "nixos/empty" = {
-            type = "zfs_fs";
-            options.mountpoint = "legacy";
-            mountpoint = "/";
-          };
-          "nixos/home" = {
-            type = "zfs_fs";
-            options.mountpoint = "legacy";
-            mountpoint = "/home";
-          };
-          "nixos/var/log" = {
-            type = "zfs_fs";
-            options.mountpoint = "legacy";
-            mountpoint = "/var/log";
-          };
-          "nixos/var/lib" = {
-            type = "zfs_fs";
-            options.mountpoint = "legacy";
-            mountpoint = "/var/lib";
-          };
-          "nixos/config" = {
-            type = "zfs_fs";
-            options.mountpoint = "legacy";
-            mountpoint = "/etc/nixos";
-          };
-          "nixos/persist" = {
-            type = "zfs_fs";
-            options.mountpoint = "legacy";
-            mountpoint = "/persist";
-          };
-          "nixos/nix" = {
-            type = "zfs_fs";
-            options.mountpoint = "legacy";
-            mountpoint = "/nix";
-          };
-        };
+        # TODO: take a proper zfs zroot/local/root@blank snapshot
+        datasets = lib.disk.zfs.impermanenceDatasets;
       };
     };
   };

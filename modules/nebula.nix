@@ -147,4 +147,13 @@ in
     }
     // hostCfg.config
   );
+
+  systemd.services = flip mapAttrs' memberNets (
+    name: _: {
+      name = "nebula@${name}";
+      value = {
+        reloadIfChanged = true;
+      };
+    }
+  );
 }

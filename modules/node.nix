@@ -21,5 +21,10 @@
       description = "ID of the node. Used for static IP assignment inside nebula.";
       type = lib.types.int;
     };
+
+    site = lib.mkOption {
+      description = "Site of the node.";
+      type = lib.types.str;
+    };
   };
 }

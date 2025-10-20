@@ -1,6 +1,7 @@
 {
   config,
   modulesPath,
+  profiles,
   ...
 }:
 let
@@ -8,7 +9,7 @@ let
 in
 {
   # NAS/storage server
-  imports = [
+  imports = with profiles; [
     (modulesPath + "/installer/scan/not-detected.nix")
     ./disk-config.nix
     ./hw.nix
@@ -16,12 +17,12 @@ in
     ./nfs.nix
     ./smb.nix
     ./metrics.nix
-    ../../../config
-    ../../../config/optional/zfs.nix
-    ../../../config/optional/impermanence.nix
-    ../../../config/optional/hardware.nix
-    ../../../config/optional/consul-client.nix
-    ../../../config/optional/storage-users.nix
+    common
+    zfs
+    impermanence
+    hardware
+    services.consul-client
+    storage-users
   ];
 
   networking.hostId = "b8d0bfb2";

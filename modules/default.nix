@@ -1,18 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
-  imports = [
-    ./backups.nix
-    ./consul-service.nix
-    ./global.nix
-    ./kea-ddns-consul.nix
-    ./nebula.nix
-    ./nftables.nix
-    ./node.nix
-    ./prometheus.nix
-    ./restic-hetzner.nix
-    ./rustic-exporter.nix
-    ./telegraf.nix
-    ./vector.nix
-    ./zrepl.nix
-  ];
+  imports = lib.collect builtins.isPath (lib.filterAttrs (n: _: n != "default") (lib.rakeLeaves ./.));
 }

@@ -7,8 +7,8 @@
 }:
 let
   nebulaIp = globals.nebula.mesh.hosts.athena.ipv4;
-
-  site = globals.sites.olympus;
+  siteName = "olympus";
+  site = globals.sites.${siteName};
 in
 {
 
@@ -48,48 +48,33 @@ in
           forward . ${nebulaIp}:8600
       }
 
-      # Rewrite <anything>.local.${globals.domains.main} → traefik.service.consul for internal reverse proxy
+      # Rewrite <anything>.local.${globals.domains.main} → traefik-${siteName}.service.consul for internal reverse proxy
       local.${globals.domains.main}.:53 {
           log
           errors
-          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik.service.consul answer auto
+          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
           forward . ${nebulaIp}:8600
       }
 
       local.${globals.domains.main}.:5301 {
           log
           errors
-          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik.service.consul answer auto
+          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
           forward . ${nebulaIp}:8600
       }
 
-      icarus.${globals.domains.main}.53 {
-          log
-          errors
-          acl {
-              drop net ${site.vlans.external-vpn.cidrv4} # Block vpn network
-          }
-          forward . tls://1.1.1.1:853 tls://1.0.0.1:853 tls://9.9.9.9:853
-      }
-
-      icarus.${globals.domains.main}.5301 {
-          log
-          errors
-          forward . dns://10.128.0.1:53
-      }
-
-      # Rewrite <anything>.local.${globals.domains.main} → traefik.service.consul for internal reverse proxy
+      # Rewrite <anything>.local.${globals.domains.main} → traefik-${siteName}.service.consul for internal reverse proxy
       ${globals.domains.main}.:53 {
           log
           errors
-          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik.service.consul answer auto
+          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
           forward . ${nebulaIp}:8600
       }
 
       ${globals.domains.main}.:5301 {
           log
           errors
-          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik.service.consul answer auto
+          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
           forward . ${nebulaIp}:8600
       }
 
@@ -129,5 +114,9 @@ in
           forward . dns://10.128.0.1:53
       }
     '';
+  };
+
+  consul.services."traefik-${siteName}" = {
+    address = lib.net.cidr.host 1 globals.sites.${siteName}.vlans.lan.cidrv4;
   };
 }

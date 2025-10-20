@@ -46,6 +46,7 @@
             users
             hetzner
             monitoring
+            consul-servers
             ;
         };
     };

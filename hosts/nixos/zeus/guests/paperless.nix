@@ -4,6 +4,7 @@
   lib,
   nodes,
   globals,
+  profiles,
   ...
 }:
 let
@@ -15,7 +16,7 @@ in
   microvm.vcpu = 4;
 
   imports = [
-    ../../../../config/optional/storage-users.nix
+    profiles.storage-users
   ];
 
   users.users."paperless".extraGroups = [ "scanning" ];

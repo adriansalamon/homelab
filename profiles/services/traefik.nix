@@ -1,16 +1,20 @@
 {
   config,
   nodes,
+  lib,
   globals,
   ...
 }:
 {
 
-  age.secrets = with nodes.athena.config.age; {
-    # use the same tokens as athena
-    "cloudflare-dns-api-token.env".rekeyFile = secrets."cloudflare-dns-api-token.env".rekeyFile;
-    "traefik-token.env".rekeyFile = secrets."traefik-token.env".rekeyFile;
-  };
+  age.secrets = lib.mkIf (config.node.name != "athena") (
+    with nodes.athena.config.age;
+    {
+      # use the same tokens as athena
+      "cloudflare-dns-api-token.env".rekeyFile = secrets."cloudflare-dns-api-token.env".rekeyFile;
+      "traefik-token.env".rekeyFile = secrets."traefik-token.env".rekeyFile;
+    }
+  );
 
   services.traefik = {
     enable = true;
@@ -48,7 +52,7 @@
             certResolver = "default";
             domains = [
               {
-                main = "${globals.domains.main}";
+                main = globals.domains.main;
                 sans = [ "*.${globals.domains.main}" ];
               }
               {
@@ -88,7 +92,7 @@
         };
 
         routers.internal = {
-          rule = "Host(`traefik-pythia.local.${globals.domains.main}`)";
+          rule = "Host(`traefik-${config.node.site}.local.${globals.domains.main}`)";
           entryPoints = [ "websecure" ];
           service = "api@internal";
           middlewares = [ "authelia@consulcatalog" ];

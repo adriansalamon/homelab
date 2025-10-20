@@ -2,6 +2,7 @@
   lib,
   pkgs,
   globals,
+  profiles,
   ...
 }:
 let
@@ -19,7 +20,7 @@ in
   microvm.vcpu = 4;
 
   imports = [
-    ../../../../config/optional/storage-users.nix
+    profiles.storage-users
   ];
 
   users.users.radarr.extraGroups = [ "media" ];
@@ -135,7 +136,7 @@ in
       mkArr = name: {
         url = "https://${name}.local.${globals.domains.main}/ping";
         expectedBodyRegex = "OK";
-        network = "todo_internal";
+        network = "internal";
       };
     in
     lib.genAttrs [ "radarr" "sonarr" "prowlarr" ] mkArr;
@@ -156,7 +157,7 @@ in
       "traefik.enable=true"
       "traefik.http.routers.${name}.rule=Host(`${name}.local.${globals.domains.main}`)"
       # for health checks, no auth
-      "traefik.http.routers.${name}-ping.rule=Host(`${name}.local.${globals.domains.main}` && Path(`/ping`))"
+      "traefik.http.routers.${name}-ping.rule=Host(`${name}.local.${globals.domains.main}`) && Path(`/ping`)"
       "traefik.http.routers.${name}.middlewares=authelia"
     ];
   });

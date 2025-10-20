@@ -64,6 +64,7 @@ TODO/add:
 - Some simple object storage (always useful)
 - Ad blocking DNS
 - Dashboard (glance/homepage)
+- Some GitOps stuff, e.g. auto-deploy
 
 ### Secrets 🔐
 

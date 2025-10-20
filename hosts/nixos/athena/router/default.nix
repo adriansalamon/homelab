@@ -2,27 +2,35 @@
   config,
   globals,
   lib,
+  profiles,
   ...
 }:
 let
-  site = globals.sites.olympus;
+  inherit (lib)
+    flip
+    concatMapAttrs
+    mapAttrsToList
+    filterAttrs
+    ;
+
+  site = globals.sites.${config.node.site};
 
   # extract all hosts from all vlans
   hosts = builtins.foldl' (acc: vlan: acc // vlan.hosts) { } (builtins.attrValues site.vlans);
 
   airvpn-port = toString site.airvpn.port;
 
-  inherit (lib)
-    net
-    flip
-    concatMapAttrs
-    mapAttrsToList
-    ;
+  otherSitesLans = mapAttrsToList (_: siteCfg: siteCfg.vlans.lan.cidrv4) (
+    filterAttrs (siteName: siteCfg: siteName != config.node.site) globals.sites
+  );
+
 in
 {
-  imports = [
+  imports = with profiles; [
     ./external-vpn.nix
     ./dns.nix
+    router.dhcp
+    router.tailscale
   ];
 
   boot.kernel.sysctl = {
@@ -146,73 +154,6 @@ in
     }
   );
 
-  services.kea.dhcp4 = {
-    enable = true;
-    settings = {
-      interfaces-config = {
-        interfaces = flip mapAttrsToList site.vlans (name: _: name);
-      };
-
-      subnet4 = flip mapAttrsToList site.vlans (
-        name: vlanCfg: {
-          inherit (vlanCfg) id;
-          subnet = vlanCfg.cidrv4;
-          pools = [ { pool = "${net.cidr.host 100 vlanCfg.cidrv4} - ${net.cidr.host 200 vlanCfg.cidrv4}"; } ];
-
-          option-data = [
-            {
-              name = "routers";
-              data = net.cidr.host 1 vlanCfg.cidrv4;
-            }
-          ]
-          # dns for vlans with internet access
-          ++
-            lib.optional
-              (lib.elem name [
-                "management"
-                "server"
-                "lan"
-                "external-vpn"
-                "guest"
-              ])
-              {
-                name = "domain-name-servers";
-                data = net.cidr.host 1 vlanCfg.cidrv4;
-              };
-
-          reservations = lib.concatLists (
-            lib.forEach (builtins.attrValues vlanCfg.hosts) (
-              hostCfg:
-              lib.optional (hostCfg.mac != null) {
-                hw-address = hostCfg.mac;
-                ip-address = hostCfg.ipv4;
-              }
-            )
-          );
-        }
-      );
-
-      # Sent to the kea-ddns-consul service, that will publish these as services in consul
-      dhcp-ddns = {
-        enable-updates = true;
-        server-ip = "127.0.0.1";
-        server-port = 53010;
-        sender-ip = "";
-        sender-port = 0;
-        max-queue-size = 1024;
-        ncr-protocol = "UDP";
-        ncr-format = "JSON";
-      };
-
-      ddns-send-updates = true;
-      ddns-override-no-update = true;
-      ddns-override-client-update = true;
-      ddns-replace-client-name = "never";
-      ddns-qualifying-suffix = "";
-      ddns-update-on-renew = true;
-    };
-  };
-
   networking.nftables = {
     enable = true;
 
@@ -221,16 +162,9 @@ in
         wan.interfaces = [ "wan0" ];
         airvpn.interfaces = [ "wg0" ];
         deluge.ipv4Addresses = [ hosts.zeus-arr.ipv4 ];
-        # Todo, generate this
         other-sites-lan = {
-          ingressExpression = [
-            "iifname nebula.mesh ip saddr ${globals.sites.erebus.vlans.lan.cidrv4}"
-            "iifname nebula.mesh ip saddr ${globals.sites.delphi.vlans.lan.cidrv4}"
-          ];
-          egressExpression = [
-            "oifname nebula.mesh ip daddr ${globals.sites.erebus.vlans.lan.cidrv4}"
-            "oifname nebula.mesh ip daddr ${globals.sites.delphi.vlans.lan.cidrv4}"
-          ];
+          ingressExpression = flip map otherSitesLans (cidrv4: "iifname nebula.mesh ip saddr ${cidrv4}");
+          egressExpression = flip map otherSitesLans (cidrv4: "oifname nebula.mesh ip daddr ${cidrv4}");
         };
         nebula.interfaces = [ "nebula.mesh" ];
         tailscale.interfaces = [ "tailscale0" ];
@@ -256,15 +190,11 @@ in
           verdict = "accept";
         };
 
-        # Allow dns from all devices that have internet access,
-        # yes, we leak some DNS data on guest networks, but the
-        # traffic is still very blocked
+        # Allow dns from all trusted zones ...
         allow-dns = {
           from = [
             "vlan-lan"
             "vlan-server"
-            "vlan-guest"
-            "vlan-iot"
             "vlan-management"
             "tailscale"
           ];
@@ -273,7 +203,15 @@ in
           allowedUDPPorts = [ 53 ];
         };
 
-        # Allow access to the reverse proxy from lan devices
+        # ...except for external VPN vlan, which has a different port
+        allow-external-vpn-dns = {
+          from = [ "vlan-external-vpn" ];
+          to = [ "local" ];
+          allowedTCPPorts = [ 5301 ];
+          allowedUDPPorts = [ 5301 ];
+        };
+
+        # Allow access to the reverse proxy from trusted zones
         allow-reverse-proxy = {
           from = [
             "vlan-lan"
@@ -289,14 +227,6 @@ in
             8080 # unifi inform
             1883 # mqtt
           ];
-        };
-
-        # External VPN vlan
-        allow-external-vpn-dns = {
-          from = [ "vlan-external-vpn" ];
-          to = [ "local" ];
-          allowedTCPPorts = [ 5301 ];
-          allowedUDPPorts = [ 5301 ];
         };
 
         allow-external-vpn-to-airvpn = {
@@ -428,20 +358,5 @@ in
 
   age.secrets.headscale-auth-key = {
     rekeyFile = config.node.secretsDir + "/headscale-auth-key.age";
-  };
-
-  services.tailscale = {
-    enable = true;
-    interfaceName = "tailscale0";
-    useRoutingFeatures = "server";
-
-    extraUpFlags = [
-      "--advertise-routes=${site.vlans.lan.cidrv4}"
-      "--accept-routes=false"
-      "--accept-dns=false"
-      "--login-server=https://headscale.${globals.domains.main}"
-    ];
-
-    authKeyFile = config.age.secrets.headscale-auth-key.path;
   };
 }

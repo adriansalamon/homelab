@@ -2,23 +2,28 @@
   config,
   globals,
   nodes,
+  profiles,
   ...
 }:
 {
   # Router at Erebus
-  imports = [
-    ../../../config
-    ../../../config/optional/zfs.nix
-    ../../../config/optional/impermanence.nix
-    ../../../config/optional/hardware.nix
-    ../../../config/optional/consul-client.nix
-
+  imports = with profiles; [
+    common
+    zfs
+    impermanence
+    hardware
+    services.consul-client
+    services.traefik
+    router.dhcp
+    router.dns
     ./hw.nix
     ./disk-config.nix
     ./net.nix
-    ./dns.nix
-    ./traefik.nix
   ];
+
+  node.site = "erebus";
+
+  networking.hostId = "887bb90d";
 
   meta.vector.enable = true;
   meta.telegraf = {

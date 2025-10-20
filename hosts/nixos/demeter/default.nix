@@ -1,21 +1,19 @@
 {
-  inputs,
-  config,
   modulesPath,
-  lib,
-  globals,
+  profiles,
   ...
 }:
 {
   # Backup NAS/storage server
-  imports = [
+  imports = with profiles; [
     (modulesPath + "/installer/scan/not-detected.nix")
     ./disk-config.nix
     ./hw.nix
-    ../../../config
-    ../../../config/optional/zfs.nix
-    ../../../config/optional/impermanence.nix
-    ../../../config/optional/hardware.nix
+    common
+    zfs
+    impermanence
+    hardware
+    services.consul-server
   ];
 
   networking.hostId = "40f61b93";
@@ -78,37 +76,8 @@
 
   networking.nftables.firewall.zones.untrusted.interfaces = [ "serverBr" ];
 
-  age.secrets."consul-acl.json" = {
-    rekeyFile = inputs.self.outPath + "/secrets/consul/server.acl.json.age";
-    owner = "consul";
-  };
-
-  services.consul = {
-    enable = true;
-    webUi = true;
-    extraConfig = {
-      server = true;
-      bind_addr = globals.nebula.mesh.hosts.demeter.ipv4;
-      client_addr = globals.nebula.mesh.hosts.demeter.ipv4;
-      retry_join = [ globals.nebula.mesh.hosts.icarus.ipv4 ];
-
-      acl = {
-        enabled = true;
-        default_policy = "deny";
-      };
-    };
-
-    extraConfigFiles = [
-      config.age.secrets."consul-acl.json".path
-    ];
-  };
-
   globals.nebula.mesh.hosts.demeter = {
     id = 3;
-
-    groups = [ "consul-server" ];
-
-    firewall.inbound = lib.nebula-firewall.consul-server;
   };
 
   meta.vector.enable = true;

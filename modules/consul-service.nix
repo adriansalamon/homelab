@@ -20,6 +20,7 @@ let
   };
 in
 {
+
   options.consul.services = mkOption {
     type = types.attrsOf types.attrs;
     default = { };

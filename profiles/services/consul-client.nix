@@ -2,11 +2,13 @@
   inputs,
   globals,
   config,
-  lib,
   ...
 }:
 let
+
   host = config.node.name;
+
+  consulServers = map (name: globals.nebula.mesh.hosts.${name}.ipv4) globals.consul-servers;
 in
 {
   age.secrets."consul-acl.json" = {
@@ -19,11 +21,7 @@ in
     extraConfig = {
       server = false;
       bind_addr = globals.nebula.mesh.hosts.${host}.ipv4;
-      retry_join = [
-        # TODO: dynamically get this from nodes
-        globals.nebula.mesh.hosts.icarus.ipv4
-        globals.nebula.mesh.hosts.athena.ipv4
-      ];
+      retry_join = consulServers;
 
       acl = {
         enabled = true;
@@ -38,6 +36,27 @@ in
 
   globals.nebula.mesh.hosts.${host} = {
     groups = [ "consul-client" ];
-    firewall.inbound = lib.nebula-firewall.consul-client;
+    firewall.inbound = [
+      {
+        port = "8301";
+        proto = "tcp";
+        group = "consul-server";
+      }
+      {
+        port = "8301";
+        proto = "udp";
+        group = "consul-server";
+      }
+      {
+        port = "8301";
+        proto = "tcp";
+        group = "consul-client";
+      }
+      {
+        port = "8301";
+        proto = "udp";
+        group = "consul-client";
+      }
+    ];
   };
 }

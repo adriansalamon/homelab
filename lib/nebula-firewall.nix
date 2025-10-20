@@ -28,29 +28,6 @@ _inputs: final: prev: {
           group = "consul-client";
         }
       ];
-
-      consul-client = [
-        {
-          port = "8301";
-          proto = "tcp";
-          group = "consul-server";
-        }
-        {
-          port = "8301";
-          proto = "udp";
-          group = "consul-server";
-        }
-        {
-          port = "8301";
-          proto = "tcp";
-          group = "consul-client";
-        }
-        {
-          port = "8301";
-          proto = "udp";
-          group = "consul-client";
-        }
-      ];
     };
   };
 }

@@ -5,6 +5,9 @@
   globals,
   ...
 }:
+let
+  site = config.node.site;
+in
 {
 
   age.secrets.kea-ddns-consul-token = {
@@ -36,11 +39,11 @@
           forward . 127.0.0.1:8600
       }
 
-      # Rewrite <anything>.local.${globals.domains.main} → traefik-erebus.service.consul for internal reverse proxy
+      # Rewrite <anything>.local.${globals.domains.main} → traefik-${site}.service.consul for internal reverse proxy
       local.${globals.domains.main} {
           log
           errors
-          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik-erebus.service.consul answer auto
+          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik-${site}.service.consul answer auto
           forward . 127.0.0.1:8600
       }
 
@@ -50,11 +53,11 @@
           forward . tls://1.1.1.1:853 tls://1.0.0.1:853 tls://9.9.9.9:853
       }
 
-      # Rewrite <anything>.${globals.domains.main} → traefik-erebus.service.consul for internal reverse proxy
+      # Rewrite <anything>.${globals.domains.main} → traefik-${site}.service.consul for internal reverse proxy
       ${globals.domains.main} {
           log
           errors
-          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik-erebus.service.consul answer auto
+          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik-${site}.service.consul answer auto
           forward . 127.0.0.1:8600
       }
 
@@ -75,7 +78,7 @@
     '';
   };
 
-  consul.services.traefik-erebus = {
-    address = lib.net.cidr.host 1 globals.sites.erebus.vlans.lan.cidrv4;
+  consul.services."traefik-${site}" = {
+    address = lib.net.cidr.host 1 globals.sites.${site}.vlans.lan.cidrv4;
   };
 }

@@ -43,7 +43,8 @@
   launchd.user.agents.nebula = {
     serviceConfig.ProgramArguments = [
       "${pkgs.nebula}/bin/nebula"
-      "-config /etc/nebula/nebula.yml"
+      "-config"
+      "/etc/nebula/config.yml"
     ];
     serviceConfig.KeepAlive = true;
   };

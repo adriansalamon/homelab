@@ -36,9 +36,10 @@
         "inherit acls" = "yes";
         "map acl inherit" = "yes";
         "encrypt passwords" = "yes";
-        "hosts allow" = "localhost 127.0.0.1 ${nodes.icarus.services.headscale.settings.prefixes.v4} ${
-          lib.concatMapAttrsStringSep " " (_: siteCfg: siteCfg.vlans.lan.cidrv4) globals.sites
-        }";
+        "hosts allow" =
+          "localhost 127.0.0.1 ${nodes.icarus.config.services.headscale.settings.prefixes.v4} ${
+            lib.concatMapAttrsStringSep " " (_: siteCfg: siteCfg.vlans.lan.cidrv4) globals.sites
+          }";
         "hosts deny" = "0.0.0.0/0";
       };
 

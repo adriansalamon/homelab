@@ -1,11 +1,12 @@
 {
   config,
+  profiles,
   ...
 }:
 {
   # All nodes definetely want to be in the nebula mesh, and part of consul cluster
   imports = [
-    ../../../../config/optional/consul-client.nix
+    profiles.services.consul-client
   ];
 
   globals.nebula.mesh.hosts.${config.node.name} = {

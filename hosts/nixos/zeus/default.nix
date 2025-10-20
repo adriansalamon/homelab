@@ -5,11 +5,9 @@
   globals,
   nodes,
   lib,
+  profiles,
   ...
 }:
-let
-  nebulaIp = globals.nebula.mesh.hosts.zeus.ipv4;
-in
 {
   # Main VM host
 
@@ -20,12 +18,15 @@ in
     ./jellyfin.nix
     ./immich.nix
     ./services
-    ../../../config
-    ../../../config/optional/zfs.nix
-    ../../../config/optional/impermanence.nix
-    ../../../config/optional/hardware.nix
-    ../../../config/optional/storage-users.nix
-  ];
+  ]
+  ++ (with profiles; [
+    common
+    zfs
+    impermanence
+    hardware
+    storage-users
+    services.consul-server
+  ]);
 
   networking.hostId = "49e32584";
 
@@ -37,6 +38,7 @@ in
     vim
     htop
     ipmitool
+    tmux
   ];
 
   networking.useNetworkd = true;
@@ -135,11 +137,10 @@ in
   globals.nebula.mesh.hosts.zeus = {
     id = 5;
     groups = [
-      "consul-server"
       "nfs-client"
     ];
 
-    firewall.inbound = lib.nebula-firewall.consul-server ++ [
+    firewall.inbound = [
       {
         port = "8500";
         proto = "tcp";
@@ -148,33 +149,11 @@ in
     ];
   };
 
-  age.secrets."consul-acl.json" = {
-    rekeyFile = inputs.self.outPath + "/secrets/consul/server.acl.json.age";
-    owner = "consul";
-  };
-
   services.consul = {
-    enable = true;
     webUi = true;
     extraConfig = {
-      server = true;
       ui = true;
-      bind_addr = nebulaIp;
-      client_addr = nebulaIp;
-      retry_join = with globals.nebula.mesh.hosts; [
-        demeter.ipv4
-        icarus.ipv4
-      ];
-
-      acl = {
-        enabled = true;
-        default_policy = "deny";
-      };
     };
-
-    extraConfigFiles = [
-      config.age.secrets."consul-acl.json".path
-    ];
   };
 
   consul.services = {
@@ -201,9 +180,9 @@ in
           pool = "zroot";
           dataset = "safe/guests/${guestName}";
         };
-        modules = [
-          ../../../config
-          ../../../config/optional/impermanence.nix
+        modules = with profiles; [
+          common
+          impermanence
           ./guests/common.nix
           ./guests/${guestName}.nix
           {
@@ -231,7 +210,12 @@ in
 
             extraSpecialArgs = {
               inherit (inputs.self.pkgs.x86_64-linux) lib;
-              inherit inputs globals nodes;
+              inherit
+                inputs
+                globals
+                nodes
+                profiles
+                ;
             };
           };
         };

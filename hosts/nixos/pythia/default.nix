@@ -2,22 +2,25 @@
   config,
   globals,
   nodes,
+  profiles,
   ...
 }:
 {
   # Router at Delphi
+  node.site = "delphi";
 
-  imports = [
+  imports = with profiles; [
     ./disk-config.nix
     ./hw.nix
-    ./dns.nix
     ./net.nix
-    ./traefik.nix
-    ../../../config
-    ../../../config/optional/zfs.nix
-    ../../../config/optional/impermanence.nix
-    ../../../config/optional/hardware.nix
-    ../../../config/optional/consul-client.nix
+    common
+    zfs
+    impermanence
+    hardware
+    services.consul-client
+    services.traefik
+    router.dhcp
+    router.dns
   ];
 
   meta.vector.enable = true;

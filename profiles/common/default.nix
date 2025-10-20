@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
 {
 
   imports = [
@@ -7,13 +12,9 @@
     inputs.agenix-rekey.nixosModules.default
     inputs.impermanence.nixosModules.impermanence
     inputs.nixos-nftables-firewall.nixosModules.default
-    ./secrets.nix
-    ./users.nix
-    ./nftables.nix
-    ./boot.nix
-    ./nix.nix
-    ../modules
-  ];
+    ../../modules
+  ]
+  ++ lib.collect builtins.isPath (lib.filterAttrs (n: _: n != "default") (lib.rakeLeaves ./.));
 
   environment.systemPackages = with pkgs; [
     gitMinimal

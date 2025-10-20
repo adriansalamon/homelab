@@ -15,6 +15,7 @@
         name: hostConfig:
         let
           pkgs = config.pkgs.x86_64-linux;
+          profiles = pkgs.lib.rakeLeaves ../profiles;
         in
         {
           nixosConfigurations.${name} = inputs.nixpkgs.lib.nixosSystem {
@@ -23,6 +24,7 @@
               inherit inputs;
               inherit (pkgs) lib;
               inherit (config) nodes globals;
+              inherit profiles;
             };
             modules = [
               inputs.microvm.nixosModules.host

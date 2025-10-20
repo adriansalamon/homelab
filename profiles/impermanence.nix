@@ -27,17 +27,16 @@ in
       "/etc/ssh/ssh_host_ed25519_key"
       "/etc/ssh/ssh_host_ed25519_key.pub"
     ];
-    directories =
-      [
-        "/var/lib/nixos"
-      ]
-      ++ optionals config.services.postgresql.enable [
-        {
-          directory = "/var/lib/postgresql";
-          user = "postgres";
-          group = "postgres";
-          mode = "0700";
-        }
-      ];
+    directories = [
+      "/var/lib/nixos"
+    ]
+    ++ optionals config.services.postgresql.enable [
+      {
+        directory = "/var/lib/postgresql";
+        user = "postgres";
+        group = "postgres";
+        mode = "0700";
+      }
+    ];
   };
 }

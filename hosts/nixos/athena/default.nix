@@ -2,28 +2,34 @@
   inputs,
   config,
   pkgs,
-  lib,
   globals,
+  profiles,
+  lib,
   ...
 }:
 let
-  nebulaIp = globals.nebula.mesh.hosts.athena.ipv4;
   site = globals.sites.olympus;
 in
 {
   # Firewall/router
 
-  imports = [
+  imports = with profiles; [
     ./router
     ./hardware-config.nix
     ./disk-config.nix
-    ./traefik.nix
-    ../../../config
-    ../../../config/optional/zfs.nix
-    ../../../config/optional/hardware.nix
+    common
+    zfs
+    hardware
+    impermanence
+    services.consul-server
+    services.traefik
+    router.nebula
   ];
 
+  systemd.enableEmergencyMode = false;
+
   networking.hostId = "8425e349";
+  node.site = "olympus";
 
   environment.systemPackages = with pkgs; [
     tcpdump
@@ -40,46 +46,10 @@ in
     cifs-utils
   ];
 
-  age.secrets."consul-acl.json" = {
-    rekeyFile = inputs.self.outPath + "/secrets/consul/server.acl.json.age";
-    owner = "consul";
-  };
-
-  services.consul = {
-    enable = true;
-    extraConfig = {
-      server = true;
-      bind_addr = nebulaIp;
-      client_addr = nebulaIp;
-      retry_join = with globals.nebula.mesh.hosts; [
-        demeter.ipv4
-        icarus.ipv4
-      ];
-      bootstrap_expect = 5;
-      services = [
-        {
-          id = "freenas02";
-          name = "freenas02";
-          port = 443;
-          address = lib.net.cidr.host 2 globals.sites.olympus.vlans.server.cidrv4;
-        }
-      ];
-      acl = {
-        enabled = true;
-        default_policy = "deny";
-      };
-    };
-
-    extraConfigFiles = [
-      config.age.secrets."consul-acl.json".path
-    ];
-  };
-
   globals.nebula.mesh.hosts.athena = {
     id = 4;
 
     groups = [
-      "consul-server"
       "reverse-proxy"
     ];
 
@@ -88,33 +58,7 @@ in
       site.vlans.management.cidrv4
     ];
 
-    config.settings = {
-      # TODO: DRY, generate this.
-      tun.unsafe_routes = [
-        {
-          route = globals.sites.erebus.vlans.lan.cidrv4;
-          via = globals.nebula.mesh.hosts.charon.ipv4;
-        }
-        {
-          route = globals.sites.delphi.vlans.lan.cidrv4;
-          via = globals.nebula.mesh.hosts.pythia.ipv4;
-        }
-      ];
-    };
-
-    firewall.inbound = lib.nebula-firewall.consul-server ++ [
-      {
-        port = "any";
-        proto = "any";
-        cidr = globals.sites.erebus.vlans.lan.cidrv4;
-        local_cidr = site.vlans.lan.cidrv4;
-      }
-      {
-        port = "any";
-        proto = "any";
-        cidr = globals.sites.delphi.vlans.lan.cidrv4;
-        local_cidr = site.vlans.lan.cidrv4;
-      }
+    firewall.inbound = [
       # Allow admins to access management network
       {
         port = "any";
@@ -136,9 +80,21 @@ in
     ];
   };
 
-  # Dynamic dns
   age.secrets = {
+    # Dynamic DNS
     cloudflare-dns-api-token.rekeyFile = ./secrets/cloudflare-dns-api-token.age;
+
+    # Wrap with env var for traefik
+    "cloudflare-dns-api-token.env" = {
+      generator.dependencies = [ config.age.secrets.cloudflare-dns-api-token ];
+      generator.script = lib.helpers.generateWithEnv "CF_DNS_API_TOKEN";
+    };
+
+    traefik-token.rekeyFile = inputs.self.outPath + "/secrets/consul/traefik.age";
+    "traefik-token.env" = {
+      generator.dependencies = [ config.age.secrets.traefik-token ];
+      generator.script = lib.helpers.generateWithEnv "TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_TOKEN";
+    };
   };
 
   services.cloudflare-dyndns = {

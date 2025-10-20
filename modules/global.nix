@@ -206,6 +206,12 @@ in
                             default = vlanSubmod.config._module.args.name;
                             type = types.str;
                           };
+
+                          trusted = mkOption {
+                            description = "Whether this VLAN is trusted. Untrusted VLANs will not be used for DNS.";
+                            type = types.bool;
+                            default = true;
+                          };
                         };
                       })
                     );
@@ -348,6 +354,11 @@ in
                 };
               }
             );
+          };
+
+          consul-servers = mkOption {
+            default = [ ];
+            type = types.listOf types.str;
           };
         };
       };
