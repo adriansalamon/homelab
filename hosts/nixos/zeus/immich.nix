@@ -31,11 +31,21 @@ in
   fileSystems."/mnt/freenas02/adrian_bilder" = {
     device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/homes/adrian/Bilder";
     fsType = "nfs";
+    options = [
+      "nfsvers=4"
+      "x-systemd.automount"
+      "noauto"
+    ];
   };
 
   fileSystems."/mnt/freenas03/adrian_bilder" = {
     device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank03/adrian/Images";
     fsType = "nfs";
+    options = [
+      "nfsvers=4"
+      "x-systemd.automount"
+      "noauto"
+    ];
   };
 
   services.immich = {

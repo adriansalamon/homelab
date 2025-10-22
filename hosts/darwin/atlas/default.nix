@@ -15,7 +15,7 @@
     vim
     age-plugin-yubikey
     inputs.agenix-rekey.packages."${system}".default
-    deploy-rs
+    inputs.deploy-rs.packages."${system}".default
     nixd
     nil
     nixfmt-rfc-style
@@ -33,6 +33,7 @@
     typst
     backrest
     restic
+    cook-cli
   ];
 
   launchd.user.agents.backrest = {

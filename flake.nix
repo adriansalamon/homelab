@@ -4,7 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    deploy-rs.url = "github:serokell/deploy-rs";
+    # pinned until this regression is fixed
+    # https://github.com/serokell/deploy-rs/issues/325
+    deploy-rs.url = "github:serokell/deploy-rs/5829cec63845eb50984dc8787b0edfe81bf5b980";
 
     disko = {
       url = "github:nix-community/disko";

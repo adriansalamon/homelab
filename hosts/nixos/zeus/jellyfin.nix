@@ -12,9 +12,14 @@ in
 
   users.users.jellyfin.extraGroups = [ "media" ];
 
-  fileSystems."/mnt/PlexMedia" = {
+  fileSystems."/mnt/media" = {
     device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/media";
     fsType = "nfs";
+    options = [
+      "nfsvers=4"
+      "x-systemd.automount"
+      "noauto"
+    ];
   };
 
   environment.systemPackages = [

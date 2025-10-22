@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   lib,
   globals,
@@ -14,6 +15,13 @@ let
   site = globals.sites.${config.node.site};
 in
 {
+  environment.persistence."/state".directories = [
+    {
+      directory = "/var/lib/private/kea/";
+      mode = "0700";
+    }
+  ];
+
   services.kea.dhcp4 = {
     enable = true;
     settings = {
@@ -74,4 +82,16 @@ in
       ddns-update-on-renew = true;
     };
   };
+
+  age.secrets.kea-ddns-consul-token = {
+    rekeyFile = inputs.self.outPath + "/secrets/consul/kea-ddns-token.age";
+    owner = "kea-ddns-consul";
+  };
+
+  services.kea-ddns-consul = {
+    enable = true;
+    consulTokenFile = config.age.secrets.kea-ddns-consul-token.path;
+    consulUrl = "http://127.0.0.1:8500";
+  };
+
 }

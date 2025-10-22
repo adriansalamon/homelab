@@ -1,7 +1,5 @@
 {
-  inputs,
   lib,
-  config,
   globals,
   ...
 }:
@@ -11,18 +9,6 @@ let
   site = globals.sites.${siteName};
 in
 {
-
-  age.secrets.consul-token = {
-    rekeyFile = inputs.self.outPath + "/secrets/consul/kea-ddns-token.age";
-    owner = "kea-ddns-consul";
-  };
-
-  services.kea-ddns-consul = {
-    enable = true;
-    consulTokenFile = config.age.secrets.consul-token.path;
-    consulUrl = "http://${nebulaIp}:8500";
-  };
-
   environment.etc."resolv.conf".text = ''
     nameserver 127.0.0.1
   '';

@@ -16,6 +16,10 @@
     }
   );
 
+  globals.nebula.mesh.hosts."${config.node.name}".groups = [
+    "reverse-proxy"
+  ];
+
   services.traefik = {
     enable = true;
 
@@ -65,6 +69,7 @@
 
         unifi-inform.address = ":8080";
         mqtt.address = ":1883";
+        forgejo-ssh.address = ":2222";
       };
 
       providers.consulCatalog = {

@@ -283,6 +283,24 @@ in
                 }
               );
             };
+
+            tcp = mkOption {
+              type = types.attrsOf (
+                types.submodule {
+                  options = defaultMonitorOptions // {
+                    host = mkOption {
+                      type = types.str;
+                      description = "The host to connect to.";
+                    };
+
+                    port = mkOption {
+                      type = types.port;
+                      description = "The port to connect to.";
+                    };
+                  };
+                }
+              );
+            };
           };
 
           loki-secrets = mkOption {

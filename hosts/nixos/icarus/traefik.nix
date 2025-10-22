@@ -58,6 +58,8 @@
 
         unifi-inform.address = ":8080";
 
+        forgejo-ssh.address = ":2222";
+
         traefik.address = ":9090"; # internal only
       };
 
@@ -110,5 +112,6 @@
     80
     443
     8080
+    2222
   ];
 }

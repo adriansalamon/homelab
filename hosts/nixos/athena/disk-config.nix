@@ -62,7 +62,6 @@ in
       zroot = lib.disk.zfs.mkZpool {
         mode = "mirror";
 
-        # TODO: take a proper zfs zroot/local/root@blank snapshot
         datasets = lib.disk.zfs.impermanenceDatasets;
       };
     };

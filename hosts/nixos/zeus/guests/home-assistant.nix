@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  nodes,
   lib,
   globals,
   ...
@@ -28,37 +29,51 @@ in
     generator.script = "alnum";
   };
 
+  age.secrets."home-assistant-secrets.yaml" = {
+    generator = {
+      dependencies = [ nodes.zeus-auth.config.age.secrets.hass-oidc-client-secret ];
+      script =
+        {
+          lib,
+          decrypt,
+          deps,
+          ...
+        }:
+        lib.concatMapStrings (secret: ''
+          echo "${lib.escapeShellArg secret.name}": "$(${decrypt} ${lib.escapeShellArg secret.file})" \
+            || die "Failure while aggregating secrets"
+        '') deps;
+    };
+    owner = "hass";
+  };
+
   services.mosquitto = {
     enable = true;
     persistence = true;
-    listeners = [
-      {
-        acl = [ "pattern readwrite #" ];
-        users = {
-          home_assistant = {
-            passwordFile = config.age.secrets.mosquitto-home-assistant-pass.path;
-            acl = [ "readwrite #" ];
-          };
-          tasmota = {
-            passwordFile = config.age.secrets.mosquitto-tasmota-pass.path;
-            acl = [ "readwrite #" ];
-          };
+    listeners = lib.singleton {
+      acl = [ "pattern readwrite #" ];
+      users = {
+        home_assistant = {
+          passwordFile = config.age.secrets.mosquitto-home-assistant-pass.path;
+          acl = [ "readwrite #" ];
         };
-        settings.allow_anonymous = false;
-      }
-    ];
+        tasmota = {
+          passwordFile = config.age.secrets.mosquitto-tasmota-pass.path;
+          acl = [ "readwrite #" ];
+        };
+      };
+      settings.allow_anonymous = false;
+    };
   };
 
   # Home Assistant
 
-  environment.persistence."/persist".directories = [
-    {
-      directory = config.services.home-assistant.configDir;
-      user = "hass";
-      group = "hass";
-      mode = "0700";
-    }
-  ];
+  environment.persistence."/persist".directories = lib.singleton {
+    directory = config.services.home-assistant.configDir;
+    user = "hass";
+    group = "hass";
+    mode = "0700";
+  };
 
   services.avahi = {
     enable = true;
@@ -77,6 +92,12 @@ in
       "cast"
       "isal"
       "tasmota"
+      "unifi"
+      "apple_tv"
+      "homekit"
+      "homekit_controller"
+      "mobile_app"
+      "esphome"
     ];
 
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
@@ -92,6 +113,11 @@ in
       mushroom
       weather-card
       weather-chart-card
+    ];
+
+    customComponents = with pkgs.home-assistant-custom-components; [
+      (pkgs.home-assistant.python.pkgs.callPackage ./hass-components/auth_oidc.nix { })
+      prometheus_sensor
     ];
 
     config = {
@@ -113,11 +139,27 @@ in
       "automation ui" = "!include automations.yaml";
       "scene ui" = "!include scenes.yaml";
       "script ui" = "!include scripts.yaml";
+
+      auth_oidc = {
+        client_id = "hass";
+        client_secret = "!secret hass-oidc-client-secret";
+        discovery_url = "https://auth.${globals.domains.main}/.well-known/openid-configuration";
+        roles = {
+          admin = "admin";
+        };
+        features.automatic_user_linking = true;
+      };
     };
   };
 
   systemd.services.home-assistant = {
     preStart = lib.mkBefore ''
+      if [[ -e ${config.services.home-assistant.configDir}/secrets.yaml ]]; then
+        rm ${config.services.home-assistant.configDir}/secrets.yaml
+      fi
+      cp ${
+        config.age.secrets."home-assistant-secrets.yaml".path
+      } ${config.services.home-assistant.configDir}/secrets.yaml
       touch -a ${config.services.home-assistant.configDir}/{automations,scenes,scripts,manual}.yaml
     '';
   };

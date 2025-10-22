@@ -24,6 +24,7 @@ in
     services.consul-server
     services.traefik
     router.nebula
+    router.monitoring
   ];
 
   systemd.enableEmergencyMode = false;
@@ -49,10 +50,6 @@ in
   globals.nebula.mesh.hosts.athena = {
     id = 4;
 
-    groups = [
-      "reverse-proxy"
-    ];
-
     routeSubnets = [
       site.vlans.lan.cidrv4
       site.vlans.management.cidrv4
@@ -72,11 +69,10 @@ in
   meta.vector.enable = true;
   meta.telegraf = {
     enable = true;
-    # monitor connectivity to external and internal services + internet connectivity
+    # monitor connectivity to external and internal services
     avilableMonitoringNetworks = [
       "external"
       "internal"
-      "internet"
     ];
   };
 

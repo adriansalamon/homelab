@@ -145,8 +145,14 @@ in
     tags = [ "prometheus.scrape=true" ];
   };
 
-  # allow the prometheus scrape server to access
   globals.nebula.mesh.hosts.${host}.firewall.inbound = [
+    # allow senders to connect
+    {
+      port = "8888";
+      proto = "tcp";
+      group = "zrepl-sender";
+    }
+    # allow the prometheus scrape server to access
     {
       port = "9811";
       proto = "tcp";

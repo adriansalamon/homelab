@@ -103,6 +103,12 @@
     '') (lib.genAttrs globals.users (name: config.age.secrets."${name}-smb-password".path))
   );
 
+  globals.monitoring.tcp.hermes-files = {
+    host = "hermes-files.internal";
+    port = 445;
+    network = "${config.node.site}-vlan-lan";
+  };
+
   consul.services."hermes-files" = {
     address = globals.sites.olympus.vlans.lan.hosts.hermes.ipv4;
     port = 445;

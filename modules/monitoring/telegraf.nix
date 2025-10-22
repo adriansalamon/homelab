@@ -147,6 +147,27 @@ in
               )
             )
           );
+
+          net_response = mkIfNotEmpty (
+            concatLists (
+              flip mapAttrsToList globals.monitoring.tcp (
+                name: tcpCfg:
+                optional (builtins.elem tcpCfg.network cfg.avilableMonitoringNetworks) {
+                  interval = "1m";
+                  protocol = "tcp";
+                  address = "${tcpCfg.host}:${toString tcpCfg.port}";
+                  tags = {
+                    inherit name;
+                    inherit (tcpCfg) network;
+                  };
+                  fieldexclude = [
+                    "result_type"
+                    "string_found"
+                  ];
+                }
+              )
+            )
+          );
         }
         // optionalAttrs (builtins.hasAttr "zfs" config.boot.supportedFilesystems) {
           zfs = { };

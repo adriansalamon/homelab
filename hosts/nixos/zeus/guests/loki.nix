@@ -44,7 +44,6 @@ in
 
   };
 
-  # TODO: add basic auth here
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;

@@ -19,8 +19,6 @@
     hardware
     services.consul-client
     services.traefik
-    router.dhcp
-    router.dns
   ];
 
   meta.vector.enable = true;

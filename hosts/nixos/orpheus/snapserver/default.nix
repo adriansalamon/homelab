@@ -25,7 +25,7 @@ in
 
       tcp = {
         enabled = true;
-        bind_to_address = lanIpv4;
+        bind_to_address = "0.0.0.0";
       };
 
       stream = {
@@ -59,6 +59,11 @@ in
       port = builtins.toString config.services.snapserver.settings.http.port;
       proto = "tcp";
       group = "reverse-proxy";
+    }
+    {
+      port = builtins.toString config.services.snapserver.settings.tcp.port;
+      proto = "tcp";
+      host = "zeus-home-assistant";
     }
   ];
 }

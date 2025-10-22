@@ -96,4 +96,10 @@
     enable = true;
     openFirewall = true;
   };
+
+  globals.monitoring.tcp.orpheus-files = {
+    host = "orpheus-files.internal";
+    port = 445;
+    network = "${config.node.site}-vlan-lan";
+  };
 }

@@ -14,8 +14,7 @@
     hardware
     services.consul-client
     services.traefik
-    router.dhcp
-    router.dns
+    router.monitoring
     ./hw.nix
     ./disk-config.nix
     ./net.nix
@@ -26,11 +25,7 @@
   networking.hostId = "887bb90d";
 
   meta.vector.enable = true;
-  meta.telegraf = {
-    enable = true;
-    # monitor internet connectivity
-    avilableMonitoringNetworks = [ "internet" ];
-  };
+  meta.telegraf.enable = true;
 
   # Dynamic dns
   age.secrets.cloudflare-dns-api-token = {

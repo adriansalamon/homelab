@@ -25,6 +25,7 @@
       "authelia"
       "lldap"
       "paperless"
+      "forgejo"
     ];
 
     ensureUsers = [
@@ -38,6 +39,10 @@
       }
       {
         name = "paperless";
+        ensureDBOwnership = true;
+      }
+      {
+        name = "forgejo";
         ensureDBOwnership = true;
       }
     ];
@@ -55,8 +60,21 @@
           EXECUTE format('ALTER ROLE authelia WITH PASSWORD '''%s''';', password);
           EXECUTE format('ALTER ROLE lldap WITH PASSWORD '''%s''';', password);
           EXECUTE format('ALTER ROLE paperless WITH PASSWORD '''%s''';', password);
+          EXECUTE format('ALTER ROLE forgejo WITH PASSWORD '''%s''';', password);
         END $$;
       '';
     in
     "${PSQL} -f ${sqlFile}";
+
+  consul.services.postgres = {
+    inherit (config.services.postgresql) port;
+  };
+
+  globals.nebula.mesh.hosts.${config.node.name}.firewall.inbound = [
+    {
+      port = builtins.toString config.services.postgresql.settings.port;
+      proto = "tcp";
+      group = "postgres-client";
+    }
+  ];
 }

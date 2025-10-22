@@ -28,14 +28,6 @@ in
 
   # implementation
   config = lib.mkIf cfg.enable {
-    # open the firewall on backup target
-    globals.nebula.mesh.hosts.${cfg.target}.firewall.inbound = [
-      {
-        port = "8888";
-        proto = "tcp";
-        host = me;
-      }
-    ];
 
     # register metrics in Consul
     consul.services."${me}-zrepl-metrics" = {
@@ -43,14 +35,19 @@ in
       tags = [ "prometheus.scrape=true" ];
     };
 
-    # allow the prometheus scrape server to access
-    globals.nebula.mesh.hosts.${me}.firewall.inbound = [
-      {
-        port = "9811";
-        proto = "tcp";
-        host = "zeus-prometheus";
-      }
-    ];
+    globals.nebula.mesh.hosts.${me} = {
+      # add to nebula group to allow access to hermes
+      groups = [ "zrepl-sender" ];
+
+      # allow the prometheus scrape server to access
+      firewall.inbound = [
+        {
+          port = "9811";
+          proto = "tcp";
+          host = "zeus-prometheus";
+        }
+      ];
+    };
 
     services.zrepl = {
       enable = true;

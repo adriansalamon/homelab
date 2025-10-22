@@ -13,11 +13,13 @@ let
   site = globals.sites.delphi;
 in
 {
-  imports = [
-    profiles.router.firewall-common
-    profiles.router.nebula
-    profiles.router.tailscale
-    profiles.router.common
+  imports = with profiles.router; [
+    common
+    dhcp
+    dns
+    firewall-common
+    nebula
+    tailscale
   ];
 
   networking.hostId = "2a48ff8c";
@@ -80,10 +82,6 @@ in
 
     routeSubnets = [
       site.vlans.lan.cidrv4
-    ];
-
-    groups = [
-      "reverse-proxy"
     ];
   };
 }

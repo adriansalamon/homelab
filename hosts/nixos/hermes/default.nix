@@ -26,6 +26,7 @@ in
   ];
 
   networking.hostId = "b8d0bfb2";
+  node.site = "olympus";
 
   globals.nebula.mesh.hosts.${host} = {
     id = 8;

@@ -13,12 +13,13 @@ let
   site = globals.sites.erebus;
 in
 {
-
-  imports = with profiles; [
-    router.common
-    router.firewall-common
-    router.nebula
-    router.tailscale
+  imports = with profiles.router; [
+    common
+    dhcp
+    dns
+    firewall-common
+    nebula
+    tailscale
   ];
 
   services.udev.extraRules = ''
@@ -69,9 +70,5 @@ in
 
   globals.nebula.mesh.hosts.charon = {
     id = 6;
-
-    groups = [
-      "reverse-proxy"
-    ];
   };
 }

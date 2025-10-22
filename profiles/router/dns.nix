@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  inputs,
   globals,
   ...
 }:
@@ -9,18 +8,6 @@ let
   site = config.node.site;
 in
 {
-
-  age.secrets.kea-ddns-consul-token = {
-    rekeyFile = inputs.self.outPath + "/secrets/consul/kea-ddns-token.age";
-    owner = "kea-ddns-consul";
-  };
-
-  services.kea-ddns-consul = {
-    enable = true;
-    consulTokenFile = config.age.secrets.kea-ddns-consul-token.path;
-    consulUrl = "http://127.0.0.1:8500";
-  };
-
   services.resolved.enable = false;
 
   environment.etc."resolv.conf".text = ''
