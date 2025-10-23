@@ -213,7 +213,8 @@ in
     netName: _: {
       name = "nebula@${netName}";
       value = {
-        reloadIfChanged = true;
+        stopIfChanged = false;
+        reloadTriggers = lib.singleton config.environment.etc."nebula/${netName}.yml".source;
         serviceConfig.ExecStart = mkForce "${pkgs.nebula}/bin/nebula -config /etc/nebula/${netName}.yml";
       };
     }

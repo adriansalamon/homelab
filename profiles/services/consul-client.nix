@@ -21,6 +21,7 @@ in
     extraConfig = {
       server = false;
       bind_addr = globals.nebula.mesh.hosts.${host}.ipv4;
+      client_addr = "127.0.0.1";
       retry_join = consulServers;
 
       acl = {

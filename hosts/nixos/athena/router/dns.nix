@@ -1,81 +1,30 @@
 {
+  config,
   lib,
   globals,
+  profiles,
   ...
 }:
 let
-  nebulaIp = globals.nebula.mesh.hosts.athena.ipv4;
   siteName = "olympus";
   site = globals.sites.${siteName};
+
+  mkInternalRules = import profiles.router.coredns.internal { inherit config lib globals; };
+
+  # We want internal rules on port 53 and 5301 (for external vpn)
+  mkDual = pattern: "${pattern}.:53 ${pattern}.:5301";
 in
 {
   environment.etc."resolv.conf".text = ''
     nameserver 127.0.0.1
   '';
 
-  # TODO: Clean up this mess of a DNS config, and add some ad-blocking (eg. AdGuard)
   services.resolved.enable = false;
   services.coredns = {
     enable = true;
     # VPN network dns clients can only use DNS queries on port 5301
     config = ''
-      # Rewrite <anything>.internal → kea-ddns.<anything>.service.consul. This manages the DDNS.
-      internal.:53 {
-          log
-          errors
-          rewrite stop name regex (.*)\.internal kea-ddns.{1}.service.consul answer auto
-          forward . ${nebulaIp}:8600
-      }
-
-      internal.:5301 {
-          log
-          errors
-          rewrite stop name regex (.*)\.internal kea-ddns.{1}.service.consul answer auto
-          forward . ${nebulaIp}:8600
-      }
-
-      # Rewrite <anything>.local.${globals.domains.main} → traefik-${siteName}.service.consul for internal reverse proxy
-      local.${globals.domains.main}.:53 {
-          log
-          errors
-          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
-          forward . ${nebulaIp}:8600
-      }
-
-      local.${globals.domains.main}.:5301 {
-          log
-          errors
-          rewrite stop name regex (.*)\.local\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
-          forward . ${nebulaIp}:8600
-      }
-
-      # Rewrite <anything>.local.${globals.domains.main} → traefik-${siteName}.service.consul for internal reverse proxy
-      ${globals.domains.main}.:53 {
-          log
-          errors
-          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
-          forward . ${nebulaIp}:8600
-      }
-
-      ${globals.domains.main}.:5301 {
-          log
-          errors
-          rewrite stop name regex (.*)\.${lib.escapeRegex globals.domains.main} traefik-${siteName}.service.consul answer auto
-          forward . ${nebulaIp}:8600
-      }
-
-      # Forward all consul queries to local consul agent
-      consul.:53 {
-          log
-          errors
-          forward . ${nebulaIp}:8600
-      }
-
-      consul.:5301 {
-          log
-          errors
-          forward . ${nebulaIp}:8600
-      }
+      ${mkInternalRules mkDual}
 
       .:53 {
           log
