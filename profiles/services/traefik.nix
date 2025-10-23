@@ -57,11 +57,9 @@
             domains = [
               {
                 main = globals.domains.main;
-                sans = [ "*.${globals.domains.main}" ];
-              }
-              {
-                main = "local.${globals.domains.main}";
-                sans = [ "*.local.${globals.domains.main}" ];
+                sans = [
+                  "*.${globals.domains.main}"
+                ];
               }
             ];
           };

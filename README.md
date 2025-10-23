@@ -45,24 +45,25 @@ configuration is done using Nix.
 | 📔 Notes              | Obsidian Livesync      | Synchronizes all my Obsidian clients, where I keep most of my digital notes.                                       |
 | 🔊 Music              | Snapserver             | Acts as a streaming device from Spotify or AirPlay, and syncs multiroom audio. I run Raspberry Pis as snapclients. |
 | 📂 File Server        | Samba                  | NAS file storage for clients on local network.                                                                     |
+| 📦 Git Forge          | Forgejo                | Self-hosted Git forge, alternative to GitHub. I host and back up private stuff here.                               |
 
 #### System
 
 |                      | system     | description                                                                                                                                                                    |
 | -------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 📁 Service Discovery | Consul     | Consul cluster to manage service registrations. I also put DHCP leases as consul services and use the built-in distributed Consul DNS.                                         |
+| 📮 DNS               | CoreDNS    | Flexible DNS server, redirects queries to Consul DNS, and blocks malicious DNS servers using a blocklist.                                                                      |
 | 🌐 Networking        | Nebula     | Overlay encrypted mesh network. All services are connected and communicate over Nebula, and use groups and use strict Nebula firewall rules.                                   |
 | 🔐 Secrets           | Age        | All secrets are stored in this repo, but encrypted using Age. Two YubiKeys (one offline backup) used for decryption. `agenix-rekey` enables me to encrypt per-service secrets. |
 | 📃 Logs              | Loki       | Journald logs are sent to Loki, using vector. They can be queried using Grafana.                                                                                               |
 | ⏱️ Metrics           | Prometheus | Metrics are collected using Prometheus and visualized using Grafana.                                                                                                           |
 | ⛈️ Backups           | Restic     | Automatic backups off all my data to Hetzner Storage Boxes via restic.                                                                                                         |
+| 💾 Nix Cache         | Attic      | Nix cache to speed up Nix builds.                                                                                                                                              |
 
 TODO/add:
 
-- Git server (Forgejo/Gitea)
 - A simple cluster to learn about orchestration (k8s, k3s or nomad)
 - Some simple object storage (always useful)
-- Ad blocking DNS
 - Dashboard (glance/homepage)
 - Some GitOps stuff, e.g. auto-deploy
 

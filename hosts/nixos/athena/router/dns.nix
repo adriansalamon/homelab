@@ -9,7 +9,7 @@ let
   siteName = "olympus";
   site = globals.sites.${siteName};
 
-  mkInternalRules = import profiles.router.coredns.internal { inherit config lib globals; };
+  mkInternalRules = import profiles.router.coredns.internal-rules { inherit config lib globals; };
 
   # We want internal rules on port 53 and 5301 (for external vpn)
   mkDual = pattern: "${pattern}.:53 ${pattern}.:5301";
@@ -19,6 +19,10 @@ in
     nameserver 127.0.0.1
   '';
 
+  imports = [
+    profiles.router.coredns.blocklist
+  ];
+
   services.resolved.enable = false;
   services.coredns = {
     enable = true;
@@ -27,12 +31,14 @@ in
       ${mkInternalRules mkDual}
 
       .:53 {
-          log
+          acl {
+              block net ${site.vlans.external-vpn.cidrv4} # Block vpn network
+          }
           errors
           cache
-          acl {
-              drop net ${site.vlans.external-vpn.cidrv4} # Block vpn network
-          }
+          metadata
+          blocker /var/lib/coredns/blocklist.txt 1h abp empty
+          log . "{common} {/blocker/request-blocked}"
 
           forward . tls://1.1.1.1:853 tls://1.0.0.1:853 tls://9.9.9.9:853
       }
@@ -41,7 +47,7 @@ in
       .:5301 {
           acl {
               allow net ${site.vlans.external-vpn.cidrv4}
-              drop
+              block
           }
           cache
           log

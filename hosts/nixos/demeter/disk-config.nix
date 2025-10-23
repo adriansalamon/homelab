@@ -65,9 +65,7 @@ in
     zpool = {
       zroot = lib.disk.zfs.mkZpool {
         mode = "mirror";
-        datasets = lib.disk.zfs.impermanenceDatasets // {
-          "safe/guests" = lib.disk.zfs.unmountable;
-        };
+        datasets = lib.disk.zfs.impermanenceDatasets;
       };
 
       tank01 = {

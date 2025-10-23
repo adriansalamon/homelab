@@ -9,6 +9,7 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     ./disk-config.nix
     ./hw.nix
+    ./atticd.nix
     common
     zfs
     impermanence
