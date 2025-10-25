@@ -65,7 +65,7 @@
 
       providers.consulCatalog = {
         endpoint = {
-          address = "http://${globals.nebula.mesh.hosts.icarus.ipv4}:8500";
+          address = "http://127.0.0.1:8500";
         };
         exposedByDefault = false;
         constraints = "Tag(`traefik.external=true`)";

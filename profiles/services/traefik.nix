@@ -20,6 +20,13 @@
     "reverse-proxy"
   ];
 
+  services.consul = {
+    webUi = true;
+    extraConfig = {
+      ui = true;
+    };
+  };
+
   services.traefik = {
     enable = true;
 
@@ -73,7 +80,7 @@
 
       providers.consulCatalog = {
         endpoint = {
-          address = "http://consul-api.service.consul:8500";
+          address = "http://127.0.0.1:8500";
         };
         exposedByDefault = false;
         defaultRule = "Host(`{{ normalize .Name }}.local.${globals.domains.main}`)";
@@ -90,6 +97,7 @@
     };
 
     dynamicConfigOptions = {
+
       http = {
         serversTransports.insecure = {
           insecureSkipVerify = true;
@@ -100,6 +108,19 @@
           entryPoints = [ "websecure" ];
           service = "api@internal";
           middlewares = [ "authelia@consulcatalog" ];
+        };
+
+        routers.consulUi = {
+          rule = "Host(`consul.local.${globals.domains.main}`)";
+          entryPoints = [ "websecure" ];
+          service = "consul-ui";
+          middlewares = [ "authelia@consulcatalog" ];
+        };
+
+        services.consul-ui = {
+          loadBalancer.servers.local = {
+            url = "http://127.0.0.1:8500";
+          };
         };
       };
     };

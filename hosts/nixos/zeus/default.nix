@@ -139,33 +139,6 @@
     groups = [
       "nfs-client"
     ];
-
-    firewall.inbound = [
-      {
-        port = "8500";
-        proto = "tcp";
-        group = "reverse-proxy";
-      }
-    ];
-  };
-
-  services.consul = {
-    webUi = true;
-    extraConfig = {
-      ui = true;
-    };
-  };
-
-  consul.services = {
-    consul-api.port = 8500;
-    consul-ui = {
-      port = 8500;
-      tags = [
-        "traefik.enable=true"
-        "traefik.http.routers.consul.rule=Host(`consul.local.${globals.domains.main}`)"
-        "traefik.http.routers.consul.middlewares=authelia"
-      ];
-    };
   };
 
   guests =

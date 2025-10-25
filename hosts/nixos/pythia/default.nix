@@ -17,7 +17,7 @@
     zfs
     impermanence
     hardware
-    services.consul-client
+    services.consul-server
     services.traefik
   ];
 

@@ -14,7 +14,7 @@
     zfs
     impermanence
     hardware
-    services.consul-server
+    services.consul-client
   ];
 
   networking.hostId = "40f61b93";
