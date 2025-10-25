@@ -35,6 +35,7 @@
     restic
     cook-cli
     nodejs
+    lazygit
   ];
 
   launchd.user.agents.backrest = {
