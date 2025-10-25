@@ -126,14 +126,12 @@ in
     network = "internal";
   };
 
-  consul.services = {
-    paperless = {
-      inherit port;
-      tags = [
-        "traefik.enable=true"
-        "traefik.http.routers.paperless.rule=Host(`paperless.local.${globals.domains.main}`)"
-      ];
-    };
+  consul.services.paperless = {
+    inherit port;
+    tags = [
+      "traefik.enable=true"
+      "traefik.http.routers.paperless.rule=Host(`paperless.local.${globals.domains.main}`)"
+    ];
   };
 
   globals.nebula.mesh.hosts.zeus-paperless.firewall.inbound = [

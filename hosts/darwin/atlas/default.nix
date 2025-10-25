@@ -34,6 +34,7 @@
     backrest
     restic
     cook-cli
+    nodejs
   ];
 
   launchd.user.agents.backrest = {

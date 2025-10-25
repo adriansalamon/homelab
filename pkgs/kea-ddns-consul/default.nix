@@ -11,6 +11,7 @@ buildGoModule {
   meta = with lib; {
     description = "KEA DDNS to Consul";
     license = licenses.mit;
+    mainProgram = "kea-ddns-consul";
     platforms = platforms.all;
   };
 }

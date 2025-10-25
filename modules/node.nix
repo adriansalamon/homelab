@@ -26,5 +26,11 @@
       description = "Site of the node.";
       type = lib.types.str;
     };
+
+    guest = lib.mkOption {
+      description = "Is this node a VM guest node";
+      type = lib.types.bool;
+      default = false;
+    };
   };
 }

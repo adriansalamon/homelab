@@ -10,6 +10,7 @@
     ./net.nix
     ./samba
     ./snapserver
+    ./homepage.nix
     ./ai.nix
     common
     zfs

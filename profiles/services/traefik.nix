@@ -59,6 +59,7 @@
                 main = globals.domains.main;
                 sans = [
                   "*.${globals.domains.main}"
+                  "*.local.${globals.domains.main}"
                 ];
               }
             ];

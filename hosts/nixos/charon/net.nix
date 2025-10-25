@@ -70,5 +70,9 @@ in
 
   globals.nebula.mesh.hosts.charon = {
     id = 6;
+
+    routeSubnets = [
+      site.vlans.lan.cidrv4
+    ];
   };
 }

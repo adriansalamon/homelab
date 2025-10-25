@@ -21,10 +21,6 @@ in
   globals.nebula.mesh.hosts.${config.node.name} = {
     groups = [ "router" ];
 
-    routeSubnets = [
-      site.vlans.lan.cidrv4
-    ];
-
     config.settings = {
       # We do our own routing below, setting the src to be
       # able to use this route for the router itself

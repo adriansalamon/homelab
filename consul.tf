@@ -62,6 +62,17 @@ service_prefix "" {
 EOT
 }
 
+resource "consul_acl_policy" "homepage" {
+  name        = "homepage-policy"
+  description = "Policy for homepage to read nodes"
+  rules       = <<EOT
+node_prefix "" {
+  policy = "read"
+}
+EOT
+}
+
+
 resource "consul_acl_token" "server_token" {
   description = "Token for server"
   policies    = [consul_acl_policy.server_policy.name]
@@ -82,6 +93,11 @@ resource "consul_acl_token" "traefik" {
   policies    = [consul_acl_policy.traefik.name]
 }
 
+resource "consul_acl_token" "homepage" {
+  description = "Homepage Token"
+  policies    = [consul_acl_policy.homepage.name]
+}
+
 data "consul_acl_token_secret_id" "server_token" {
   accessor_id = consul_acl_token.server_token.id
 }
@@ -97,6 +113,11 @@ data "consul_acl_token_secret_id" "kea_ddns_token" {
 data "consul_acl_token_secret_id" "traefik" {
   accessor_id = consul_acl_token.traefik.id
 }
+
+data "consul_acl_token_secret_id" "homepage" {
+  accessor_id = consul_acl_token.homepage.id
+}
+
 
 locals {
   acl_tokens = {

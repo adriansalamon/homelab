@@ -88,33 +88,43 @@ git-agecrypt config -i secrets/yubikey-identity.pub
 
 ### Provisioning hosts
 
-TODO: figure out how to make this work with `git-agecrypt`.
-
-Boot into a NixOS live ISO, or try your luck with `nixos-anywhere`. Using
-`nixos-anywhere`:
-
-```
-nix run github:nix-community/nixos-anywhere -- --flake #name <user>@<host> --build-on-remote
-```
-
-If you want to do it manually (e.g. there might be some data already there, and
-you want to be careful). Read on. You can build a NixOS live ISO with
-preconfigured ssh keys:
+Boot into a NixOS live ISO, for example one pre-generated with your ssh key. You can build a
+NixOS live ISO with preconfigured ssh keys:
 
 ```bash
 nix build --print-out-paths --no-link github:adriansalamon/homelab#live-iso
 ```
 
-Then on the host run:
+After booting into your system, you will want to gather:
+
+- Hard drive ids, to put in `disk-config.nix`
+- Network interface mac ids, to put in `net.nix`
+- Anything else hardware-related
+
+When you are happy with config, run:
+
+```
+nix run github:nix-community/nixos-anywhere -- --flake #name <user>@<host> --build-on-remote
+```
+
+To install.
+
+If you want to do it manually (e.g. there might be some data already there, and
+you want to be careful). Read on.
+
+Get the repo on the host, and figure out how to decrypt git-agecrypt secrets. Then on the host run:
 
 ```bash
 export host=<name>
 nix-shell -p disko
-sudo disko -m disko --flake github:adriansalamon/homelab#$host
-sudo nixos-install --root /mnt --no-root-password --flake github:adriansalamon/homelab#$host
+sudo disko -m disko --flake .#$host
+sudo nixos-install --root /mnt --no-root-password --flake .#$host
 # Important! If the system has a zfs pool, otherwise it will fail to import on boot
 sudo umount -l /mnt && sudo zpool export -a
 ```
+
+After installing, grab the ssh public key and put in `<host>/secrets/host.pub`, rekey secrets,
+and deploy normally.
 
 ### OpenTofu
 

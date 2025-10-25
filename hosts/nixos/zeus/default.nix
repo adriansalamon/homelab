@@ -186,6 +186,7 @@
           ./guests/common.nix
           ./guests/${guestName}.nix
           {
+            node.guest = true;
             node.secretsDir = ./secrets/${guestName};
             networking.nftables.firewall = {
               zones.untrusted.interfaces = lib.mapAttrsToList (

@@ -2,7 +2,6 @@
   config,
   lib,
   globals,
-  pkgs,
   ...
 }:
 let
@@ -72,53 +71,30 @@ in
 
         jobs = [
           {
-            name = "snapshots";
-            type = "snap";
-            filesystems = cfg.filesystems;
-
-            snapshotting = {
-              type = "periodic";
-              prefix = "_zrepl";
-              interval = "15m";
-            };
-
-            pruning.keep = [
-              {
-                type = "regex";
-                negate = true;
-                regex = "^_zrepl.*$";
-              }
-              {
-                type = "last_n";
-                regex = "^_zrepl.*$";
-                count = 10;
-              }
-              {
-                type = "grid";
-                regex = "^_zrepl.*$";
-                grid = "1x1h(keep=all) | 24x1h | 30x1d | 12x30d";
-              }
-            ];
-          }
-          {
             name = "backup-to-hermes";
             type = "push";
             connect = {
               type = "tcp";
               address = "${globals.nebula.mesh.hosts.${cfg.target}.ipv4}:8888";
             };
-
             inherit (cfg) filesystems;
 
             snapshotting = {
-              type = "manual";
+              type = "periodic";
+              prefix = "_zrepl";
+              interval = "30m";
             };
 
             pruning.keep_sender = [
-              # pruning is done in snapshot job
               {
                 type = "regex";
-                regex = ".*";
+                negate = true;
+                regex = "^_zrepl.*$";
+              }
+              {
+                type = "grid";
+                regex = "^_zrepl.*$";
+                grid = "1x1h(keep=all) | 24x1h | 14x1d";
               }
             ];
 
@@ -136,28 +112,6 @@ in
             ];
           }
         ];
-      };
-    };
-
-    # run backups every night
-    systemd.services."zrepl-backup" = {
-      description = "Triggers a zrepl replicate/backup job";
-      after = [ "zrepl.service" ];
-
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${pkgs.zrepl}/bin/zrepl signal wakeup backup-to-hermes";
-      };
-    };
-
-    systemd.timers."zrepl-backup" = {
-      description = "zrepl backup";
-      wantedBy = [ "timers.target" ];
-      partOf = [ "zrepl-backup.service" ];
-      timerConfig = {
-        OnCalendar = "01:00";
-        RandomizedDelaySec = "3h";
-        Persistent = true;
       };
     };
   };
