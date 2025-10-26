@@ -1,6 +1,9 @@
-{ config, globals, ... }:
+{
+  config,
+  globals,
+  ...
+}:
 let
-  user = config.services.atticd.user;
   port = 8004;
   host = "nix-cache.local.${globals.domains.main}";
 in
@@ -11,21 +14,31 @@ in
     rekeyFile = config.node.secretsDir + "/atticd.env.age";
   };
 
-  services.postgresql = {
-    enable = true;
-    ensureUsers = [
+  # This is annoying :(
+  age.secrets.atticFullEnv.generator = {
+    dependencies = { inherit (config.age.secrets) atticEnv atticd-postgres-password; };
+    script =
       {
-        name = user;
-        ensureDBOwnership = true;
-      }
-    ];
-    ensureDatabases = [ user ];
+        lib,
+        decrypt,
+        deps,
+        ...
+      }:
+      ''
+        passwd=$(${decrypt} ${lib.escapeShellArg deps.atticd-postgres-password.file})
+        ${decrypt} ${lib.escapeShellArg deps.atticEnv.file}
+        echo "ATTIC_SERVER_DATABASE_URL='postgresql://atticd:"$passwd"@primary.homelab-cluster.service.consul:5432/atticd'"
+      '';
+  };
+
+  globals.databases.atticd = {
+    owner = "atticd";
   };
 
   services.atticd = {
     enable = true;
     mode = "monolithic";
-    environmentFile = config.age.secrets.atticEnv.path;
+    environmentFile = config.age.secrets.atticFullEnv.path;
 
     settings = {
       listen = "${globals.nebula.mesh.hosts.${config.node.name}.ipv4}:${builtins.toString port}";
@@ -37,8 +50,6 @@ in
       };
 
       jwt = { };
-
-      database.url = "postgresql:///${user}";
 
       compression = {
         type = "zstd";

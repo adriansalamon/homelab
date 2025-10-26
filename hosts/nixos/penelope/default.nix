@@ -22,7 +22,6 @@
   ];
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
 
   # Dynamic dns
   age.secrets.cloudflare-dns-api-token = {

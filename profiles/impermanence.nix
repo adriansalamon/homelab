@@ -30,7 +30,7 @@ in
     directories = [
       "/var/lib/nixos"
     ]
-    ++ optionals config.services.postgresql.enable [
+    ++ optionals (config.services.postgresql.enable || config.services.patroni.enable) [
       {
         directory = "/var/lib/postgresql";
         user = "postgres";

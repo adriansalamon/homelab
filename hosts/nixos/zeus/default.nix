@@ -25,7 +25,8 @@
     impermanence
     hardware
     storage-users
-    services.consul-server
+    services.consul-client
+    services.nomad.client
   ]);
 
   networking.hostId = "49e32584";
@@ -220,7 +221,7 @@
     lib.flatten (map createRulesForGuest guestNames);
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
+  meta.telegraf.enable = true;
 
   system.stateVersion = "24.11";
 }

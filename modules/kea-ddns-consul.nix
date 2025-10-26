@@ -31,6 +31,17 @@ in
           description = "URL of the Consul server";
           default = "http://127.0.0.1:8500";
         };
+
+        siteName = mkOption {
+          type = types.str;
+          description = "Site name identifier for this kea-ddns instance";
+        };
+
+        cleanupInterval = mkOption {
+          type = types.str;
+          description = "Interval for cleanup of expired services (Go duration format, e.g. '1h', '30m')";
+          default = "1h";
+        };
       };
     };
   };
@@ -57,6 +68,8 @@ in
       environment = {
         CONSUL_TOKEN_FILE = cfg.consulTokenFile;
         CONSUL_URL = cfg.consulUrl;
+        SITE_NAME = cfg.siteName;
+        CLEANUP_INTERVAL = cfg.cleanupInterval;
       };
     };
   };

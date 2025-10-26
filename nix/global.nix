@@ -47,6 +47,7 @@
             hetzner
             monitoring
             consul-servers
+            databases
             ;
         };
     };

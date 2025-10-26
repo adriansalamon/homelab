@@ -79,27 +79,30 @@ in
       "nebula-${name}.key" = {
         owner = "nebula-${name}";
         group = "nebula-${name}";
-        generator.script =
-          {
-            pkgs,
-            file,
-            decrypt,
-            ...
-          }:
-          let
-            pubkeyPath = lib.escapeShellArg (lib.removeSuffix ".key.age" file + ".crt");
-          in
-          # Using modified nebula-keygen-age. It generates private key to stdout, which we can then encrypt with age.
-          # Also, we need to sign the public key with the CA key, which we can pipe to stdin of the nebula-keygen-age.
-          ''
-            priv=$(${pkgs.nebula-keygen-age}/bin/nebula-keygen-age genkey -out-pub ${pubkeyPath})
-            ${decrypt} ${lib.escapeShellArg caKeyPath} \
-              | ${pkgs.nebula-keygen-age}/bin/nebula-keygen-age sign -name ${config.node.name} -ip "${ipv4cidr}" \
-                -subnets ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.routeSubnets)} \
-                -groups ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.groups)} \
-                -ca-crt ${lib.escapeShellArg caCertPath} -in-pub ${pubkeyPath} -out-crt ${pubkeyPath}
-            echo "$priv"
-          '';
+        generator = {
+          tags = [ "nebula-cert" ];
+          script =
+            {
+              pkgs,
+              file,
+              decrypt,
+              ...
+            }:
+            let
+              pubkeyPath = lib.escapeShellArg (lib.removeSuffix ".key.age" file + ".crt");
+            in
+            # Using modified nebula-keygen-age. It generates private key to stdout, which we can then encrypt with age.
+            # Also, we need to sign the public key with the CA key, which we can pipe to stdin of the nebula-keygen-age.
+            ''
+              priv=$(${pkgs.nebula-keygen-age}/bin/nebula-keygen-age genkey -out-pub ${pubkeyPath})
+              ${decrypt} ${lib.escapeShellArg caKeyPath} \
+                | ${pkgs.nebula-keygen-age}/bin/nebula-keygen-age sign -name ${config.node.name} -ip "${ipv4cidr}" \
+                  -subnets ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.routeSubnets)} \
+                  -groups ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.groups)} \
+                  -ca-crt ${lib.escapeShellArg caCertPath} -in-pub ${pubkeyPath} -out-crt ${pubkeyPath}
+              echo "$priv"
+            '';
+        };
       };
     }
   );

@@ -12,8 +12,10 @@
     zfs
     impermanence
     hardware
-    services.consul-client
+    services.consul-server
+    services.nomad.server
     services.traefik
+    services.valkey-server
     router.monitoring
     ./hw.nix
     ./disk-config.nix

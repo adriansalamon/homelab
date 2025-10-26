@@ -13,6 +13,11 @@ in
     inherit (nodes.athena.config.age.secrets.headscale-auth-key) rekeyFile;
   };
 
+  environment.persistence."/state".directories = lib.singleton {
+    directory = "/var/lib/tailscale";
+    mode = "0700";
+  };
+
   services.tailscale = {
     enable = true;
     interfaceName = "tailscale0";

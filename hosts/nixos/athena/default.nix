@@ -21,8 +21,10 @@ in
     zfs
     hardware
     impermanence
-    services.consul-client
+    services.consul-server
+    services.nomad.server
     services.traefik
+    services.valkey-server
     router.nebula
     router.monitoring
   ];

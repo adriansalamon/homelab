@@ -27,11 +27,6 @@
             localStorageDir = inputs.self.outPath + "/secrets/rekeyed/nomad";
           };
 
-          age.secrets."adrian-smb-password" = {
-            generator.script = "passphrase";
-            nomadPath = "nomad/jobs/smb";
-          };
-
           home = {
             username = "nomad";
             homeDirectory = "/home/nomad";

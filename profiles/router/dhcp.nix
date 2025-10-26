@@ -92,6 +92,7 @@ in
     enable = true;
     consulTokenFile = config.age.secrets.kea-ddns-consul-token.path;
     consulUrl = "http://127.0.0.1:8500";
+    siteName = config.node.site;
   };
 
 }

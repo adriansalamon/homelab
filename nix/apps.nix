@@ -16,5 +16,12 @@
         inherit pkgs;
         inherit (inputs.self) globals;
       };
+
+      apps.provision-postgres = import ../apps/provision-postgres.nix {
+        inherit pkgs;
+        inherit (inputs.self) globals;
+        inherit (inputs.self.nodes.demeter.config.age) secrets;
+        decryptIdentity = (builtins.head inputs.self.secretsConfig.masterIdentities).identity;
+      };
     };
 }

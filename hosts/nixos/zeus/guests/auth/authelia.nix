@@ -316,6 +316,10 @@ in
     };
   };
 
+  globals.databases.authelia = {
+    owner = "authelia";
+  };
+
   age.secrets = lib.mkMerge (
     [
       {

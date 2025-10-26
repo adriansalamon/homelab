@@ -9,7 +9,7 @@
     common
     zfs
     impermanence
-    services.consul-server
+    services.consul-client
   ];
 
   networking.hostId = "3b1ab44f";

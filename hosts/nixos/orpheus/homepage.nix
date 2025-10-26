@@ -43,7 +43,7 @@ in
       "PUBLIC_DOMAIN" = globals.domains.main;
       "PUBLIC_LOCAL_DOMAIN" = "local.${globals.domains.main}";
       "JELLYFIN_URL" = "https://jellyfin.${globals.domains.main}";
-      "CONSUL_URL" = "http://${globals.nebula.mesh.hosts.${config.node.name}.ipv4}:8500";
+      "CONSUL_URL" = "http://127.0.0.1:8500";
       "NODES_FILE" = nodesFile;
     };
   };

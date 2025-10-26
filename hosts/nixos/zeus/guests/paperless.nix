@@ -19,6 +19,10 @@ in
     profiles.storage-users
   ];
 
+  globals.databases.paperless = {
+    owner = "paperless";
+  };
+
   users.users."paperless".extraGroups = [ "scanning" ];
 
   environment.persistence."/persist".directories = [

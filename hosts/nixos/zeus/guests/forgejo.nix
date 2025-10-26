@@ -21,6 +21,10 @@ in
     inherit (config.services.forgejo) group;
   };
 
+  globals.databases.forgejo = {
+    owner = "forgejo";
+  };
+
   age.secrets.forgejo-postgres-password = {
     inherit (nodes.zeus.config.age.secrets.postgres-password) rekeyFile;
     mode = "440";

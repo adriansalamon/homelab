@@ -33,7 +33,7 @@ in
   };
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
+  meta.telegraf.enable = true;
 
   system.stateVersion = "24.11";
 }

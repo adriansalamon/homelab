@@ -12,6 +12,10 @@ in
 {
   # TODO: It would be nice provision the users and groups declaratively :)
 
+  globals.databases.lldap = {
+    owner = "lldap";
+  };
+
   users = {
     users.lldap = {
       group = "lldap";

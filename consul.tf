@@ -7,9 +7,9 @@ provider "consul" {
   token   = var.consul_bootstrap_token
 }
 
-resource "consul_acl_policy" "agent_policy" {
-  name        = "agent-policy"
-  description = "Policy for Consul agent nodes to register services"
+resource "consul_acl_policy" "base_agent" {
+  name        = "base-agent-policy"
+  description = "Base policy for all Consul agent nodes to register services and nodes"
   rules       = <<EOT
 node_prefix "" {
   policy = "write"
@@ -25,14 +25,8 @@ EOT
 
 resource "consul_acl_policy" "server_policy" {
   name        = "server-agent-policy"
-  description = "Policy for Consul server agents"
+  description = "Policy for Consul server agents with elevated permissions"
   rules       = <<EOT
-node_prefix "" {
-  policy = "write"
-}
-service_prefix "" {
-  policy = "write"
-}
 agent_prefix "" {
   policy = "write"
 }
@@ -72,15 +66,60 @@ node_prefix "" {
 EOT
 }
 
+resource "consul_acl_policy" "patroni" {
+  name  = "patroni-policy"
+  rules = <<EOT
+key_prefix "service/homelab-cluster/" {
+  policy = "write"
+}
+
+session_prefix "" {
+  policy = "write"
+}
+
+service "homelab-cluster" {
+  policy = "write"
+}
+
+service "homelab-cluster-primary" {
+  policy = "write"
+}
+
+service "homelab-cluster-replica" {
+  policy = "write"
+}
+
+service_prefix "" {
+  policy = "read"
+}
+
+node_prefix "" {
+  policy = "read"
+}
+  EOT
+}
+
+resource "consul_acl_policy" "nomad_server" {
+  name        = "nomad-server-policy"
+  description = "Policy for Nomad servers to manage state in Consul"
+  rules       = <<EOT
+acl  = "write"
+mesh = "write"
+EOT
+}
+
 
 resource "consul_acl_token" "server_token" {
-  description = "Token for server"
-  policies    = [consul_acl_policy.server_policy.name]
+  description = "Token for Consul server agents"
+  policies = [
+    consul_acl_policy.base_agent.name,
+    consul_acl_policy.server_policy.name
+  ]
 }
 
 resource "consul_acl_token" "agent_token" {
-  description = "Agent Token"
-  policies    = [consul_acl_policy.agent_policy.name]
+  description = "Token for Consul client agents"
+  policies    = [consul_acl_policy.base_agent.name]
 }
 
 resource "consul_acl_token" "kea_ddns_token" {
@@ -96,6 +135,24 @@ resource "consul_acl_token" "traefik" {
 resource "consul_acl_token" "homepage" {
   description = "Homepage Token"
   policies    = [consul_acl_policy.homepage.name]
+}
+
+resource "consul_acl_token" "patroni" {
+  description = "Token for patroni"
+  policies    = [consul_acl_policy.patroni.name]
+}
+
+resource "consul_acl_token" "nomad_server" {
+  description = "Token for Nomad servers"
+  policies = [
+    consul_acl_policy.nomad_server.name,
+    consul_acl_policy.base_agent.name
+  ]
+}
+
+resource "consul_acl_token" "nomad_client" {
+  description = "Token for Nomad clients"
+  policies    = [consul_acl_policy.base_agent.name]
 }
 
 data "consul_acl_token_secret_id" "server_token" {
@@ -118,19 +175,47 @@ data "consul_acl_token_secret_id" "homepage" {
   accessor_id = consul_acl_token.homepage.id
 }
 
+data "consul_acl_token_secret_id" "patroni" {
+  accessor_id = consul_acl_token.patroni.id
+}
+
+data "consul_acl_token_secret_id" "nomad_server" {
+  accessor_id = consul_acl_token.nomad_server.id
+}
+
+data "consul_acl_token_secret_id" "nomad_client" {
+  accessor_id = consul_acl_token.nomad_client.id
+}
 
 locals {
   acl_tokens = {
-    server = data.consul_acl_token_secret_id.server_token
-    agent  = data.consul_acl_token_secret_id.agent_token
+    server       = data.consul_acl_token_secret_id.server_token
+    agent        = data.consul_acl_token_secret_id.agent_token
+    nomad_server = data.consul_acl_token_secret_id.nomad_server
+    nomad_client = data.consul_acl_token_secret_id.nomad_client
   }
-
 
   tokens = {
     kea_ddns = data.consul_acl_token_secret_id.kea_ddns_token
     traefik  = data.consul_acl_token_secret_id.traefik
   }
 }
+
+# Optional: Uncomment to generate gossip key file for encryption
+# resource "local_file" "nomad_gossip_key" {
+#   filename        = "secrets/nomad/gossip-key"
+#   file_permission = "0600"
+#   content         = local.nomad_gossip_key_b64
+#   provisioner "local-exec" {
+#     command     = <<BASH
+#       filename="secrets/nomad/gossip-key"
+#       rm "$filename.age"
+#       rage -i $IDENTITY_FILE -e "$filename" -o "$filename.age"
+#       rm $filename
+#     BASH
+#     working_dir = "."
+#   }
+# }
 
 # // local exec to create the acl
 # //

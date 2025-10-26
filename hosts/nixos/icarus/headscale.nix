@@ -49,7 +49,7 @@ let
       }
     ];
 
-    autoApporvers = {
+    autoApprovers = {
       routes = flip mapAttrs' globals.sites (
         _: siteCfg: {
           name = siteCfg.vlans.lan.cidrv4;

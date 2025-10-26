@@ -25,3 +25,8 @@ variable "domain" {
   type        = string
   description = "Domain name"
 }
+
+variable "nomad_bootstrap_token" {
+  type        = string
+  description = "Nomad bootstrap token"
+}

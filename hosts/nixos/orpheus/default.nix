@@ -12,17 +12,19 @@
     ./snapserver
     ./homepage.nix
     ./ai.nix
+    ./db.nix
     common
     zfs
     storage-users
     hardware
-    services.consul-server
+    services.consul-client
+    services.nomad.client
   ];
 
   networking.hostId = "fa959c4a";
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
+  meta.telegraf.enable = true;
 
   globals.nebula.mesh.hosts.orpheus = {
     id = 2;

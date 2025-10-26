@@ -18,11 +18,13 @@
     impermanence
     hardware
     services.consul-server
+    services.nomad.server
     services.traefik
+    services.valkey-server
   ];
 
   meta.vector.enable = true;
-  meta.prometheus.enable = true;
+  meta.telegraf.enable = true;
 
   # Dynamic dns
   age.secrets.cloudflare-dns-api-token = {

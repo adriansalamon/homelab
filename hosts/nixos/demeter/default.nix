@@ -10,11 +10,13 @@
     ./disk-config.nix
     ./hw.nix
     ./atticd.nix
+    ./db.nix
     common
     zfs
     impermanence
     hardware
     services.consul-client
+    services.nomad.client
   ];
 
   networking.hostId = "40f61b93";
