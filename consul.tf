@@ -20,6 +20,9 @@ service_prefix "" {
 agent_prefix "" {
   policy = "read"
 }
+key_prefix "config/" {
+  policy = "read"
+}
 EOT
 }
 
@@ -199,6 +202,13 @@ locals {
     kea_ddns = data.consul_acl_token_secret_id.kea_ddns_token
     traefik  = data.consul_acl_token_secret_id.traefik
   }
+}
+
+# Module to setup Consul with Nomad Workload Identities
+module "consul_setup" {
+  source = "hashicorp-modules/nomad-setup/consul"
+
+  nomad_jwks_url = "${var.nomad_url}/.well-known/jwks.json"
 }
 
 # Optional: Uncomment to generate gossip key file for encryption

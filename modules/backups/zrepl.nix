@@ -29,7 +29,7 @@ in
   config = lib.mkIf cfg.enable {
 
     # register metrics in Consul
-    consul.services."${me}-zrepl-metrics" = {
+    consul.services."zrepl" = {
       port = 9811;
       tags = [ "prometheus.scrape=true" ];
     };

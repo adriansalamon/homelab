@@ -27,7 +27,6 @@ in
       data_dir = "/var/lib/nomad";
       bind_addr = nebulaIp;
 
-      # This is implicitly set up, but is here for clarity
       consul = {
         address = "127.0.0.1:8500";
       };

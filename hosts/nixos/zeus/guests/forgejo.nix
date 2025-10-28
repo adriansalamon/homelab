@@ -4,6 +4,7 @@
   lib,
   globals,
   nodes,
+  nomadCfg,
   ...
 }:
 let
@@ -16,7 +17,7 @@ in
     config.node.secretsDir + "/forgejo-mailer-password.age";
 
   age.secrets.forgejo-oidc-client-secret = {
-    inherit (nodes.zeus-auth.config.age.secrets.forgejo-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.forgejo-oidc-client-secret) rekeyFile;
     mode = "440";
     inherit (config.services.forgejo) group;
   };
@@ -36,7 +37,7 @@ in
 
     firewall.inbound = [
       {
-        port = builtins.toString anubisPort;
+        port = anubisPort;
         proto = "tcp";
         group = "reverse-proxy";
       }

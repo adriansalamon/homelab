@@ -13,17 +13,26 @@ in
   networking.useNetworkd = true;
   systemd.network.enable = true;
 
-  systemd.network.netdevs = flip concatMapAttrs vlans (
-    name: id: {
-      "30-vlan-${name}" = {
-        netdevConfig = {
-          Kind = "vlan";
-          Name = name;
+  systemd.network.netdevs =
+    (flip concatMapAttrs vlans (
+      name: id: {
+        "30-vlan-${name}" = {
+          netdevConfig = {
+            Kind = "vlan";
+            Name = name;
+          };
+          vlanConfig.Id = id;
         };
-        vlanConfig.Id = id;
+      }
+    ))
+    // {
+      "40-serverBr" = {
+        netdevConfig = {
+          Kind = "bridge";
+          Name = "serverBr";
+        };
       };
-    }
-  );
+    };
 
   systemd.network.networks = {
     "10-physical" = {
@@ -45,10 +54,20 @@ in
     "30-vlan-server" = {
       matchConfig.Name = "server";
       networkConfig = {
+        DHCP = "no";
+        Bridge = "serverBr";
+      };
+    };
+
+    "40-serverBr" = {
+      matchConfig.Name = "serverBr";
+      networkConfig = {
         DHCP = "yes";
       };
     };
   };
 
-  networking.nftables.firewall.zones.untrusted.interfaces = builtins.attrNames vlans;
+  networking.nftables.firewall.zones.untrusted.interfaces = (builtins.attrNames vlans) ++ [
+    "serverBr"
+  ];
 }

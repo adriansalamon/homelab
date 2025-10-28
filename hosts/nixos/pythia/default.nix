@@ -21,6 +21,7 @@
     services.nomad.server
     services.traefik
     services.valkey-server
+    services.etcd
   ];
 
   meta.vector.enable = true;

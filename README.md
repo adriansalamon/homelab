@@ -62,9 +62,7 @@ configuration is done using Nix.
 
 TODO/add:
 
-- A simple cluster to learn about orchestration (k8s, k3s or nomad)
 - Some simple object storage (always useful)
-- Dashboard (glance/homepage)
 - Some GitOps stuff, e.g. auto-deploy
 
 ### Secrets 🔐
@@ -103,8 +101,8 @@ After booting into your system, you will want to gather:
 
 When you are happy with config, run:
 
-```
-nix run github:nix-community/nixos-anywhere -- --flake #name <user>@<host> --build-on-remote
+```bash
+nix run github:nix-community/nixos-anywhere -- --flake .#name <user>@<host> --build-on-remote
 ```
 
 To install.
@@ -112,15 +110,17 @@ To install.
 If you want to do it manually (e.g. there might be some data already there, and
 you want to be careful). Read on.
 
-Get the repo on the host, and figure out how to decrypt git-agecrypt secrets. Then on the host run:
+Get the repo on the host, e.g. `git ls-files | rsync -a --files-from=- . <user>@<host>/homelab`. Then on the host run:
 
 ```bash
-export host=<name>
-nix-shell -p disko
-sudo disko -m disko --flake .#$host
-sudo nixos-install --root /mnt --no-root-password --flake .#$host
-# Important! If the system has a zfs pool, otherwise it will fail to import on boot
-sudo umount -l /mnt && sudo zpool export -a
+nix shell nixpkgs#disko
+sudo disko -m <disko|format|mount> --flake .#<host>
+```
+
+To make sure your filesystem is formatted correctly. You are then ready to install like normally:
+
+```bash
+nix run github:nix-community/nixos-anywhere -- --flake .#name <user>@<host> --build-on-remote --disko-mode mount
 ```
 
 After installing, grab the ssh public key and put in `<host>/secrets/host.pub`, rekey secrets,

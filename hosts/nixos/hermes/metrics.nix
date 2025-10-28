@@ -122,7 +122,7 @@ in
   };
 
   # register metrics in Consul
-  consul.services."${host}-rustic-exporter" = {
+  consul.services."rustic" = {
     inherit (config.services.prometheus.exporters.rustic) port;
     tags = [ "prometheus.scrape=true" ];
   };

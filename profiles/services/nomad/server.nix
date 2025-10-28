@@ -29,6 +29,19 @@ in
         bootstrap_expect = 3;
       };
 
+      # For services and tasks to get identities from Consul
+      consul = {
+        service_identity = {
+          aud = [ "consul.io" ];
+          ttl = "1h";
+        };
+
+        task_identity = {
+          aud = [ "consul.io" ];
+          ttl = "1h";
+        };
+      };
+
       tls = {
         cert_file = "${nomadSecretDir}/global-server-nomad.pem";
         key_file = config.age.secrets."server-nomad-key.pem".path;

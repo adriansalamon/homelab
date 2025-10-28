@@ -1,25 +1,25 @@
 {
   config,
   lib,
-  nodes,
+  nomadCfg,
   globals,
   ...
 }:
 {
 
-  # environment.persistence."/state".directories = [
-  #   {
-  #     directory = "/var/lib/private/ollama";
-  #     mode = "0700";
-  #   }
-  #   {
-  #     directory = "/var/lib/private/open-webui";
-  #     mode = "0700";
-  #   }
-  # ];
+  environment.persistence."/state".directories = [
+    {
+      directory = "/var/lib/private/ollama";
+      mode = "0700";
+    }
+    {
+      directory = "/var/lib/private/open-webui";
+      mode = "0700";
+    }
+  ];
 
   age.secrets.open-webui-env = {
-    generator.dependencies = [ nodes.zeus-auth.config.age.secrets.open-webui-oidc-client-secret ];
+    generator.dependencies = [ nomadCfg.config.age.secrets.open-webui-oidc-client-secret ];
     generator.script = lib.helpers.generateWithEnv "OAUTH_CLIENT_SECRET";
   };
 

@@ -1,5 +1,6 @@
 {
   inputs,
+  globals,
   ...
 }:
 {
@@ -25,12 +26,12 @@
       experimental-features = "nix-command flakes";
 
       substituters = [
-        "https://nix-cache.local.salamon.xyz/homelab"
+        "https://nix-cache.local.${globals.domains.main}/homelab"
         "https://cache.nixos.org"
       ];
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "homelab:1U/4nSASmrwaLvlRbX3wGtDj6q6dPSQTeCbjlqjQ6Ao="
+        "homelab:leKffLkOCSfX8pPGaQltduLxJNNVmG5oGPt6w3fH4t0="
       ];
     };
   };

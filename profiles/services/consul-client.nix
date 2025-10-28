@@ -24,9 +24,17 @@ in
       client_addr = "127.0.0.1";
       retry_join = consulServers;
 
+      connect = {
+        enabled = true;
+      };
+
       acl = {
         enabled = true;
         default_policy = "deny";
+      };
+
+      ports = {
+        grpc = 8502;
       };
     };
 

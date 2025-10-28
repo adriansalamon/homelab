@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  nodes,
+  nomadCfg,
   lib,
   globals,
   ...
@@ -31,7 +31,7 @@ in
 
   age.secrets."home-assistant-secrets.yaml" = {
     generator = {
-      dependencies = [ nodes.zeus-auth.config.age.secrets.hass-oidc-client-secret ];
+      dependencies = [ nomadCfg.config.age.secrets.hass-oidc-client-secret ];
       script =
         {
           lib,

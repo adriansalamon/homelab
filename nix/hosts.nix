@@ -25,6 +25,7 @@
               inherit (pkgs) lib;
               inherit (config) nodes globals;
               inherit profiles;
+              nomadCfg = config.homeConfigurations.nomad;
             };
             modules = [
               inputs.microvm.nixosModules.host

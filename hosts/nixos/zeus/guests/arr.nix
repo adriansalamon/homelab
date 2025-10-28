@@ -172,7 +172,7 @@ in
 
   globals.nebula.mesh.hosts.zeus-arr.firewall.inbound = flip mapAttrsToList ports (
     _: port: {
-      port = builtins.toString port;
+      inherit port;
       proto = "tcp";
       group = "reverse-proxy";
     }

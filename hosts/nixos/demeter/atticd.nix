@@ -1,6 +1,7 @@
 {
   config,
   globals,
+  lib,
   ...
 }:
 let
@@ -54,6 +55,8 @@ in
       compression = {
         type = "zstd";
       };
+
+      database = lib.mkForce { };
 
       chunking = {
         nar-size-threshold = 64 * 1024; # chunk files that are 64 KiB or larger

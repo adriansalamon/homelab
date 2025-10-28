@@ -4,6 +4,7 @@
   lib,
   nodes,
   globals,
+  nomadCfg,
   profiles,
   ...
 }:
@@ -42,7 +43,7 @@ in
   };
 
   age.secrets.paperless-oidc-client-secret = {
-    inherit (nodes.zeus-auth.config.age.secrets.paperless-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.paperless-oidc-client-secret) rekeyFile;
     mode = "440";
     group = "paperless";
   };
@@ -140,7 +141,7 @@ in
 
   globals.nebula.mesh.hosts.zeus-paperless.firewall.inbound = [
     {
-      port = builtins.toString port;
+      inherit port;
       proto = "tcp";
       group = "reverse-proxy";
     }

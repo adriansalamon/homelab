@@ -44,7 +44,7 @@
       };
 
       "adrian" = {
-        path = "/mnt/tank03/adrian/";
+        path = "/data/tank03/adrian/";
         "browseable" = "yes";
         "writable" = "yes";
         "guest ok" = "no";
@@ -52,7 +52,7 @@
       };
 
       "media" = {
-        path = "/mnt/tank03/media/";
+        path = "/data/tank03/media/";
         "browseable" = "yes";
         "writable" = "yes";
         "guest ok" = "no";

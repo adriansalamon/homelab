@@ -23,5 +23,10 @@
         inherit (inputs.self.nodes.demeter.config.age) secrets;
         decryptIdentity = (builtins.head inputs.self.secretsConfig.masterIdentities).identity;
       };
+
+      apps.provision-nomad-secrets = import ../apps/provision-nomad-secrets.nix {
+        inherit pkgs inputs;
+        decryptIdentity = (builtins.head inputs.self.secretsConfig.masterIdentities).identity;
+      };
     };
 }

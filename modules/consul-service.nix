@@ -8,14 +8,14 @@ let
     literalExpression
     ;
 
-  svcToFile = name: attrs: {
-    name = "consul.d/${name}.json";
+  svcToFile = id: attrs: {
+    name = "consul.d/${id}.json";
     value.text = builtins.toJSON {
       service = {
-        id = name;
-        name = name;
+        inherit id;
+        name = attrs.name or id;
       }
-      // attrs;
+      // (builtins.removeAttrs attrs [ "name" ]);
     };
   };
 in
@@ -33,6 +33,11 @@ in
         "jellyfin" = {
           port = 8096;
           tags = [ "traefik.enable=true" ];
+        };
+        "jellyfin-metrics" = {
+          name = "jellyfin";
+          port = 9001;
+          tags = [ "prometheus.scrape=true" ];
         };
       }
     '';

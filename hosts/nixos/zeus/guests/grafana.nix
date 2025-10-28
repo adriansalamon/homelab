@@ -2,6 +2,7 @@
   config,
   globals,
   nodes,
+  nomadCfg,
   ...
 }:
 {
@@ -22,7 +23,7 @@
 
   # Mirror the original oidc secret
   age.secrets.grafana-oidc-client-secret = {
-    inherit (nodes.zeus-auth.config.age.secrets.grafana-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.grafana-oidc-client-secret) rekeyFile;
     mode = "440";
     group = "grafana";
   };

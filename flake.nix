@@ -72,7 +72,7 @@
         ./nix/iso.nix
         ./nix/apps.nix
         ./nix/global.nix
-        ./nomad
+        ./nix/nomad.nix
       ];
     };
 }

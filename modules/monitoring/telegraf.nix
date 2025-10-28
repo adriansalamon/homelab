@@ -176,7 +176,7 @@ in
     };
 
     # register it in Consul
-    consul.services."${name}-telegraf" = {
+    consul.services."telegraf" = {
       inherit (cfg) port;
       tags = [ "prometheus.scrape=true" ];
     };
@@ -184,11 +184,10 @@ in
     # allow the prometheus scrape server to access
     globals.nebula.mesh.hosts.${name}.firewall.inbound = [
       {
-        port = builtins.toString cfg.port;
+        inherit (cfg) port;
         proto = "tcp";
         host = "zeus-prometheus";
       }
     ];
   };
-
 }

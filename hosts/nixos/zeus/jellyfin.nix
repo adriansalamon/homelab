@@ -80,7 +80,7 @@ in
 
   globals.nebula.mesh.hosts.zeus.firewall.inbound = [
     {
-      port = builtins.toString port;
+      inherit port;
       proto = "tcp";
       group = "reverse-proxy";
     }

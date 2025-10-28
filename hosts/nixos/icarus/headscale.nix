@@ -3,7 +3,7 @@
   lib,
   pkgs,
   globals,
-  nodes,
+  nomadCfg,
   ...
 }:
 let
@@ -72,7 +72,7 @@ in
 {
   # Mirror the original oidc secret
   age.secrets.headscale-oidc-client-secret = {
-    inherit (nodes.zeus-auth.config.age.secrets.headscale-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.headscale-oidc-client-secret) rekeyFile;
     owner = "headscale";
   };
 
@@ -145,7 +145,7 @@ in
   };
 
   consul.services.headscale = {
-    port = config.services.headscale.port;
+    inherit (config.services.headscale) port;
     tags = [
       "traefik.enable=true"
       "traefik.external=true"

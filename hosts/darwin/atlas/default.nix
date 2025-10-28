@@ -36,6 +36,7 @@
     cook-cli
     nodejs
     lazygit
+    nomad
   ];
 
   launchd.user.agents.backrest = {

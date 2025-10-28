@@ -4,7 +4,7 @@
 
   node.site = "erebus";
 
-  imports = with profiles; [
+  imports = [
     ./disk-config.nix
     ./hardware-configuration.nix
     ./net.nix
@@ -12,14 +12,18 @@
     ./snapserver
     ./homepage.nix
     ./ai.nix
-    ./db.nix
+    ./guests.nix
+  ]
+  ++ (with profiles; [
     common
     zfs
     storage-users
     hardware
+    impermanence
     services.consul-client
-    services.nomad.client
-  ];
+    #services.nomad.client
+    services.patroni
+  ]);
 
   networking.hostId = "fa959c4a";
 

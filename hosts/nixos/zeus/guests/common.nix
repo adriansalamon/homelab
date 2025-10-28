@@ -4,6 +4,8 @@
   ...
 }:
 {
+  networking.hostName = config.node.name;
+
   # All nodes definetely want to be in the nebula mesh, and part of consul cluster
   imports = [
     profiles.services.consul-client

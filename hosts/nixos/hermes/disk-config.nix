@@ -140,7 +140,7 @@ in
   };
 
   # register metrics in Consul
-  consul.services."${host}-zrepl-metrics" = {
+  consul.services."zrepl" = {
     port = 9811;
     tags = [ "prometheus.scrape=true" ];
   };

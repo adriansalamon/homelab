@@ -52,13 +52,13 @@ in
     inherit port;
     tags = [
       "traefik.enable=true"
-      "traefik.http.routers.homepage.rule=Host(`home.salamon.xyz`) || Host(`home.local.salamon.xyz`)"
+      "traefik.http.routers.homepage.rule=Host(`home.${globals.domains.main}`) || Host(`home.local.${globals.domains.main}`)"
       "traefik.http.routers.homepage.middlewares=authelia"
     ];
   };
 
   globals.nebula.mesh.hosts.${config.node.name}.firewall.inbound = lib.singleton {
-    port = builtins.toString port;
+    inherit port;
     proto = "tcp";
     group = "reverse-proxy";
   };

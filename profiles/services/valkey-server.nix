@@ -27,7 +27,7 @@ in
 
   # Persist Valkey data
   environment.persistence."/persist".directories = lib.singleton {
-    directory = "/var/lib/redis-primary";
+    directory = "/var/lib/redis-server";
     mode = "0700";
     user = "redis";
     group = "redis";
@@ -36,7 +36,7 @@ in
   age.secrets.valkey-server-password = {
     rekeyFile = inputs.self.outPath + "/secrets/generated/valkey-server-password.age";
     generator.script = "alnum";
-    owner = config.services.redis.servers.primary.user;
+    owner = config.services.redis.servers.server.user;
   };
 
   age.secrets.valkey-sentinel-password = {
@@ -50,7 +50,7 @@ in
     package = pkgs.valkey;
 
     servers = {
-      primary = {
+      server = {
         enable = true;
         user = "redis";
 
@@ -89,7 +89,7 @@ in
     };
   };
 
-  systemd.services.redis-primary = {
+  systemd.services.redis-server = {
     serviceConfig.ExecStartPre = lib.mkAfter [
       (
         "+"
@@ -97,7 +97,7 @@ in
           {
             echo -n "masterauth "
             cat ${config.age.secrets.valkey-server-password.path}
-          } >> "/run/redis-primary/nixos.conf"
+          } >> "/run/redis-server/nixos.conf"
         ''
       )
     ];
@@ -123,26 +123,51 @@ in
   };
 
   consul.services = {
-    redis = {
-      inherit (config.services.redis.servers.primary) port;
-    };
+    redis =
+      let
+        inherit (config.services.redis.servers.server) port bind;
+      in
+      {
+        name = "redis";
+        inherit port;
 
-    redis-sentinel = {
-      inherit (config.services.redis.servers.sentinel) port;
-    };
+        check = {
+          tcp = "${bind}:${toString port}";
+          interval = "10s";
+          timeout = "2s";
+        };
+
+        tags = [ "server" ];
+      };
+
+    redis-sentinel =
+      let
+        inherit (config.services.redis.servers.sentinel) port bind;
+      in
+      {
+        name = "redis";
+        inherit port;
+
+        check = {
+          tcp = "${bind}:${toString port}";
+          interval = "10s";
+          timeout = "2s";
+        };
+
+        tags = [ "sentinel" ];
+      };
   };
 
   globals.nebula.mesh.hosts.${host}.firewall.inbound = [
     {
-      port = builtins.toString config.services.redis.servers.primary.port;
+      inherit (config.services.redis.servers.server) port;
       proto = "tcp";
       group = "any";
     }
     {
-      port = builtins.toString config.services.redis.servers.sentinel.port;
+      inherit (config.services.redis.servers.sentinel) port;
       proto = "tcp";
       group = "any";
     }
   ];
-
 }

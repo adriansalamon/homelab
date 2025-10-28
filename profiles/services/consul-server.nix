@@ -40,9 +40,17 @@ in
       retry_join = consulServers;
       bootstrap_expect = builtins.length globals.consul-servers;
 
+      connect = {
+        enabled = true;
+      };
+
       acl = {
         enabled = true;
         default_policy = "deny";
+      };
+
+      ports = {
+        grpc = 8502;
       };
     };
 

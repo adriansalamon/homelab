@@ -19,8 +19,10 @@
     services.nomad.client
   ];
 
+  meta.usenftables = false;
+
   networking.hostId = "40f61b93";
-  networking.nftables.enable = true;
+  networking.nftables.enable = false;
 
   networking.useNetworkd = true;
   systemd.network.enable = true;
@@ -77,7 +79,7 @@
     };
   };
 
-  networking.nftables.firewall.zones.untrusted.interfaces = [ "serverBr" ];
+  # networking.nftables.firewall.zones.untrusted.interfaces = [ "serverBr" ];
 
   globals.nebula.mesh.hosts.demeter = {
     id = 3;

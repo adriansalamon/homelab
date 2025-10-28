@@ -22,6 +22,7 @@
   ];
 
   meta.vector.enable = true;
+  meta.telegraf.enable = true;
 
   # Dynamic dns
   age.secrets.cloudflare-dns-api-token = {

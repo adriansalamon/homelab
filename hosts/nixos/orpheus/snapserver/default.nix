@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   config,
   globals,
   ...
@@ -9,6 +10,12 @@ let
 in
 {
   imports = [ ./airplay.nix ];
+
+  # librespot caches Spotify Oauth tokens here
+  environment.persistence."/state".directories = lib.singleton {
+    directory = "/var/lib/snapserver";
+    mode = "0700";
+  };
 
   services.snapserver = {
     enable = true;
@@ -46,7 +53,7 @@ in
   };
 
   consul.services.snapcast = {
-    port = config.services.snapserver.settings.http.port;
+    inherit (config.services.snapserver.settings.http) port;
     tags = [
       "traefik.enable=true"
       "traefik.http.routers.snapcast.rule=Host(`snapcast.local.${globals.domains.main}`)"
@@ -56,12 +63,12 @@ in
 
   globals.nebula.mesh.hosts.orpheus.firewall.inbound = [
     {
-      port = builtins.toString config.services.snapserver.settings.http.port;
+      inherit (config.services.snapserver.settings.http) port;
       proto = "tcp";
       group = "reverse-proxy";
     }
     {
-      port = builtins.toString config.services.snapserver.settings.tcp.port;
+      inherit (config.services.snapserver.settings.tcp) port;
       proto = "tcp";
       host = "zeus-home-assistant";
     }

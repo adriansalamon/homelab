@@ -25,6 +25,7 @@ in
     services.nomad.server
     services.traefik
     services.valkey-server
+    services.etcd
     router.nebula
     router.monitoring
   ];

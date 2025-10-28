@@ -1,5 +1,4 @@
-# Example to create a bios compatible gpt partition
-{ ... }:
+{ lib, ... }:
 {
   disko.devices = {
     disk.disk1 = {
@@ -27,8 +26,8 @@
             name = "root";
             size = "100%";
             content = {
-              type = "lvm_pv";
-              vg = "pool";
+              type = "zfs";
+              pool = "zroot";
             };
           };
         };
@@ -42,32 +41,21 @@
       datasets = {
         "adrian" = {
           type = "zfs_fs";
-          mountpoint = "/mnt/tank03/adrian";
+          mountpoint = "/data/tank03/adrian";
           options.mountpoint = "legacy";
         };
 
         "media" = {
           type = "zfs_fs";
-          mountpoint = "/mnt/tank03/media";
+          mountpoint = "/data/tank03/media";
           options.mountpoint = "legacy";
         };
       };
     };
 
-    lvm_vg = {
-      pool = {
-        type = "lvm_vg";
-        lvs = {
-          root = {
-            size = "100%FREE";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/";
-              mountOptions = [ "defaults" ];
-            };
-          };
-        };
+    zpool.zroot = lib.disk.zfs.mkZpool {
+      datasets = lib.disk.zfs.impermanenceDatasets // {
+        "safe/guests" = lib.disk.zfs.unmountable;
       };
     };
   };
@@ -82,6 +70,6 @@
 
   meta.backups.storageboxes."cloud-backups" = {
     subuser = "orpheus-files";
-    paths = [ "/mnt/tank03/adrian/" ];
+    paths = [ "/data/tank03/adrian/" ];
   };
 }

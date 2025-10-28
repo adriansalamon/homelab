@@ -30,3 +30,7 @@ variable "nomad_bootstrap_token" {
   type        = string
   description = "Nomad bootstrap token"
 }
+
+variable "nomad_url" {
+  type = string
+}

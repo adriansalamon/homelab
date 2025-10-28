@@ -72,7 +72,7 @@
 
   globals.nebula.mesh.hosts.${config.node.name}.firewall.inbound = [
     {
-      port = builtins.toString config.services.postgresql.settings.port;
+      inherit (config.services.postgresql.settings) port;
       proto = "tcp";
       group = "postgres-client";
     }
