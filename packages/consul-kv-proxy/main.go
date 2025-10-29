@@ -13,7 +13,7 @@ import (
 
 func main() {
 	port := getEnv("PORT", "8080")
-	consulAddr := getEnv("CONSUL_ADDR", "http://127.0.0.1:8500")
+	consulAddr := getEnv("CONSUL_HTTP_ADDR", "http://127.0.0.1:8500")
 
 	http.HandleFunc("/", handleRequest(consulAddr))
 	http.HandleFunc("/health", handleHealth)

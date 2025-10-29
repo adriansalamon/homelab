@@ -6,7 +6,7 @@
 }:
 zonesFn:
 let
-  consulIp = config.services.consul.extraConfig.client_addr;
+  consulIp = "127.0.0.1";
 
   snippets = ''
     (internal) {

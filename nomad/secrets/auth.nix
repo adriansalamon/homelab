@@ -238,7 +238,7 @@ in
       nomadPath = "nomad/jobs/authelia";
     };
     authelia_redis_sentinel_password = {
-      rekeyFile = inputs.self.outPath + "/secrets/generated/valkey-sen-password.age";
+      rekeyFile = inputs.self.outPath + "/secrets/generated/valkey-sentinel-password.age";
       nomadPath = "nomad/jobs/authelia";
     };
     authelia_smtp_password = mkSecret "authelia" "smtp-password.txt.age";

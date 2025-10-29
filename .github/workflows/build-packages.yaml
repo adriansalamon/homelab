@@ -2,6 +2,8 @@ name: "build-packages"
 
 on:
   push:
+    branches:
+      - "main"
     paths:
       - "packages/**"
       - ".github/workflows/build-packages.yaml"
@@ -22,6 +24,8 @@ jobs:
           filters: |
             consul-kv-proxy:
               - 'packages/consul-kv-proxy/**'
+            homepage:
+              - 'packages/homepage/**'
 
   # Build matrix of services
   build:
@@ -59,7 +63,6 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix={{branch}}-
             type=ref,event=branch
-            type=ref,event=pr
 
       - name: Build and push
         uses: docker/build-push-action@v5

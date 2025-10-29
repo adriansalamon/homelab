@@ -1,0 +1,55 @@
+<script lang="ts">
+	import { Carousel, Card } from "$lib/components/ui";
+	import { trpc } from "$lib/trpc";
+	import Autoplay from "embla-carousel-autoplay";
+	import JellyfinCarouselCard from "./JellyfinCarouselCard.svelte";
+	import { onDestroy } from "svelte";
+	import { createMediaStore } from "svelte-media-queries";
+
+	interface Props {
+		domain: string;
+	}
+
+	const { domain }: Props = $props();
+
+	const jfData = trpc()?.jellyfin.latestMedia.createQuery();
+
+	const matches = createMediaStore("(min-width: 768px)");
+	onDestroy(() => matches.destroy());
+</script>
+
+<Carousel.Root
+	class="mx-auto mb-2 w-full"
+	opts={$jfData?.data
+		? {
+				loop: true,
+			}
+		: undefined}
+	plugins={$jfData?.data
+		? [
+				Autoplay({
+					delay: 10000000,
+				}),
+			]
+		: undefined}
+>
+	<Carousel.Content>
+		{#if $jfData?.data}
+			{#each $jfData.data as item}
+				<JellyfinCarouselCard {item} {domain} />
+			{/each}
+		{:else}
+			<Carousel.Item>
+				<Card.Root class="animate-pulse bg-muted">
+					<Card.Content
+						class="flex h-32 min-h-32 items-end justify-start p-6 sm:h-48 sm:min-h-48 md:h-48 md:min-h-64"
+					></Card.Content>
+				</Card.Root>
+			</Carousel.Item>
+		{/if}
+	</Carousel.Content>
+	{#if $matches}
+		<Carousel.Previous />
+		<Carousel.Next />
+	{/if}
+</Carousel.Root>

@@ -48,9 +48,11 @@ in
             let
               decryptSecrets = concatStringsSep "\n" (
                 map (secret: ''
+                  echo "Decrypting ${secret.name}"
                   secret=$(${decryptSecret secret})
-                  name=$(echo "${secret.name}" | sed -E 's/[^_]+_(.+)/\1/g' | sed 's/-/_/g')
-                  printf "%s" "$name = \"$secret\"" >> "$tmpfile"
+                  name=$(echo "${secret.name}" | sed 's/-/_/g' | sed -E 's/[^_]+_(.+)/\1/g')
+                  echo "Uploading to $name"
+                  printf "%s\n" "$name = \"$secret\"" >> "$tmpfile"
                 '') secrets
               );
             in

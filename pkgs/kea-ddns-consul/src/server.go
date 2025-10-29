@@ -41,9 +41,9 @@ func main() {
 		IP:   net.ParseIP("127.0.0.1"),
 	}
 
-	consulUrl, ok := os.LookupEnv("CONSUL_URL")
+	consulUrl, ok := os.LookupEnv("CONSUL_HTTP_ADDR")
 	if !ok {
-		slog.Error("Environment variable not set", "var", "CONSUL_URL")
+		slog.Error("Environment variable not set", "var", "CONSUL_HTTP_ADDR")
 		os.Exit(1)
 	}
 

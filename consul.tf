@@ -23,6 +23,9 @@ agent_prefix "" {
 key_prefix "config/" {
   policy = "read"
 }
+key_prefix "builds/" {
+  policy = "read"
+}
 EOT
 }
 
@@ -111,6 +114,15 @@ mesh = "write"
 EOT
 }
 
+resource "consul_acl_policy" "builds_push" {
+  name        = "builds-policy"
+  description = "Policy for builders to push derivation paths"
+  rules       = <<EOT
+key_prefix "builds/" {
+  policy = "write"
+}
+EOT
+}
 
 resource "consul_acl_token" "server_token" {
   description = "Token for Consul server agents"
@@ -158,6 +170,13 @@ resource "consul_acl_token" "nomad_client" {
   policies    = [consul_acl_policy.base_agent.name]
 }
 
+
+resource "consul_acl_token" "build_token" {
+  description = "Token for build servers"
+  policies    = [consul_acl_policy.builds_push.name]
+}
+
+
 data "consul_acl_token_secret_id" "server_token" {
   accessor_id = consul_acl_token.server_token.id
 }
@@ -188,6 +207,10 @@ data "consul_acl_token_secret_id" "nomad_server" {
 
 data "consul_acl_token_secret_id" "nomad_client" {
   accessor_id = consul_acl_token.nomad_client.id
+}
+
+data "consul_acl_token_secret_id" "build_token" {
+  accessor_id = consul_acl_token.build_token.id
 }
 
 locals {

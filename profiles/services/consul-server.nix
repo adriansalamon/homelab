@@ -36,7 +36,7 @@ in
     extraConfig = {
       server = true;
       bind_addr = nebulaIp;
-      client_addr = "127.0.0.1";
+      client_addr = "127.0.0.1 ${nebulaIp}";
       retry_join = consulServers;
       bootstrap_expect = builtins.length globals.consul-servers;
 

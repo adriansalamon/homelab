@@ -67,7 +67,7 @@ in
 
       environment = {
         CONSUL_TOKEN_FILE = cfg.consulTokenFile;
-        CONSUL_URL = cfg.consulUrl;
+        CONSUL_HTTP_ADDR = cfg.consulUrl;
         SITE_NAME = cfg.siteName;
         CLEANUP_INTERVAL = cfg.cleanupInterval;
       };
