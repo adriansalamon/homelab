@@ -57,3 +57,10 @@ jobs:
         run: |
           nix run nixpkgs#attic-client login ci https://nix-cache.salamon.xyz ${{ secrets.ATTIC_TOKEN }}
           nix run nixpkgs#attic-client push homelab result -j 2
+
+      - name: Update key-val store
+        if: github.ref == 'refs/heads/main'
+        run: |
+          curl -X POST --url "https://kv-proxy.salamon.xyz/builds/nixos-system-${{ matrix.machine.host }}" \
+               -H  "Authorization: Bearer ${{ secrets.KV_PROXY_TOKEN }}" \
+               -d  "$(readlink result || nix eval --raw --read-only .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel)"
