@@ -33,10 +33,9 @@ jobs:
 
       - name: "Decrypt repo secrets"
         run: |
-          nix shell nixpkgs#git-agecrypt
           echo ${{ secrets.AGECRYPT_PASSPHRASE }} | base64 -d > key.txt
-          git-agecrypt init
-          git-agecrypt config add -i key.txt
+          nix run nixpkgs#git-agecrypt init
+          nix run nixpkgs#git-agecrypt config add -i key.txt
           rm .git/index
           git checkout HEAD -- "$(git rev-parse --show-toplevel)"
           rm key.txt
