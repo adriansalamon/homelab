@@ -13,8 +13,16 @@ jobs:
       fail-fast: false
       matrix:
         machine:
+          - host: athena
           - host: charon
-            platform: x86-64-linux
+          - host: demeter
+          - host: hermes
+          - host: icarus
+          - host: orpheus
+          - host: penelope
+          - host: pythia
+          - host: zeus
+
     steps:
       #- uses: wimpysworld/nothing-but-nix@main
       - uses: actions/checkout@v4
