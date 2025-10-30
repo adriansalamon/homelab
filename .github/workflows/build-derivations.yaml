@@ -16,7 +16,7 @@ jobs:
           - host: charon
             platform: x86-64-linux
     steps:
-      - uses: wimpysworld/nothing-but-nix@main
+      #- uses: wimpysworld/nothing-but-nix@main
       - uses: actions/checkout@v4
       - name: "Setup Nix cache"
         run: |
@@ -35,7 +35,7 @@ jobs:
         run: |
           echo ${{ secrets.AGECRYPT_KEY }} | base64 -d > key.txt
           nix run nixpkgs#git-agecrypt init
-          nix run nixpkgs#git-agecrypt config add -i key.txt
+          nix run nixpkgs#git-agecrypt config -- add -i key.txt
           rm .git/index
           git checkout HEAD -- "$(git rev-parse --show-toplevel)"
           rm key.txt
