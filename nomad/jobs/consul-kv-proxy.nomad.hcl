@@ -44,6 +44,7 @@ job "kv-proxy" {
 
         tags = [
           "traefik.enable=true",
+          "traefik.external=true",
           "traefik.http.routers.kv-proxy.rule=Host(`kv-proxy.${DOMAIN}`)",
         ]
       }
