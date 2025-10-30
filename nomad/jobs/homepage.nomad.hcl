@@ -18,19 +18,19 @@ job "homepage" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/consul-kv-proxy:25b4c6c1"
+        image = "ghcr.io/adriansalamon/homepage:latest"
         ports = ["http"]
       }
 
 
       template {
         data        = <<EOF
-        {{ range $name := var.nodes }}
+        {{ range sprig_list "athena" "charon" "demeter" "hermes" "icarus" "orpheus" "penelope" "pythia" "zeus" }}
         [[nodes]]
-        name = "{{ $name }}"
+        name = "{{ . }}"
         {{ end }}
         EOF
-        destination = "local/nodes.toml"
+        destination = "${NOMAD_ALLOC_DIR}/nodes.toml"
       }
 
       template {
@@ -39,38 +39,33 @@ job "homepage" {
         PUBLIC_LOCAL_DOMAIN="local.{{ key "config/domains/main" }}"
         JELLYFIN_URL="https://jellyfin.{{ key "config/domains/main" }}"
         CONSUL_HTTP_ADDR="http://consul.service.consul:8500"
-        NODES_FILE=local/nodes.toml
+        NODES_FILE={{ env "NOMAD_ALLOC_DIR" }}/nodes.toml
         EOF
-        destination = "local/homepage.env"
+        destination = "${NOMAD_ALLOC_DIR}/homepage.env"
         env         = true
       }
 
       template {
         data        = <<EOF
-        {{ with nomadVars "nomad/jobs/homepage" }}
+        {{ with nomadVar "nomad/jobs/homepage" }}
         CONSUL_HTTP_TOKEN={{ .consul_http_token }}
         JELLYFIN_TOKEN={{ .jellyfin_token }}
         {{ end }}
         EOF
         destination = "${NOMAD_SECRETS_DIR}/secrets.env"
-        mode        = "0600"
         env         = true
       }
 
       service {
-        name = "kv-proxy"
+        name = "homepage"
         port = "http"
 
         tags = [
           "traefik.enable=true",
-          "traefik.http.routers.kv-proxy.rule=Host(`kv-proxy.${PUBLIC_DOMAIN}`)",
+          "traefik.http.routers.homepage.rule=Host(`home.${PUBLIC_DOMAIN}`) || Host(`home.local.${PUBLIC_DOMAIN}`)",
+          "traefik.http.routers.homepage.middlewares=authelia"
         ]
       }
     }
   }
-}
-
-variable "nodes" {
-  type = list(string)
-  default = ["athena", "charon", "demeter", "hermes", "icarus", "orpheus", "penelope", "pythia", "zeus"]
 }

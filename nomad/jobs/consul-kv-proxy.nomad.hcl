@@ -18,7 +18,7 @@ job "kv-proxy" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/consul-kv-proxy:25b4c6c1"
+        image = "ghcr.io/adriansalamon/consul-kv-proxy:main-8ed8852"
         ports = ["http"]
       }
 
@@ -35,12 +35,18 @@ job "kv-proxy" {
         name = "kv-proxy"
         port = "http"
 
+        check {
+          type     = "http"
+          path     = "/health"
+          interval = "10s"
+          timeout  = "2s"
+        }
+
         tags = [
           "traefik.enable=true",
           "traefik.http.routers.kv-proxy.rule=Host(`kv-proxy.${DOMAIN}`)",
         ]
       }
-
     }
   }
 }

@@ -2,7 +2,7 @@ job "authelia" {
   type = "service"
 
   group "authelia" {
-    count = 1
+    count = 2
 
     network {
       mode = "cni/flannel"
