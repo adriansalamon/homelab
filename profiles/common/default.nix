@@ -30,5 +30,6 @@
     neofetch
     lshw
     tcpdump
+    attic-client
   ];
 }

@@ -15,6 +15,7 @@
   };
 
   system.primaryUser = "asalamon";
+  nixpkgs.config.allowUnfree = true;
 
   nix = {
     settings = {

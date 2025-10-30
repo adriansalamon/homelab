@@ -1,5 +1,17 @@
-{ globals, ... }:
 {
+  config,
+  globals,
+  inputs,
+  ...
+}:
+{
+  # Contents:
+  # machine nix-cache.<domain>
+  # password <attic token>
+  age.secrets.nix-cache-netrc = {
+    rekeyFile = inputs.self.outPath + "/secrets/nix-cache.netrc.age";
+  };
+
   nix = {
     settings = {
       trusted-users = [
@@ -23,6 +35,8 @@
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "homelab:leKffLkOCSfX8pPGaQltduLxJNNVmG5oGPt6w3fH4t0="
       ];
+
+      netrc-file = config.age.secrets.nix-cache-netrc.path;
     };
 
     gc = {

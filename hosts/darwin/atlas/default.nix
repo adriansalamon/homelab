@@ -37,6 +37,7 @@
     nodejs
     lazygit
     nomad
+    attic-client
   ];
 
   launchd.user.agents.backrest = {
