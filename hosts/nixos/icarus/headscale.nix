@@ -72,7 +72,7 @@ in
 {
   # Mirror the original oidc secret
   age.secrets.headscale-oidc-client-secret = {
-    inherit (nomadCfg.config.age.secrets.headscale-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.authelia-headscale-oidc-client-secret) rekeyFile;
     owner = "headscale";
   };
 

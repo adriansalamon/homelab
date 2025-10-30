@@ -17,7 +17,7 @@ in
     config.node.secretsDir + "/forgejo-mailer-password.age";
 
   age.secrets.forgejo-oidc-client-secret = {
-    inherit (nomadCfg.config.age.secrets.forgejo-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.authelia-forgejo-oidc-client-secret) rekeyFile;
     mode = "440";
     inherit (config.services.forgejo) group;
   };

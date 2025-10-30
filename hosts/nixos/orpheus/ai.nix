@@ -19,7 +19,7 @@
   ];
 
   age.secrets.open-webui-env = {
-    generator.dependencies = [ nomadCfg.config.age.secrets.open-webui-oidc-client-secret ];
+    generator.dependencies = [ nomadCfg.config.age.secrets.authelia-open-webui-oidc-client-secret ];
     generator.script = lib.helpers.generateWithEnv "OAUTH_CLIENT_SECRET";
   };
 

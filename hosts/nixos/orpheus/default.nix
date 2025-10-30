@@ -10,7 +10,6 @@
     ./net.nix
     ./samba
     ./snapserver
-    ./homepage.nix
     ./ai.nix
     ./guests.nix
   ]

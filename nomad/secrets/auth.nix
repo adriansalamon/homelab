@@ -13,7 +13,7 @@ let
   };
 
   mkOidcSecret = name: {
-    name = "${name}-oidc-client-secret";
+    name = "authelia-${name}-oidc-client-secret";
     value = {
       rekeyFile = localSecretsDir + "/oidc/${name}-oidc-client-secret.txt.age";
       nomadPath = "nomad/jobs/authelia";
@@ -218,33 +218,33 @@ let
 in
 {
   age.secrets = {
-    lldap_jwt_secret = mkSecret "lldap" "jwt-secret.txt.age";
-    lldap_key_seed = mkSecret "lldap" "key-seed.txt.age";
-    lldap_user_password = mkSecret "lldap" "user-password.txt.age";
-    lldap_postgres_password = {
+    lldap-jwt-secret = mkSecret "lldap" "jwt-secret.txt.age";
+    lldap-key-seed = mkSecret "lldap" "key-seed.txt.age";
+    lldap-user-password = mkSecret "lldap" "user-password.txt.age";
+    lldap-postgres-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/lldap-postgres-password.age";
       nomadPath = "nomad/jobs/lldap";
     };
 
-    authelia_jwt_secret = mkSecret "authelia" "jwt-secret.txt.age";
-    authelia_storage_encryption_key = mkSecret "authelia" "storage-encryption-key.txt.age";
-    authelia_session_secret = mkSecret "authelia" "session-secret.txt.age";
-    authelia_postgres_password = {
+    authelia-jwt-secret = mkSecret "authelia" "jwt-secret.txt.age";
+    authelia-storage-encryption-key = mkSecret "authelia" "storage-encryption-key.txt.age";
+    authelia-session-secret = mkSecret "authelia" "session-secret.txt.age";
+    authelia-postgres-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/authelia-postgres-password.age";
       nomadPath = "nomad/jobs/authelia";
     };
-    authelia_redis_password = {
+    authelia-redis-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/valkey-server-password.age";
       nomadPath = "nomad/jobs/authelia";
     };
-    authelia_redis_sentinel_password = {
+    authelia-redis-sentinel-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/valkey-sentinel-password.age";
       nomadPath = "nomad/jobs/authelia";
     };
-    authelia_smtp_password = mkSecret "authelia" "smtp-password.txt.age";
-    authelia_ldap_password = mkSecret "authelia" "ldap-password.txt.age";
-    authelia_hmac_secret = mkSecret "authelia" "hmac-secret.txt.age";
-    authelia_jwks_key = mkSecret "authelia" "jwks-key.key.age";
+    authelia-smtp-password = mkSecret "authelia" "smtp-password.txt.age";
+    authelia-ldap-password = mkSecret "authelia" "ldap-password.txt.age";
+    authelia-hmac-secret = mkSecret "authelia" "hmac-secret.txt.age";
+    authelia-jwks-key = mkSecret "authelia" "jwks-key.key.age";
   }
   // lib.genAttrs' (builtins.attrNames oidcClients) mkOidcSecret;
 }

@@ -23,7 +23,7 @@
 
   # Mirror the original oidc secret
   age.secrets.grafana-oidc-client-secret = {
-    inherit (nomadCfg.config.age.secrets.grafana-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.authelia-grafana-oidc-client-secret) rekeyFile;
     mode = "440";
     group = "grafana";
   };

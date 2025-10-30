@@ -31,7 +31,7 @@ in
 
   age.secrets."home-assistant-secrets.yaml" = {
     generator = {
-      dependencies = [ nomadCfg.config.age.secrets.hass-oidc-client-secret ];
+      dependencies = [ nomadCfg.config.age.secrets.authelia-hass-oidc-client-secret ];
       script =
         {
           lib,

@@ -114,6 +114,8 @@ in
       limits_config = {
         reject_old_samples = true;
         reject_old_samples_max_age = "168h";
+        retention_period = "720h"; # 30 days
+        max_query_lookback = "720h"; # 30 days
       };
 
       table_manager = {
@@ -124,6 +126,9 @@ in
       compactor = {
         working_directory = lokiDir;
         compactor_ring.kvstore.store = "inmemory";
+        retention_enabled = true;
+        retention_delete_delay = "2h";
+        compaction_interval = "10m";
       };
     };
   };

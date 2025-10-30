@@ -43,7 +43,7 @@ in
   };
 
   age.secrets.paperless-oidc-client-secret = {
-    inherit (nomadCfg.config.age.secrets.paperless-oidc-client-secret) rekeyFile;
+    inherit (nomadCfg.config.age.secrets.authelia-paperless-oidc-client-secret) rekeyFile;
     mode = "440";
     group = "paperless";
   };
