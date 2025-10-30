@@ -6,7 +6,7 @@
 }:
 let
   port = 8004;
-  host = "nix-cache.local.${globals.domains.main}";
+  host = "nix-cache.${globals.domains.main}";
 in
 {
   age.secrets.atticEnv = {
@@ -81,6 +81,7 @@ in
     inherit port;
     tags = [
       "traefik.enable=true"
+      "traefik.external=true"
       "traefik.http.routers.atticd.rule=Host(`${host}`)"
       "traefik.http.routers.atticd.entrypoints=websecure"
     ];

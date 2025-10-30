@@ -27,7 +27,7 @@
       experimental-features = "nix-command flakes";
 
       substituters = [
-        "https://nix-cache.local.${globals.domains.main}/homelab"
+        "https://nix-cache.${globals.domains.main}/homelab"
         "https://cache.nixos.org"
       ];
       trusted-public-keys = [

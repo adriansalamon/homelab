@@ -1,0 +1,60 @@
+name: "build-derivations"
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        machine:
+          - host: charon
+            platform: x86-64-linux
+    steps:
+      - uses: wimpysworld/nothing-but-nix@main
+      - uses: actions/checkout@v4
+      - name: "Setup Nix cache"
+        run: |
+          sudo mkdir -p /etc/nix
+          echo "machine nix-cache.salamon.xyz password ${{ secrets.ATTIC_TOKEN }}" | sudo tee /etc/nix/netrc > /dev/null
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            substituters = https://nix-cache.salamon.xyz/homelab https://cache.nixos.org
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= homelab:leKffLkOCSfX8pPGaQltduLxJNNVmG5oGPt6w3fH4t0=
+            always-allow-substitutes = true
+            allow-import-from-derivation = false
+
+      - name: "Decrypt repo secrets"
+        run: |
+          nix shell nixpkgs#git-agecrypt
+          echo ${{ secrets.AGECRYPT_PASSPHRASE }} | base64 -d > key.txt
+          git-agecrypt init
+          git-agecrypt config add -i key.txt
+          rm .git/index
+          git checkout HEAD -- "$(git rev-parse --show-toplevel)"
+          rm key.txt
+
+      - name: Check if build needed
+        id: build-needed
+        run: |
+          nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel --dry-run 2> dry-run-output
+          echo "needs-build=$(cat dry-run-output | grep 'will be built' &> /dev/null && echo 1 || echo 0)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Build system
+        if: steps.build-needed.outputs.needs-build == '1'
+        run: |
+          nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel
+
+      - name: Push system
+        if: steps.build-needed.outputs.needs-build == '1'
+        run: |
+          nix run nixpkgs#attic-client login ci https://nix-cache.salamon.xyz ${{ secrets.ATTIC_TOKEN }}
+          nix run nixpkgs#attic-client push homelab result -j 2
