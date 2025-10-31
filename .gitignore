@@ -46,3 +46,4 @@ result-*
 .direnv
 
 deploy.json
+.claude

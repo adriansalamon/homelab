@@ -22,6 +22,7 @@
     services.traefik
     services.valkey-server
     services.etcd
+    auto-update
   ];
 
   meta.vector.enable = true;

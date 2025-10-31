@@ -18,6 +18,7 @@
     impermanence
     hardware
     services.consul-client
+    auto-update
   ];
 
   meta.usenftables = false;

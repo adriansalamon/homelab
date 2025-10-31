@@ -12,6 +12,7 @@
     zfs
     impermanence
     hardware
+    auto-update
     services.consul-server
     services.nomad.server
     services.traefik

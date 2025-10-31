@@ -24,6 +24,7 @@
     hardware
     storage-users
     services.consul-client
+    auto-update
   ]);
 
   networking.hostId = "49e32584";

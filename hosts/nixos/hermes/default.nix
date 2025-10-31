@@ -23,6 +23,7 @@ in
     hardware
     services.consul-client
     storage-users
+    auto-update
   ];
 
   networking.hostId = "b8d0bfb2";

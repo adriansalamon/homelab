@@ -19,6 +19,7 @@
     hardware
     services.consul-client
     services.traefik
+    auto-update
   ];
 
   meta.vector.enable = true;

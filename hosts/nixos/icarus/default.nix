@@ -10,6 +10,7 @@
     zfs
     impermanence
     services.consul-client
+    auto-update
   ];
 
   networking.hostId = "3b1ab44f";

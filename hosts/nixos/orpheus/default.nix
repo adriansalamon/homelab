@@ -22,6 +22,7 @@
     services.consul-client
     #services.nomad.client
     services.patroni
+    auto-update
   ]);
 
   networking.hostId = "fa959c4a";

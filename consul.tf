@@ -124,6 +124,18 @@ key_prefix "builds/" {
 EOT
 }
 
+resource "consul_acl_policy" "apply_builds" {
+  name  = "apply-builds-policy"
+  rules = <<EOT
+key_prefix "builds/" {
+  policy = "write"
+}
+session_prefix "" {
+  policy = "write"
+}
+EOT
+}
+
 resource "consul_acl_token" "server_token" {
   description = "Token for Consul server agents"
   policies = [
@@ -174,6 +186,11 @@ resource "consul_acl_token" "nomad_client" {
 resource "consul_acl_token" "build_token" {
   description = "Token for build servers"
   policies    = [consul_acl_policy.builds_push.name]
+}
+
+resource "consul_acl_token" "apply_builds" {
+  description = "Token for apply builds"
+  policies    = [consul_acl_policy.apply_builds.name]
 }
 
 

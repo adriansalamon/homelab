@@ -28,6 +28,7 @@ in
     services.etcd
     router.nebula
     router.monitoring
+    auto-update
   ];
 
   systemd.enableEmergencyMode = false;
