@@ -7,7 +7,6 @@
 
 let
   cfg = config.services.nixos-auto-updater;
-  updaterPkg = pkgs.callPackage ../pkgs/nixos-auto-updater { };
 in
 {
   options.services.nixos-auto-updater = with lib; {
@@ -54,9 +53,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Add required packages
     environment.systemPackages = with pkgs; [
-      updaterPkg
+      nixos-auto-updater
       nix
     ];
 
@@ -79,13 +77,15 @@ in
         export CONSUL_HTTP_TOKEN=$(cat ${cfg.consulTokenFile})
         export PUSHOVER_USER=$(cat ${cfg.pushoverUserFile})
         export PUSHOVER_APP=$(cat ${cfg.pushoverAppFile})
-        exec ${updaterPkg}/bin/nixos-auto-updater
+        exec ${pkgs.nixos-auto-updater}/bin/nixos-auto-updater
       '';
 
       serviceConfig = {
         Type = "oneshot";
         User = "root";
       };
+
+      path = [ pkgs.nix ];
     };
 
     # Create the systemd timer to trigger periodic checks
