@@ -44,6 +44,11 @@ in
         register_service = true;
       };
 
+      log = {
+        level = "INFO";
+        deduplicate_heartbeat_logs = true;
+      };
+
       bootstrap = {
         dcs = {
           ttl = 30;
