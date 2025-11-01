@@ -214,6 +214,10 @@ let
           id_token_signed_response_alg = "RS256";
           token_endpoint_auth_method = "client_secret_post";
         };
+        nomad = {
+          client_id = "nomad";
+          client_name = "Nomad";
+        };
       };
 in
 {

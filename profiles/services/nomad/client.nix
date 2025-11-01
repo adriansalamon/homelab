@@ -34,12 +34,31 @@ in
         network_interface = "nebula.mesh";
         cni_path = "${pkgs.cni-plugins}/bin:${pkgs.cni-plugin-flannel}/bin";
         cni_config_dir = "/etc/cni/net.d";
+
+        host_volume."docker-socket" = {
+          path = "/var/run/docker.sock";
+          read_only = true;
+        };
       };
 
       tls = {
         cert_file = "${nomadSecretDir}/global-client-nomad.pem";
         key_file = config.age.secrets."nomad-client-key.pem".path;
       };
+
+      telemetry = {
+        publish_allocation_metrics = true;
+        publish_node_metrics = true;
+        prometheus_metrics = true;
+      };
+
+      plugin.docker.config.extra_labels = [
+        "job_name"
+        "task_group_name"
+        "task_name"
+        "namespace"
+        "node_name"
+      ];
     };
 
     credentials.secrets = config.age.secrets."nomad-secrets.json".path;
@@ -47,6 +66,15 @@ in
     extraPackages = with pkgs; [
       cni-plugins
       consul
+    ];
+  };
+
+  consul.services.nomad-client = {
+    port = 4646;
+    tags = [
+      "prometheus.scrape=true"
+      "prometheus.path=/v1/metrics"
+      "prometheus.scheme=https"
     ];
   };
 
@@ -89,6 +117,11 @@ in
     groups = [ "nomad-client" ];
 
     firewall.inbound = [
+      {
+        port = "4646";
+        proto = "tcp";
+        group = "any";
+      }
       {
         port = "20000-32000";
         proto = "tcp";

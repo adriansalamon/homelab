@@ -9,11 +9,9 @@ variable "cloudflare_email" {
   description = "Cloudflare email"
 }
 
-
 variable "hcloud_token" {
   sensitive = true
 }
-
 
 variable "consul_bootstrap_token" {
   type        = string

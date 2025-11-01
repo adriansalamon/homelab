@@ -241,6 +241,22 @@ identity_providers:
           - groups
         id_token_signed_response_alg: "RS256"
         token_endpoint_auth_method: client_secret_post
+
+      - client_id: "nomad"
+        client_name: "Nomad"
+        client_secret: {{ .nomad_oidc_client_secret }}
+        pre_configured_consent_duration: "3 months"
+        public: false
+        require_pkce: false
+        authorization_policy: two_factor
+        redirect_uris:
+          - "https://nomad.local.{{ $domain }}/ui/settings/tokens"
+          - "http://localhost:4649/oidc/callback"
+        scopes:
+          - openid
+          - profile
+          - groups
+        token_endpoint_auth_method: client_secret_basic
 {{ end }}
 EOF
 

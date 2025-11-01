@@ -22,11 +22,26 @@
             #filter = ''"prometheus.scrape=true" in ServiceTags'';
           }
         ];
+        tls_config = {
+          insecure_skip_verify = true;
+        };
         relabel_configs = [
           {
             source_labels = [ "__meta_consul_node" ];
             replacement = "$1";
             target_label = "instance";
+          }
+          {
+            source_labels = [ "__meta_consul_tags" ];
+            regex = ".*,prometheus.path=([^,]*),.*";
+            replacement = "$1";
+            target_label = "__metrics_path__";
+          }
+          {
+            source_labels = [ "__meta_consul_tags" ];
+            regex = ".*,prometheus.scheme=([^,]*),.*";
+            target_label = "__scheme__";
+            replacement = "$1";
           }
         ];
       }

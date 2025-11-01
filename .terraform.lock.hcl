@@ -60,6 +60,23 @@ provider "registry.opentofu.org/hashicorp/consul" {
   ]
 }
 
+provider "registry.opentofu.org/hashicorp/nomad" {
+  version     = "2.5.1"
+  constraints = "~> 2.0"
+  hashes = [
+    "h1:PIWuXZ/+uS2tZGvPF920Mx3dzIjrhFo+rRP1Csw2t7s=",
+    "zh:1dba89489ba11cd4afb896949ab6dca85ad81f56cea9450d68bdca2ab5bf80c1",
+    "zh:26b233bb6574e6cffb3389b40afa473619fa447b61f57cef96b95ee20425268f",
+    "zh:305ef0ea879e4fb52de31d3ac89e99e8b75b967b50c9338b95517065ec0410dd",
+    "zh:417ccbc7145dae10303548c07195882bca58eecc732c713b50d63e43c542f6b7",
+    "zh:760983f6fa652fac14c66c665765488f1d88302daff80b8c803fe35a8d66c300",
+    "zh:9a7a3aa0f1a738291157efab2cce046ef6aae893a2f2986aba2636deb6337db5",
+    "zh:de4234d73fa8be9c9d4a125ef71351b1af79b0c259c7a46427c6f109a2ceba4c",
+    "zh:e45e22bd28e3ba9ab8af4fb4e47bb217f299e2d7cca28ec4ebfc230bd17a1a4d",
+    "zh:e74462cad43a82d46387b9c815216930cba8836a47244e56f43548fd09e2a851",
+  ]
+}
+
 provider "registry.opentofu.org/hetznercloud/hcloud" {
   version     = "1.51.0"
   constraints = "1.51.0"

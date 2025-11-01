@@ -16,6 +16,10 @@ terraform {
       source  = "hashicorp/consul"
       version = "~> 2.0"
     }
+    nomad = {
+      source  = "hashicorp/nomad"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -33,21 +37,6 @@ resource "aws_iam_user" "smtp_user" {
 
 resource "aws_iam_access_key" "smtp_user" {
   user = aws_iam_user.smtp_user.name
-
-  provisioner "local-exec" {
-    command     = <<BASH
-       rm aws-ses-keys.env.age
-       echo "AWS_ACCESS_KEY_ID=${self.id}\nAWS_SECRET_ACCESS_KEY=${self.secret}\nSMTP_PASSWORD=${self.ses_smtp_password_v4}" | \
-         agenix -e aws-ses-keys.env.age
-
-       rm authelia-smtp-username.txt
-       echo "${self.id}" > authelia-smtp-username.txt
-
-       rm authelia-smtp-password.txt.age
-       echo "${self.ses_smtp_password_v4}" | agenix -e authelia-smtp-password.txt.age
-     BASH
-    working_dir = "./secrets"
-  }
 }
 
 data "aws_iam_policy_document" "ses_sender" {

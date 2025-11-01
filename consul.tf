@@ -251,6 +251,71 @@ module "consul_setup" {
   nomad_jwks_url = "${var.nomad_url}/.well-known/jwks.json"
 }
 
+
+# nomad
+provider "nomad" {
+  address = var.nomad_url
+}
+
+
+resource "nomad_acl_policy" "admin" {
+  name        = "admin"
+  description = "Policy for admin users"
+  rules_hcl   = <<EOT
+namespace "*" {
+  policy = "write"
+}
+
+node {
+  policy = "write"
+}
+
+agent {
+  policy = "write"
+}
+
+host_volume "*" {
+  policy = "write"
+}
+
+plugin {
+  policy = "write"
+}
+EOT
+}
+
+variable "nomad_oidc_client_secret" {
+  type      = string
+  sensitive = true
+}
+
+resource "nomad_acl_auth_method" "authelia" {
+  name           = "authelia"
+  max_token_ttl  = "24h0m0s"
+  token_locality = "global"
+  type           = "OIDC"
+  config {
+    oidc_discovery_url = "https://auth.${var.domain}"
+    oidc_client_id     = "nomad"
+    oidc_client_secret = var.nomad_oidc_client_secret
+    bound_audiences    = ["nomad"]
+    allowed_redirect_uris = [
+      "${var.nomad_url}/ui/settings/tokens",
+      "http://localhost:4649/oidc/callback"
+    ]
+    oidc_scopes    = ["openid", "profile", "groups"]
+    claim_mappings = { "sub" : "username" }
+  }
+}
+
+resource "nomad_acl_binding_rule" "authelia_admin" {
+  auth_method = nomad_acl_auth_method.authelia.name
+  selector    = "admin in list.groups"
+  bind_type   = "policy"
+  bind_name   = nomad_acl_policy.admin.name
+}
+
+
 # Optional: Uncomment to generate gossip key file for encryption
 # resource "local_file" "nomad_gossip_key" {
 #   filename        = "secrets/nomad/gossip-key"
