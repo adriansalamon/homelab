@@ -96,7 +96,7 @@ in
         OnCalendar = cfg.checkInterval;
         Persistent = true;
         AccuracySec = "1min";
-        RandomizedDelaySec = "5min";
+        RandomizedDelaySec = "10min";
       };
       wantedBy = [ "timers.target" ];
     };

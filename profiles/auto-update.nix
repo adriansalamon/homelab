@@ -10,7 +10,7 @@
   services.nixos-auto-updater = {
     enable = true;
 
-    checkInterval = "2h";
+    checkInterval = "*-*-* 00/3:00:00"; # every 3 hours
     lockTimeout = "30m";
 
     consulAddr = "127.0.0.1:8500";
