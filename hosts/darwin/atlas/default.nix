@@ -10,34 +10,34 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    coreutils
-    git
-    vim
     age-plugin-yubikey
+    alejandra
+    attic-client
+    atuin
+    backrest
+    btop
+    cook-cli
+    coreutils
+    fzf
+    git
+    git-agecrypt
     inputs.agenix-rekey.packages."${system}".default
     inputs.deploy-rs.packages."${system}".default
-    nixd
-    nil
-    nixfmt-rfc-style
-    rage
-    yubikey-personalization
-    btop
     iperf3
-    alejandra
-    fzf
-    nebula
-    atuin
-    tldr
-    nebula
-    git-agecrypt
-    typst
-    backrest
-    restic
-    cook-cli
-    nodejs
     lazygit
+    nebula
+    nebula
+    nil
+    nixd
+    nixfmt-rfc-style
+    nodejs
     nomad
-    attic-client
+    rage
+    restic
+    tldr
+    typst
+    vim
+    yubikey-personalization
   ];
 
   launchd.user.agents.backrest = {

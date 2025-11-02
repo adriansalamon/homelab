@@ -17,14 +17,14 @@
   environment = {
     variables.EDITOR = "nvim";
     systemPackages = with pkgs; [
-      neovim
+      curl
+      fzf
       git
-      tmux
       parted
       ripgrep
-      fzf
+      tmux
       wget
-      curl
+      neovim
     ];
   };
 }

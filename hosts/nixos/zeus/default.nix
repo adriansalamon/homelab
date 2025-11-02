@@ -30,14 +30,14 @@
   networking.hostId = "49e32584";
 
   environment.systemPackages = with pkgs; [
-    dnsutils
     curl
+    dnsutils
     gitMinimal
-    zfs
-    vim
     htop
     ipmitool
     tmux
+    vim
+    zfs
   ];
 
   globals.nebula.mesh.hosts.zeus = {

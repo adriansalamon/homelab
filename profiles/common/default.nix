@@ -17,19 +17,19 @@
   ++ lib.collect builtins.isPath (lib.filterAttrs (n: _: n != "default") (lib.rakeLeaves ./.));
 
   environment.systemPackages = with pkgs; [
-    gitMinimal
-    curl
-    vim
-    jq
-    lsof
-    strace
-    iotop
-    btop
-    tldr
-    dnsutils
-    neofetch
-    lshw
-    tcpdump
     attic-client
+    btop
+    curl
+    dnsutils
+    iotop
+    jq
+    lshw
+    lsof
+    neofetch
+    strace
+    tcpdump
+    tldr
+    vim
+    gitMinimal
   ];
 }

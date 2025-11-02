@@ -22,10 +22,10 @@ in
     ];
   };
 
-  environment.systemPackages = [
-    pkgs.jellyfin
-    pkgs.jellyfin-web
-    pkgs.jellyfin-ffmpeg
+  environment.systemPackages = with pkgs; [
+    jellyfin
+    jellyfin-ffmpeg
+    jellyfin-web
   ];
 
   environment.persistence."/persist".directories = [

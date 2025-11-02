@@ -37,18 +37,18 @@ in
   node.site = "olympus";
 
   environment.systemPackages = with pkgs; [
-    tcpdump
-    mtr
-    iperf3
-    ethtool
+    cifs-utils
     conntrack-tools
-    librespeed-cli
-    traceroute
-    pciutils
-    sysstat
+    ethtool
     iftop
     iotop
-    cifs-utils
+    iperf3
+    librespeed-cli
+    mtr
+    pciutils
+    sysstat
+    tcpdump
+    traceroute
   ];
 
   globals.nebula.mesh.hosts.athena = {

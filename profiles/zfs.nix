@@ -6,8 +6,8 @@
   services.zfs.autoScrub.enable = true;
 
   environment.systemPackages = with pkgs; [
-    zfs
     cifs-utils
+    zfs
   ];
 
   # After importing the rpool, rollback the root system to be empty.
