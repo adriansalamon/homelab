@@ -33,14 +33,20 @@
           }
           {
             source_labels = [ "__meta_consul_tags" ];
-            regex = ".*,prometheus.path=([^,]*),.*";
+            regex = ".*,prometheus\.path=([^,]*),.*";
             replacement = "$1";
             target_label = "__metrics_path__";
           }
           {
             source_labels = [ "__meta_consul_tags" ];
-            regex = ".*,prometheus.scheme=([^,]*),.*";
+            regex = ".*,prometheus\.scheme=([^,]*),.*";
             target_label = "__scheme__";
+            replacement = "$1";
+          }
+          {
+            source_labels = [ "__meta_consul_tags" ];
+            regex = ".*,prometheus\.query\.format=([^,]*),.*";
+            target_label = "__param_format";
             replacement = "$1";
           }
         ];

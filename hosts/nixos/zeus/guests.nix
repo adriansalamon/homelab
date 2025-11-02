@@ -69,7 +69,10 @@
         bridge = "vpnBr";
         id = 2050;
       })
-      (mkMicrovm "home-assistant" { id = 2051; })
+      (mkMicrovm "home-assistant" {
+        id = 2051;
+        bridge = "lanBr";
+      })
       (mkMicrovm "nomad" { id = 2052; })
       (mkMicrovm "paperless" { id = 2053; })
       (mkMicrovm "loki" { id = 2054; })

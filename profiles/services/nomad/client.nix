@@ -75,6 +75,7 @@ in
       "prometheus.scrape=true"
       "prometheus.path=/v1/metrics"
       "prometheus.scheme=https"
+      "prometheus.query.format=prometheus"
     ];
   };
 

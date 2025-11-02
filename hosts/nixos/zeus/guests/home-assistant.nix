@@ -82,22 +82,24 @@ in
   services.home-assistant = {
     enable = true;
     extraComponents = [
-      "met"
-      "snapcast"
-      "octoprint"
-      "spotify"
-      "verisure"
-      "mqtt"
+      "apple_tv"
+      "bluetooth"
+      "bluetooth_adapters"
       "braviatv"
       "cast"
-      "isal"
-      "tasmota"
-      "unifi"
-      "apple_tv"
+      "esphome"
       "homekit"
       "homekit_controller"
+      "isal"
+      "met"
       "mobile_app"
-      "esphome"
+      "mqtt"
+      "octoprint"
+      "snapcast"
+      "spotify"
+      "tasmota"
+      "unifi"
+      "verisure"
     ];
 
     customLovelaceModules = with pkgs.home-assistant-custom-lovelace-modules; [
@@ -115,10 +117,18 @@ in
       weather-chart-card
     ];
 
-    customComponents = with pkgs.home-assistant-custom-components; [
-      (pkgs.home-assistant.python.pkgs.callPackage ./hass-components/auth_oidc.nix { })
-      prometheus_sensor
-    ];
+    customComponents =
+      let
+        inherit (pkgs.home-assistant.python.pkgs) callPackage;
+      in
+      with pkgs.home-assistant-custom-components;
+      [
+        (callPackage ./hass-components/auth_oidc.nix { })
+        (callPackage ./hass-components/hass-plejd.nix {
+          pyplejd = (callPackage ./hass-components/pyplejd.nix { });
+        })
+        prometheus_sensor
+      ];
 
     config = {
       default_config = { };
