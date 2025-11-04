@@ -118,8 +118,14 @@ in
     groups = [ "nomad-client" ];
 
     firewall.inbound = [
+      # vxvlan
       {
-        port = "4646";
+        port = 8472;
+        proto = "udp";
+        group = "nomad-client";
+      }
+      {
+        port = 4646;
         proto = "tcp";
         group = "any";
       }
