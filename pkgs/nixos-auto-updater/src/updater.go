@@ -33,10 +33,22 @@ func NewUpdater(consul *consul.Client, config Config, logger *slog.Logger, pusho
 
 func (u *Updater) CheckAndUpdate(ctx context.Context) {
 	u.logger.Info("Checking for updates")
+	checkKey := "builds/auto-updater-enabled"
+	pair, _, err := u.consul.KV().Get(checkKey, nil)
+	if err != nil {
+		u.logger.Error("Failed to query Consul KV", "error", err, "key", checkKey)
+		u.notify(fmt.Sprintf("Failed to query Consul KV: %v", err), true)
+		return
+	}
+
+	if pair != nil && string(pair.Value) != "true" {
+		u.logger.Info("Auto updater is disabled")
+		return
+	}
 
 	// Query Consul KV for latest derivation
 	kvKey := fmt.Sprintf("builds/nixos-system-%s", u.config.Hostname)
-	pair, _, err := u.consul.KV().Get(kvKey, nil)
+	pair, _, err = u.consul.KV().Get(kvKey, nil)
 	if err != nil {
 		u.logger.Error("Failed to query Consul KV", "error", err, "key", kvKey)
 		u.notify(fmt.Sprintf("Failed to query Consul KV: %v", err), true)
