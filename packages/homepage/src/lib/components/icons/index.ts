@@ -16,3 +16,4 @@ export { default as AutheliaIcon } from "./Authelia.svelte";
 export { default as PrometheusIcon } from "./Prometheus.svelte";
 export { default as NomadIcon } from "./Nomad.svelte";
 export { default as ConsulIcon } from "./Consul.svelte";
+export { default as LinkwardenIcon } from "./Linkwarden.svelte";

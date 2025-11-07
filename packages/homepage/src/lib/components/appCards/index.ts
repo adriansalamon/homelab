@@ -17,3 +17,4 @@ export { default as LLDAPAppCard } from "./LLDAP.svelte";
 export { default as OllamaAppCard } from "./Ollama.svelte";
 export { default as NomadAppCard } from "./Nomad.svelte";
 export { default as ConsulAppCard } from "./Consul.svelte";
+export { default as LinkwardenAppCard } from "./Linkwarden.svelte";

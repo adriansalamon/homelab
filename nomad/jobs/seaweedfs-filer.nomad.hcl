@@ -9,8 +9,12 @@ job "seaweedfs-filer" {
     }
 
     network {
-      port "http" {}
-      port "grpc" {}
+      port "http" {
+        static = 20090
+      }
+      port "grpc" {
+        static = 30090
+      }
       port "s3" {}
 
       mode = "cni/flannel"
@@ -56,15 +60,14 @@ job "seaweedfs-filer" {
         ]
 
         check {
-          type     = "http"
-          path     = "/"
+          type     = "tcp"
           interval = "10s"
           timeout  = "2s"
         }
       }
 
       config {
-        image = "chrislusf/seaweedfs:latest"
+        image = "chrislusf/seaweedfs:4.00"
         ports = ["http", "grpc"]
 
         args = [
@@ -73,14 +76,16 @@ job "seaweedfs-filer" {
           "-ip.bind=0.0.0.0",
           "-port=${NOMAD_PORT_http}",
           "-master=${MASTERS}",
-          "-defaultReplicaPlacement=010",
+          "-defaultReplicaPlacement=100",
           "-s3",
           "-s3.port=${NOMAD_PORT_s3}",
+          "-s3.config=/etc/seaweedfs/s3-config.json",
           "-rack=${node.unique.name}"
         ]
 
         volumes = [
-          "local/filer.toml:/etc/seaweedfs/filer.toml"
+          "local/filer.toml:/etc/seaweedfs/filer.toml",
+          "local/s3-config.json:/etc/seaweedfs/s3-config.json"
         ]
       }
 
@@ -134,6 +139,37 @@ connection_max_open = 100
 connection_max_lifetime_seconds = 0
 EOF
         destination = "local/filer.toml"
+      }
+
+
+      template {
+        data        = <<EOF
+        {
+          "identities": [
+            {
+              "name": "admin",
+              "credentials": [
+                {
+                  "accessKey": "admin",
+                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .admin_secret_key }}"{{ end }}
+                }
+              ],
+              "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+            },
+            {
+              "name": "linkwarden",
+              "credentials": [
+                {
+                  "accessKey": "linkwarden",
+                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .linkwarden_secret_key }}"{{ end }}
+                }
+              ],
+              "actions": ["Read:linkwarden", "Write:linkwarden", "List:linkwarden", "Tagging:linkwarden"]
+            }
+          ]
+        }
+      EOF
+        destination = "local/s3-config.json"
       }
 
       resources {

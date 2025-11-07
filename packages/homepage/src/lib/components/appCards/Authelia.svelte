@@ -14,7 +14,7 @@
 <AppCard
 	name="Authelia"
 	description="Authentication and authorization server"
-	gradientColours={["#006c9a", "#0096d6", "#00c4ff"]}
+	gradientColours={["#004c6f", "#2C6AA3", "#589CE9"]}
 	href="https://auth.{domain}"
 	class={className}
 	{notInList}

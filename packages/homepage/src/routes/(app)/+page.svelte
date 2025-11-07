@@ -14,6 +14,7 @@
 		PrometheusAppCard,
 		AutheliaAppCard,
 		NomadAppCard,
+		LinkwardenAppCard,
 	} from "$lib/components/appCards";
 	import { AppCardList, HomepageSectionTitle, SeeMoreApps } from "$lib/components/app";
 	import { JellyfinIcon } from "$lib/components/icons";
@@ -52,6 +53,7 @@
 	<PaperlessAppCard domain={localDomain} />
 	<OllamaAppCard {domain} />
 	<ForgejoAppCard {domain} />
+	<LinkwardenAppCard {domain} />
 	<AutheliaAppCard {domain} />
 </AppCardList>
 

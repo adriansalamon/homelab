@@ -5,6 +5,7 @@
 	interface Props {
 		notInList?: boolean;
 		class?: string;
+		domain: string;
 	}
 
 	const { domain, notInList, class: className }: Props = $props();
