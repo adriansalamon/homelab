@@ -22,6 +22,7 @@ in
     impermanence
     hardware
     services.consul-client
+    services.seaweedfs.volume
     storage-users
     auto-update
   ];

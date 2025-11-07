@@ -72,7 +72,9 @@ in
     zpool = {
       zroot = lib.disk.zfs.mkZpool {
         mode = "mirror";
-        datasets = lib.disk.zfs.impermanenceDatasets;
+        datasets = lib.disk.zfs.impermanenceDatasets // {
+          "safe/seaweedfs" = lib.disk.zfs.filesystem "/data/seaweedfs";
+        };
       };
 
       tank02 = {

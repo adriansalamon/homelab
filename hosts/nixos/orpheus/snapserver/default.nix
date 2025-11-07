@@ -13,7 +13,7 @@ in
 
   # librespot caches Spotify Oauth tokens here
   environment.persistence."/state".directories = lib.singleton {
-    directory = "/var/lib/snapserver";
+    directory = "/var/lib/private/snapserver";
     mode = "0700";
   };
 

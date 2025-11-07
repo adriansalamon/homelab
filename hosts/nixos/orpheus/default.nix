@@ -20,7 +20,7 @@
     hardware
     impermanence
     services.consul-client
-    #services.nomad.client
+    services.seaweedfs.volume
     services.patroni
     auto-update
   ]);

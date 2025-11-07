@@ -18,6 +18,7 @@
     services.traefik
     services.valkey-server
     services.etcd
+    services.seaweedfs.master
     router.monitoring
     ./hw.nix
     ./disk-config.nix

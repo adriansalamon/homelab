@@ -22,6 +22,7 @@
     services.traefik
     services.valkey-server
     services.etcd
+    services.seaweedfs.master
     auto-update
   ];
 

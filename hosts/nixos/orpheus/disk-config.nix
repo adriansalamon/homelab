@@ -56,6 +56,7 @@
     zpool.zroot = lib.disk.zfs.mkZpool {
       datasets = lib.disk.zfs.impermanenceDatasets // {
         "safe/guests" = lib.disk.zfs.unmountable;
+        "safe/seaweedfs" = lib.disk.zfs.filesystem "/data/seaweedfs";
       };
     };
   };
