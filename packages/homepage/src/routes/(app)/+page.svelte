@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { JellyfinLatestCarousel } from "$lib/components/media";
 	import type { PageServerData } from "./$types";
-	import { Cloud, Popcorn, Sparkles, House, HardDrive } from "lucide-svelte";
+	import { Popcorn } from "lucide-svelte";
 	import {
 		ImmichAppCard,
 		JellyfinAppCard,

@@ -5,7 +5,8 @@
 	interface Props {
 		notInList?: boolean;
 		class?: string;
-		site?: string
+		site: string;
+		domain: string;
 	}
 
 	const capitalize = (str: string) => str[0].toUpperCase() + str.slice(1);
