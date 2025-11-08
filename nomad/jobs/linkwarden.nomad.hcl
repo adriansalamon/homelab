@@ -39,7 +39,7 @@ job "linkwarden" {
 
       resources {
         cpu    = 500
-        memory = 1024
+        memory = 2048 # OMG what bloat?
       }
 
       template {

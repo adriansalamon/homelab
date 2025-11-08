@@ -18,7 +18,7 @@ job "homepage" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/homepage:latest"
+        image = "ghcr.io/adriansalamon/homepage:main-144dd5a"
         ports = ["http"]
       }
 

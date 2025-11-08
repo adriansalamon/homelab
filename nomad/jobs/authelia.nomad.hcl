@@ -261,6 +261,7 @@ identity_providers:
       - client_id: 'linkwarden'
         client_name: 'Linkwarden'
         client_secret: {{ .linkwarden_oidc_client_secret }}
+        pre_configured_consent_duration: "3 months"
         public: false
         require_pkce: false
         redirect_uris:
