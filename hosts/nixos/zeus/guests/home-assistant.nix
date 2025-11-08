@@ -127,6 +127,7 @@ in
         (callPackage ./hass-components/hass-plejd.nix {
           pyplejd = (callPackage ./hass-components/pyplejd.nix { });
         })
+        (callPackage ./hass-components/wiim.nix { })
         prometheus_sensor
       ];
 
