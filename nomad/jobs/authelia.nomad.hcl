@@ -17,7 +17,7 @@ job "authelia" {
       driver = "docker"
 
       config {
-        image = "authelia/authelia:latest"
+        image = "authelia/authelia:4.39"
         ports = ["http"]
         args = [
           "--config", "/config/configuration.yml",

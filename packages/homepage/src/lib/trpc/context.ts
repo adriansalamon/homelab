@@ -6,9 +6,6 @@ export async function createContext(event: RequestEvent) {
 	const name = event.request.headers.get("Remote-Name") ?? "Guest";
 	const email = event.request.headers.get("Remote-Email");
 
-	username = "adrian";
-
-	// Temporarily disabled - will re-enable when authentik API clients are generated
 	return {
 		event,
 		username,

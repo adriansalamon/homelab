@@ -13,10 +13,9 @@
 	},
 	"devDependencies": {
 		"@hey-api/openapi-ts": "^0.87.5",
-		"@lucide/svelte": "^0.544.0",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-node": "^5.4.0",
-		"@sveltejs/enhanced-img": "^0.4.4",
+		"@sveltejs/enhanced-img": "^0.8.5",
 		"@sveltejs/kit": "^2.48.5",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/typography": "^0.5.19",
@@ -48,20 +47,20 @@
 	"type": "module",
 	"dependencies": {
 		"@internationalized/date": "^3.10.0",
-		"@jellyfin/sdk": "^0.11.0",
+		"@jellyfin/sdk": "^0.13.0",
 		"@trpc/server": "^10.45.2",
 		"bits-ui": "^2.14.3",
 		"clsx": "^2.1.1",
 		"embla-carousel-svelte": "^8.6.0",
 		"formsnap": "^2.0.1",
-		"paneforge": "^0.0.6",
-		"svelte-sonner": "^0.3.28",
+		"paneforge": "^1.0.2",
+		"svelte-sonner": "^1.0.6",
 		"sveltekit-superforms": "^2.28.1",
 		"tailwind-merge": "^3.4.0",
 		"toml": "^3.0.0",
 		"trpc-sveltekit": "^3.6.3"
 	},
-	"packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af",
+	"packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c",
 	"pnpm": {
 		"ignoredBuiltDependencies": [
 			"@nestjs/core",

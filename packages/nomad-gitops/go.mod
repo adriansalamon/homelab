@@ -4,9 +4,9 @@ go 1.25
 
 require (
 	github.com/caarlos0/env/v11 v11.3.1
-	github.com/go-git/go-git/v5 v5.10.1
-	github.com/gregdel/pushover v1.2.0
-	github.com/hashicorp/consul/api v1.28.0
+	github.com/go-git/go-git/v5 v5.16.3
+	github.com/gregdel/pushover v1.4.0
+	github.com/hashicorp/consul/api v1.33.0
 	github.com/hashicorp/nomad/api v0.0.0-20251114154449-b67790fd8bd0
 )
 

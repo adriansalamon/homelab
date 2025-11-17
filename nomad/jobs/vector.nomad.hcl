@@ -41,7 +41,7 @@ job "vector" {
     task "vector" {
       driver = "docker"
       config {
-        image = "timberio/vector:0.50.0-alpine"
+        image = "timberio/vector:0.51.1-alpine"
         ports = ["api"]
       }
 
