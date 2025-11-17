@@ -3,7 +3,7 @@
 	import { Skeleton } from "$lib/components/ui";
 </script>
 
-<button class="align-center flex items-center !outline-none !ring-0">
+<button class="align-center flex items-center outline-none! ring-0!">
 	<p class="mb-1 text-base font-semibold text-muted-foreground">Nodes</p>
 	<ChevronDown class="ml-auto h-4 w-4 transition-all" />
 </button>

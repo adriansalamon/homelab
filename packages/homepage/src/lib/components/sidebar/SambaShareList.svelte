@@ -24,7 +24,7 @@
 	});
 </script>
 
-<button class="align-center flex items-center !outline-none !ring-0" use:pressAction>
+<button class="align-center flex items-center outline-none! ring-0!" use:pressAction>
 	<p class="mb-1 text-base font-semibold text-muted-foreground">Samba Shares</p>
 	<ChevronDown class={cn("ml-auto h-4 w-4 transition-all", expanded ? "rotate-180" : "")} />
 </button>

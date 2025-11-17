@@ -8,10 +8,8 @@ import * as Calendar from "./calendar";
 import * as Card from "./card";
 import * as Carousel from "./carousel";
 import * as Collapsible from "./collapsible";
-import * as Command from "./command";
 import * as ContextMenu from "./context-menu";
 import * as Dialog from "./dialog";
-import * as Drawer from "./drawer";
 import * as Dropdown from "./dropdown-menu";
 import * as Form from "./form";
 import * as HoverCard from "./hover-card";
@@ -59,10 +57,8 @@ export {
 	Card,
 	Carousel,
 	Collapsible,
-	Command,
 	ContextMenu,
 	Dialog,
-	Drawer,
 	Dropdown,
 	Form,
 	HoverCard,

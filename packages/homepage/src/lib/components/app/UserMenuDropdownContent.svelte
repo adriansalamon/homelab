@@ -14,7 +14,7 @@
 	onDestroy(() => matches.destroy());
 </script>
 
-<Dropdown.Content class="z-[49] min-w-56">
+<Dropdown.Content class="z-49 min-w-56">
 	{#if $matches}
 		<Dropdown.Item
 			href="https://grafana.local.salamon.xyz/public-dashboards/b1adb135338b4807b3a9ed5971c11a9c"

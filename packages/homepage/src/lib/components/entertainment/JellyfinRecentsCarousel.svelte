@@ -13,6 +13,8 @@
 
 	const resumeItems = trpc()?.jellyfin.resume.createQuery();
 
+	console.log($resumeItems);
+
 	const { domain }: Props = $props();
 
 	const matches = createMediaStore("(min-width: 768px)");
@@ -26,7 +28,7 @@
 		</h2>
 		<a
 			href="https://jellyfin.{domain}"
-			class="align-center ml-auto flex items-center text-sm text-muted-foreground transition-all hover:text-primary md:text-base"
+			class="align-center text-muted-foreground hover:text-primary ml-auto flex items-center text-sm transition-all md:text-base"
 		>
 			View all <ChevronRight class="h-4 w-4" />
 		</a>
@@ -49,7 +51,7 @@
 		</h2>
 		<a
 			href="https://jellyfin.{domain}"
-			class="align-center ml-auto flex items-center text-muted-foreground transition-all hover:text-primary"
+			class="align-center text-muted-foreground hover:text-primary ml-auto flex items-center transition-all"
 		>
 			View all <ChevronRight class="h-4 w-4" />
 		</a>
@@ -58,7 +60,7 @@
 		<Carousel.Content>
 			{#each Array.from({ length: 7 }) as _}
 				<Carousel.Item class="basis-1/3 sm:basis-1/4">
-					<Card.Root class="aspect-[3/4] animate-pulse bg-muted"></Card.Root>
+					<Card.Root class="bg-muted aspect-3/4 animate-pulse"></Card.Root>
 				</Carousel.Item>
 			{/each}
 		</Carousel.Content>

@@ -55,7 +55,7 @@
 
 <Carousel.Item class="basis-1/3 sm:basis-1/4">
 	<a href={getItemLink(Id, ServerId)} class="group contents">
-		<Card.Root class="aspect-[3/4]">
+		<Card.Root class="aspect-3/4">
 			<div class="relative h-full w-full overflow-hidden rounded-lg">
 				<canvas
 					class="absolute inset-0 z-0 h-full w-full rounded-lg"
@@ -77,7 +77,7 @@
 					<div class="h-full bg-purple-500/60" style="width: {playedPercentage}%"></div>
 				</div>
 				<div
-					class="align-center dark absolute left-0 top-0 z-[11] flex h-full w-full flex-col items-center justify-center p-4 text-center opacity-0 backdrop-blur-md backdrop-brightness-50 backdrop-saturate-150 transition-all group-hover:opacity-100"
+					class="align-center dark absolute left-0 top-0 z-11 flex h-full w-full flex-col items-center justify-center p-4 text-center opacity-0 backdrop-blur-md backdrop-brightness-50 backdrop-saturate-150 transition-all group-hover:opacity-100"
 				>
 					<img
 						src={getJellyfinImage(SeriesId ?? Id, "Logo")}

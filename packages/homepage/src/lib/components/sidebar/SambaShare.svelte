@@ -33,28 +33,25 @@
 <li>
 	<div class="flex items-center justify-between gap-2">
 		<p class="text-sm font-semibold">{share.name}</p>
-		<Tooltip.Root>
-			<Tooltip.Trigger asChild let:builder>
-				<button
-					{...builder}
-					use:builder.action
-					onclick={copyToClipboard}
-					class="rounded p-1 transition-colors hover:bg-muted"
-				>
-					{#if isCopied}
-						<Check class="size-3 text-green-500" />
-					{:else}
-						<Copy class="size-3 text-muted-foreground" />
-					{/if}
-				</button>
-			</Tooltip.Trigger>
-			<Tooltip.Content>
-				{isCopied ? "Copied!" : "Copy path"}
-			</Tooltip.Content>
-		</Tooltip.Root>
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger>
+					<button onclick={copyToClipboard} class="hover:bg-muted rounded p-1 transition-colors">
+						{#if isCopied}
+							<Check class="size-3 text-green-500" />
+						{:else}
+							<Copy class="text-muted-foreground size-3" />
+						{/if}
+					</button>
+				</Tooltip.Trigger>
+				<Tooltip.Content>
+					{isCopied ? "Copied!" : "Copy path"}
+				</Tooltip.Content>
+			</Tooltip.Root>
+		</Tooltip.Provider>
 	</div>
 	{#if expanded}
-		<p class="text-xs text-muted-foreground" transition:fly={{ y: -5 }}>
+		<p class="text-muted-foreground text-xs" transition:fly={{ y: -5 }}>
 			{share.path}
 		</p>
 	{/if}

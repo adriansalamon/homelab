@@ -71,7 +71,7 @@
 				<div
 					aria-hidden="true"
 					style="mask-image: linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(0,0,0,0.7) 40%, rgba(0, 0, 0, 1) 70%);"
-					class="absolute left-0 top-0 h-full w-full rounded-lg backdrop-blur-md backdrop-brightness-[25%]"
+					class="absolute left-0 top-0 h-full w-full rounded-lg backdrop-blur-md backdrop-brightness-25"
 				></div>
 				<Card.Content
 					class="dark relative flex h-32 min-h-32 flex-col items-start justify-end p-4 sm:h-48 sm:min-h-48 md:h-64 md:min-h-64 md:flex-row md:items-end md:justify-start md:p-6"
@@ -89,7 +89,7 @@
 						{/if}
 
 						{#if failedImageLoad || !imageLoaded}
-							<p class="mb-2 max-w-[36rem] text-lg md:mb-4 md:text-2xl xl:text-4xl">
+							<p class="mb-2 max-w-xl text-lg md:mb-4 md:text-2xl xl:text-4xl">
 								{Name ?? OriginalTitle}
 							</p>
 						{/if}

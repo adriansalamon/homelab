@@ -13,9 +13,9 @@
 	const { children, domain }: Props = $props();
 </script>
 
-<div class="mx-auto flex h-full w-full max-w-screen-xl">
+<div class="mx-auto flex h-full w-full max-w-(--breakpoint-xl)">
 	<div class="my-6 flex pl-4">
-		<aside class="flex w-full min-w-72 flex-col overflow-y-auto py-4 pl-4 pr-4 xl:pl-0">
+		<aside class="flex w-full min-w-72 flex-col overflow-y-auto py-4 pr-4 pl-4 xl:pl-0">
 			<div class="align-center mb-4 flex items-center">
 				<h1 class="text-2xl font-semibold">Salamon</h1>
 			</div>
@@ -48,7 +48,7 @@
 		<Separator orientation="vertical" />
 	</div>
 
-	<main class="h-full w-full overflow-y-auto overflow-x-hidden px-20 py-8">
+	<main class="h-full w-full overflow-x-hidden overflow-y-auto px-20 py-8">
 		{@render children()}
 	</main>
 </div>

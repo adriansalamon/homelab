@@ -28,7 +28,7 @@
 	plugins={$jfData?.data
 		? [
 				Autoplay({
-					delay: 10000000,
+					delay: 15000,
 				}),
 			]
 		: undefined}
@@ -40,7 +40,7 @@
 			{/each}
 		{:else}
 			<Carousel.Item>
-				<Card.Root class="animate-pulse bg-muted">
+				<Card.Root class="bg-muted animate-pulse">
 					<Card.Content
 						class="flex h-32 min-h-32 items-end justify-start p-6 sm:h-48 sm:min-h-48 md:h-48 md:min-h-64"
 					></Card.Content>
