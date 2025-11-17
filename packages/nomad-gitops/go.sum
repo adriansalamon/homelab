@@ -86,6 +86,8 @@ github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aN
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/gregdel/pushover v1.2.0 h1:SLnpvJijUyEZvkJNyrldGhFhryYgQYlThSLpB5Oqt5k=
 github.com/gregdel/pushover v1.2.0/go.mod h1:EcaO66Nn1StkpEm1iKtBTV3d2A16SoMsVER1PthX7to=
+github.com/gregdel/pushover v1.4.0 h1:P77WAJ2zPG+b0mEsmMjWGrPMuvhkh9k3v7OviwsoveE=
+github.com/gregdel/pushover v1.4.0/go.mod h1:EcaO66Nn1StkpEm1iKtBTV3d2A16SoMsVER1PthX7to=
 github.com/hashicorp/consul/api v1.28.0 h1:QWfM1UXnQaECMh7bwP5jt+/uJsCE09qWuYq3GWbBZA8=
 github.com/hashicorp/consul/api v1.28.0/go.mod h1:MyriVXDqGlf2ZeV6NW2NGdyl26W1mwF5nKLlg8xlNak=
 github.com/hashicorp/consul/sdk v0.16.0-rc1 h1:OtIkCaAz72W9UNVqW5QublWl9lFDjt9z5sEiBNTZcck=
