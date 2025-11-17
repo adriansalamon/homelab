@@ -8,7 +8,7 @@
 		description: string;
 		href: string;
 		gradientColours?: [string, string, string];
-		icon: Snippet<[string]>;
+		icon?: Snippet<[string]>;
 		notInList?: boolean;
 		children?: Snippet;
 		class?: string;

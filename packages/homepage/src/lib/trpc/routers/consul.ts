@@ -97,7 +97,7 @@ export const consulRouter = t.router({
 			// Combine expected nodes with online status and IP address
 			const nodes = Array.from(expectedNodeNames).map((name) => ({
 				name,
-				ready: nodeMap.has(name) && nodeMap.get(name).Status == 1,
+				ready: nodeMap.has(name) && nodeMap.get(name)?.Status == 1,
 				address: nodeMap.get(name)?.Addr ?? null,
 			}));
 

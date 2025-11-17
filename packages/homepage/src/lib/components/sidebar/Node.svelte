@@ -7,7 +7,7 @@
 	interface Node {
 		name: string;
 		ready: boolean;
-		address: string;
+		address?: string;
 	}
 
 	interface Props {

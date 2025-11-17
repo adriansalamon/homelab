@@ -30,7 +30,7 @@
 	<p class="mb-1 text-base font-semibold text-muted-foreground">Nodes</p>
 	<ChevronDown class={cn("ml-auto h-4 w-4 transition-all", expanded ? "rotate-180" : "")} />
 </button>
-<ul class="mt-1 mt-2 flex flex-col gap-2">
+<ul class="mt-2 flex flex-col gap-2">
 	{#each nodes as node (node.name)}
 		<Node {node} {expanded} />
 	{/each}
