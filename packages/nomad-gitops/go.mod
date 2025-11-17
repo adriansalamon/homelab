@@ -7,7 +7,7 @@ require (
 	github.com/go-git/go-git/v5 v5.10.1
 	github.com/gregdel/pushover v1.2.0
 	github.com/hashicorp/consul/api v1.28.0
-	github.com/hashicorp/nomad/api v0.0.0-20231208210505-e551814df5f2
+	github.com/hashicorp/nomad/api v0.0.0-20251114154449-b67790fd8bd0
 )
 
 require (
@@ -22,8 +22,8 @@ require (
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/hashicorp/cronexpr v1.1.2 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/hashicorp/cronexpr v1.1.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
