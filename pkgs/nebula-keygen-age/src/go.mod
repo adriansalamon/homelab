@@ -3,7 +3,7 @@ module github.com/adriansalamon/nebula-keygen-age
 go 1.23.8
 
 require (
-	github.com/slackhq/nebula v1.9.5
+	github.com/slackhq/nebula v1.9.7
 	golang.org/x/crypto v0.26.0
 )
 
