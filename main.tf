@@ -10,7 +10,7 @@ terraform {
     }
     hcloud = {
       source  = "hetznercloud/hcloud"
-      version = "1.51.0"
+      version = "1.56.0"
     }
     consul = {
       source  = "hashicorp/consul"
