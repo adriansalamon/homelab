@@ -64,8 +64,6 @@ in
               ${decryptSecrets}
               echo "}" >> "$tmpfile"
 
-              cat "$tmpfile"
-
               cat "$tmpfile" | ${pkgs.nomad}/bin/nomad var put -in hcl -force ${nomadPath} -
             '';
 

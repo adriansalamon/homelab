@@ -136,6 +136,16 @@ session_prefix "" {
 EOT
 }
 
+resource "consul_acl_policy" "gitops_nomad" {
+  name        = "gitops-nomad-policy"
+  description = "Policy for gitops-nomad service"
+  rules       = <<EOT
+key_prefix "nomad-gitops/" {
+  policy = "write"
+}
+EOT
+}
+
 resource "consul_acl_token" "server_token" {
   description = "Token for Consul server agents"
   policies = [
@@ -193,6 +203,9 @@ resource "consul_acl_token" "apply_builds" {
   policies    = [consul_acl_policy.apply_builds.name]
 }
 
+resource "consul_acl_token" "nomad_gitops" {
+  policies = [consul_acl_policy.base_agent.name, consul_acl_policy.gitops_nomad.name]
+}
 
 data "consul_acl_token_secret_id" "server_token" {
   accessor_id = consul_acl_token.server_token.id
@@ -230,6 +243,10 @@ data "consul_acl_token_secret_id" "build_token" {
   accessor_id = consul_acl_token.build_token.id
 }
 
+data "consul_acl_token_secret_id" "nomad_gitops_token" {
+  accessor_id = consul_acl_token.nomad_gitops.id
+}
+
 locals {
   acl_tokens = {
     server       = data.consul_acl_token_secret_id.server_token
@@ -257,7 +274,6 @@ provider "nomad" {
   address = var.nomad_url
 }
 
-
 resource "nomad_acl_policy" "admin" {
   name        = "admin"
   description = "Policy for admin users"
@@ -283,6 +299,26 @@ plugin {
 }
 EOT
 }
+
+resource "nomad_acl_policy" "operator" {
+  name      = "nomad-gitops-operator"
+  rules_hcl = <<EOT
+namespace "*" {
+  policy = "write"
+}
+
+host_volume "*" {
+  policy = "write"
+}
+  EOT
+}
+
+resource "nomad_acl_token" "operator_token" {
+  type     = "client"
+  policies = [nomad_acl_policy.operator.name]
+}
+
+
 
 variable "nomad_oidc_client_secret" {
   type      = string
