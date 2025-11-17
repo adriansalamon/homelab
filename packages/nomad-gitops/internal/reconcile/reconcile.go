@@ -54,14 +54,12 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*ReconcileResult, error) {
 		Errors:  []string{},
 	}
 
-	// Pull latest from git
 	if err := r.gitRepo.Pull(ctx); err != nil {
 		r.logger.Error("failed to pull git repository", "error", err)
 		r.consulState.SaveError(err.Error())
 		return result, err
 	}
 
-	// Get current commit SHA
 	commitSHA, err := r.gitRepo.GetCommitSHA()
 	if err != nil {
 		r.logger.Error("failed to get commit SHA", "error", err)
@@ -69,13 +67,12 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*ReconcileResult, error) {
 		return result, err
 	}
 
-	// Get previous sync state
 	prevState, err := r.consulState.GetSyncState()
 	if err != nil {
 		r.logger.Error("failed to get previous sync state", "error", err)
 	}
 
-	// If already synced to this commit, skip
+	// If already synced to this commit, skip. Maybe we should check that all deployed jobs have same commit?
 	if prevState != nil && prevState.LastCommitSHA == commitSHA {
 		r.logger.Info("already synced to this commit", "sha", commitSHA)
 		return result, nil
@@ -84,7 +81,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*ReconcileResult, error) {
 	r.logger.Info("syncing to commit", "sha", commitSHA)
 
 	// Collect all job files from all paths
-	var allJobFiles []string
+	allJobFiles := make(map[string]struct{})
 	for _, jobPath := range r.jobPaths {
 		jobFiles, err := r.gitRepo.GetFilesByGlob(jobPath)
 		if err != nil {
@@ -93,7 +90,10 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*ReconcileResult, error) {
 			return result, err
 		}
 		r.logger.Debug("found job files", "path", jobPath, "count", len(jobFiles))
-		allJobFiles = append(allJobFiles, jobFiles...)
+
+		for _, jobFile := range jobFiles {
+			allJobFiles[jobFile] = struct{}{}
+		}
 	}
 
 	r.logger.Info("total job files found", "count", len(allJobFiles))
@@ -101,8 +101,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*ReconcileResult, error) {
 	// Map of desired jobs (name -> job)
 	desiredJobs := make(map[string]string)
 
-	// Parse and apply all job files
-	for _, jobFile := range allJobFiles {
+	for jobFile, _ := range allJobFiles {
 		hcl, err := r.gitRepo.ReadFile(jobFile)
 		if err != nil {
 			errMsg := fmt.Sprintf("failed to read job file %s: %v", jobFile, err)
@@ -114,7 +113,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*ReconcileResult, error) {
 		hclStr := string(hcl)
 
 		// Parse job
-		parsedJob, err := r.nomadClient.ParseJob(hclStr)
+		parsedJob, err := r.nomadClient.ParseJob(string(hcl))
 		if err != nil {
 			errMsg := fmt.Sprintf("failed to parse job %s: %v", jobFile, err)
 			r.logger.Error(errMsg)
@@ -189,14 +188,12 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*ReconcileResult, error) {
 		r.logger.Error("failed to save deployed jobs to consul", "error", err)
 	}
 
-	// Send notification
 	if len(result.Created) > 0 || len(result.Updated) > 0 || len(result.Deleted) > 0 {
 		message := fmt.Sprintf("Created: %d, Updated: %d, Deleted: %d",
 			len(result.Created), len(result.Updated), len(result.Deleted))
 		r.notifier.SendSuccess("Nomad Sync", message)
 	}
 
-	// Log errors if any
 	if len(result.Errors) > 0 {
 		errMessage := strings.Join(result.Errors, "; ")
 		r.notifier.SendError("Nomad Sync Error", errMessage)

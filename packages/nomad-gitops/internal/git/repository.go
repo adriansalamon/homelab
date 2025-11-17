@@ -29,12 +29,10 @@ func New(url, branch, workdir string) *Repository {
 
 // Init clones the repository if it doesn't exist, otherwise opens it
 func (r *Repository) Init(ctx context.Context) error {
-	// Create workdir if it doesn't exist
 	if err := os.MkdirAll(r.workdir, 0755); err != nil {
 		return fmt.Errorf("failed to create workdir: %w", err)
 	}
 
-	// Check if repo already exists
 	repo, err := gogit.PlainOpen(r.workdir)
 	if err == nil {
 		r.repo = repo

@@ -42,7 +42,6 @@ func (s *State) GetSyncState() (*SyncState, error) {
 		return nil, fmt.Errorf("failed to get state from consul: %w", err)
 	}
 
-	// Return empty state if key doesn't exist
 	if pair == nil {
 		return &SyncState{
 			LastSyncTime: time.Now(),
