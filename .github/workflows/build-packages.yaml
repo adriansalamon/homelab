@@ -26,6 +26,8 @@ jobs:
               - 'packages/consul-kv-proxy/**'
             homepage:
               - 'packages/homepage/**'
+            nomad-gitops:
+              - 'packages/nomad-gitops/**'
 
   # Build matrix of services
   build:
