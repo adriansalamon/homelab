@@ -1,5 +1,4 @@
 <script lang="ts">
-	// @ts-ignore
 	import MarqueeTextWidget from "svelte-marquee-text-widget";
 
 	interface Props {
