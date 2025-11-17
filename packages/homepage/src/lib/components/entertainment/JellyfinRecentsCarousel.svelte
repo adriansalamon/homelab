@@ -13,8 +13,6 @@
 
 	const resumeItems = trpc()?.jellyfin.resume.createQuery();
 
-	console.log($resumeItems);
-
 	const { domain }: Props = $props();
 
 	const matches = createMediaStore("(min-width: 768px)");
