@@ -5,7 +5,7 @@ go 1.25.1
 require (
 	github.com/caarlos0/env/v11 v11.1.0
 	github.com/cenkalti/backoff/v5 v5.0.3
-	github.com/hashicorp/consul/api v1.32.0
+	github.com/hashicorp/consul/api v1.33.0
 )
 
 require (
