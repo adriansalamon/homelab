@@ -51,7 +51,7 @@ func main() {
 	notifier := notification.NewDummyNotifier()
 
 	// Initialize git repo
-	gitRepo := git.New(cfg.GitURL, cfg.GitBranch, "/tmp/nomad-gitops-repo")
+	gitRepo := git.New(cfg)
 	if err := gitRepo.Init(context.Background()); err != nil {
 		slog.Error("failed to initialize git repository", "error", err)
 		os.Exit(1)

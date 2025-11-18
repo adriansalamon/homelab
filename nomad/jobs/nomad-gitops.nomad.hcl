@@ -33,6 +33,7 @@ job "nomad-gitops" {
           GIT_URL = "https://github.com/adriansalamon/homelab"
           GIT_BRANCH = "main"
           GIT_SYNC_INTERVAL = "5m"
+          GIT_LOCAL_PATH = "{{ env "NOMAD_ALLOC_DIR" }}/repo"
           NOMAD_JOB_PATHS = "nomad/jobs/*.nomad.hcl,nomad/**/*.nomad.hcl"
 
           # Nomad configuration

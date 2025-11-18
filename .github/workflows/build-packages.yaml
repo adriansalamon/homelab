@@ -91,10 +91,16 @@ jobs:
           cmd: |
             jq '."${{ matrix.service }}".job_file' .github/workflows/services.json -r -c
 
+      - name: Set short commit SHA
+        id: sha
+        run: |
+          sha=$(git rev-parse --short ${{ github.sha }})
+          echo "SHORT_SHA=$sha" >> $GITHUB_ENV
+
       - name: Update nomad job
         run: |
           NOMAD_JOB="${{ steps.job-file.outputs.value }}"
-          NEW_TAG="main-${GITHUB_SHA::7}"
+          NEW_TAG="main-${{ env.SHORT_SHA }}"
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}"
 
           if [ ! -f "${NOMAD_JOB}" ]; then
@@ -112,5 +118,5 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: "chore: deploy ${{ matrix.service }}@${GITHUB_SHA::7} [skip ci]"
+          commit_message: "chore: deploy ${{ matrix.service }}@${{ env.SHORT_SHA }} [skip ci]"
           file_pattern: ${{ steps.job-file.outputs.value }}

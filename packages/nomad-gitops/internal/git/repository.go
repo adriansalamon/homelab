@@ -3,6 +3,7 @@ package git
 import (
 	"context"
 	"fmt"
+	"nomad-gitops/internal/config"
 	"os"
 	"path/filepath"
 	"time"
@@ -19,11 +20,11 @@ type Repository struct {
 	worktree *gogit.Worktree
 }
 
-func New(url, branch, workdir string) *Repository {
+func New(cfg *config.Config) *Repository {
 	return &Repository{
-		url:     url,
-		branch:  branch,
-		workdir: workdir,
+		url:     cfg.GitURL,
+		branch:  cfg.GitBranch,
+		workdir: cfg.GitLocalPath,
 	}
 }
 

@@ -11,6 +11,7 @@ type Config struct {
 	GitURL           string        `env:"GIT_URL,required"`
 	GitBranch        string        `env:"GIT_BRANCH"`
 	GitSyncInterval  time.Duration `env:"GIT_SYNC_INTERVAL"`
+	GitLocalPath     string        `env:"GIT_LOCAL_PATH"`
 	NomadJobPaths    []string      `env:"NOMAD_JOB_PATHS,required"`
 	ConsulPrefix     string        `env:"CONSUL_PREFIX"`
 	PushoverUserKey  string        `env:"PUSHOVER_USER_KEY"`
@@ -29,6 +30,7 @@ func LoadConfig() (*Config, error) {
 	cfg := Config{
 		GitBranch:       "main",
 		GitSyncInterval: time.Minute * 5,
+		GitLocalPath:    "/tmp/nomad-gitops-repo",
 		LogLevel:        slog.LevelInfo,
 		NomadJobPaths:   []string{"nomad/jobs/**/*.nomad"},
 		ConsulPrefix:    "nomad-gitops",
