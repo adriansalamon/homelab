@@ -265,7 +265,7 @@ identity_providers:
         public: false
         require_pkce: false
         redirect_uris:
-          - 'https://linkwarden.salamon.xyz/api/v1/auth/callback/authelia'
+          - 'https://linkwarden.{{ $domain }}/api/v1/auth/callback/authelia'
         scopes:
           - 'openid'
           - 'groups'

@@ -1,9 +1,9 @@
 name: "build-derivations"
 
 on:
-  #push:
-  #  branches:
-  #    - "main"
+  push:
+    branches:
+      - "main"
   workflow_dispatch:
 
 jobs:
@@ -48,6 +48,7 @@ jobs:
           git checkout HEAD -- "$(git rev-parse --show-toplevel)"
           rm key.txt
 
+      # TODO: this does not work reliably
       - name: Check if build needed
         id: build-needed
         run: |
