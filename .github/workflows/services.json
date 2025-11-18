@@ -5,7 +5,8 @@
   },
   "homepage": {
     "path": "packages/homepage/**",
-    "job_file": "nomad/jobs/homepage.nomad.nomad.hcl"
+    "job_file": "nomad/jobs/homepage.nomad.nomad.hcl",
+    "dummy": "**/**"
   },
   "nomad-gitops": {
     "path": "packages/nomad-gitops/**",
