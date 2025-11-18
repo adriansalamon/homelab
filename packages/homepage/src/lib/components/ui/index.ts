@@ -28,7 +28,7 @@ import * as ToggleGroup from "./toggle-group";
 import * as Tooltip from "./tooltip";
 
 export * from "./badge";
-export { Button, type ButtonEvents, type ButtonProps, buttonVariants } from "./button";
+export { Button, type ButtonProps, buttonVariants } from "./button";
 export { Checkbox } from "./checkbox";
 export { type FormInputEvent, Input, type InputEvents } from "./input";
 export { Label } from "./label";

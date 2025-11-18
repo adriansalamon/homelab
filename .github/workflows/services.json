@@ -1,14 +1,14 @@
 {
   "consul-kv-proxy": {
     "path": "packages/consul-kv-proxy/**",
-    "job_file": "nomad/consul-kv-proxy.nomad"
+    "job_file": "nomad/jobs/consul-kv-proxy.nomad.hcl"
   },
   "homepage": {
     "path": "packages/homepage/**",
-    "job_file": "nomad/homepage.nomad"
+    "job_file": "nomad/jobs/homepage.nomad.nomad.hcl"
   },
   "nomad-gitops": {
     "path": "packages/nomad-gitops/**",
-    "job_file": "nomad/nomad-gitops.nomad"
+    "job_file": "nomad/jobs/nomad-gitops.nomad.hcl"
   }
 }
