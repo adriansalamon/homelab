@@ -6,6 +6,7 @@ on:
       - "main"
     paths:
       - "packages/**"
+      - "nomad/jobs/**"
       - ".github/workflows/build-packages.yaml"
   workflow_dispatch:
 
@@ -18,16 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
+      - uses: sergeysova/jq-action@v2
+        id: filter-rules
+        with:
+          cmd: "jq 'to_entries | map({(.key): (.value | to_entries | map(.value))})' .github/workflows/services.json -r"
+
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
         id: filter
         with:
-          filters: |
-            consul-kv-proxy:
-              - 'packages/consul-kv-proxy/**'
-            homepage:
-              - 'packages/homepage/**'
-            nomad-gitops:
-              - 'packages/nomad-gitops/**'
+          filters: ${{ steps.filter-rules.outputs.value }}
 
   # Build matrix of services
   build:
@@ -35,7 +35,7 @@ jobs:
     if: needs.detect-changes.outputs.services != '[]'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     strategy:
@@ -66,12 +66,50 @@ jobs:
             type=sha,prefix={{branch}}-
             type=ref,event=branch
 
+      - name: Get build path
+        id: build-path
+        uses: sergeysova/jq-action@v2
+        with:
+          cmd: |
+            jq '."${{ matrix.service }}".path | split("/") | .[0:-1] | "./" + join("/") + "/"' .github/workflows/services.json -r
+
       - name: Build and push
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
         with:
-          context: ./packages/${{ matrix.service }}
+          context: ${{ steps.build-path.outputs.value }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Get nomad job file
+        id: job-file
+        uses: sergeysova/jq-action@v2
+        with:
+          cmd: |
+            jq '."${{ matrix.service }}".job_file' .github/workflows/services.json -r
+
+      - name: Update nomad job
+        run: |
+          NOMAD_JOB="${{ steps.job-file.outputs.value }}"
+          NEW_TAG="main-${GITHUB_SHA::7}"
+          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}"
+
+          if [ ! -f "${NOMAD_JOB}" ]; then
+            echo "Warning: ${NOMAD_JOB} not found, skipping"
+            exit 0
+          fi
+
+          sed -i -E "s|(image[[:space:]]*=[[:space:]]*\"${IMAGE_NAME}:)[^\"]+|\1${NEW_TAG}|g" "${NOMAD_JOB}"
+
+          if git diff --quiet "${NOMAD_JOB}"; then
+            echo "No changes to ${NOMAD_JOB}"
+            exit 0
+          fi
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: deploy ${{ matrix.service }}@${GITHUB_SHA::7} [skip ci]"
+          file_pattern: ${{ steps.job-file.outputs.value }}
