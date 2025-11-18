@@ -56,6 +56,11 @@ job "homepage" {
         env         = true
       }
 
+      resources {
+        cpu    = 100
+        memory = 128
+      }
+
       service {
         name = "homepage"
         port = "http"
