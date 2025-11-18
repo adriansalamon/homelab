@@ -15,8 +15,8 @@ importers:
         specifier: ^0.13.0
         version: 0.13.0(axios@1.8.3)
       '@trpc/server':
-        specifier: ^10.45.2
-        version: 10.45.2
+        specifier: ^11.0.0
+        version: 11.7.1(typescript@5.9.3)
       bits-ui:
         specifier: ^2.14.3
         version: 2.14.3(@internationalized/date@3.10.0)(@sveltejs/kit@2.48.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(svelte@5.43.8)
@@ -46,7 +46,7 @@ importers:
         version: 3.0.0
       trpc-sveltekit:
         specifier: ^3.6.3
-        version: 3.6.3(@sveltejs/adapter-node@5.4.0(@sveltejs/kit@2.48.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1))))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))
+        version: 3.6.3(@sveltejs/adapter-node@5.4.0(@sveltejs/kit@2.48.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1))))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))
     devDependencies:
       '@hey-api/openapi-ts':
         specifier: ^0.87.5
@@ -76,8 +76,8 @@ importers:
         specifier: ^5.90.2
         version: 5.90.2(svelte@5.43.8)
       '@trpc/client':
-        specifier: ^10.45.2
-        version: 10.45.2(@trpc/server@10.45.2)
+        specifier: ^11.0.0
+        version: 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
       autoprefixer:
         specifier: ^10.4.22
         version: 10.4.22(postcss@8.5.6)
@@ -131,7 +131,7 @@ importers:
         version: 4.1.17
       trpc-svelte-query-adapter:
         specifier: ^2.3.16
-        version: 2.3.16(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(@tanstack/svelte-query@5.90.2(svelte@5.43.8))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(svelte@5.43.8)(typescript@5.9.3)
+        version: 2.3.16(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(@tanstack/svelte-query@5.90.2(svelte@5.43.8))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(svelte@5.43.8)(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -845,13 +845,16 @@ packages:
     peerDependencies:
       svelte: ^3.54.0 || ^4.0.0 || ^5.0.0
 
-  '@trpc/client@10.45.2':
-    resolution: {integrity: sha512-ykALM5kYWTLn1zYuUOZ2cPWlVfrXhc18HzBDyRhoPYN0jey4iQHEFSEowfnhg1RvYnrAVjNBgHNeSAXjrDbGwg==}
+  '@trpc/client@11.7.1':
+    resolution: {integrity: sha512-uOnAjElKI892/U6aQMcBHYs3x7mme3Cvv1F87ytBL56rBvs7+DyK7r43zgaXKf13+GtPEI6ex5xjVUfyDW8XcQ==}
     peerDependencies:
-      '@trpc/server': 10.45.2
+      '@trpc/server': 11.7.1
+      typescript: '>=5.7.2'
 
-  '@trpc/server@10.45.2':
-    resolution: {integrity: sha512-wOrSThNNE4HUnuhJG6PfDRp4L2009KDVxsd+2VYH8ro6o/7/jwYZ8Uu5j+VaW+mOmc8EHerHzGcdbGNQSAUPgg==}
+  '@trpc/server@11.7.1':
+    resolution: {integrity: sha512-N3U8LNLIP4g9C7LJ/sLkjuPHwqlvE3bnspzC4DEFVdvx2+usbn70P80E3wj5cjOTLhmhRiwJCSXhlB+MHfGeCw==}
+    peerDependencies:
+      typescript: '>=5.7.2'
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
@@ -2489,11 +2492,14 @@ snapshots:
       '@tanstack/query-core': 5.90.2
       svelte: 5.43.8
 
-  '@trpc/client@10.45.2(@trpc/server@10.45.2)':
+  '@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
-      '@trpc/server': 10.45.2
+      '@trpc/server': 11.7.1(typescript@5.9.3)
+      typescript: 5.9.3
 
-  '@trpc/server@10.45.2': {}
+  '@trpc/server@11.7.1(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
 
   '@types/cookie@0.6.0': {}
 
@@ -3390,21 +3396,21 @@ snapshots:
 
   totalist@3.0.1: {}
 
-  trpc-svelte-query-adapter@2.3.16(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(@tanstack/svelte-query@5.90.2(svelte@5.43.8))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(svelte@5.43.8)(typescript@5.9.3):
+  trpc-svelte-query-adapter@2.3.16(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(@tanstack/svelte-query@5.90.2(svelte@5.43.8))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(svelte@5.43.8)(typescript@5.9.3):
     dependencies:
       '@sveltejs/vite-plugin-svelte': 6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1))
       '@tanstack/svelte-query': 5.90.2(svelte@5.43.8)
-      '@trpc/client': 10.45.2(@trpc/server@10.45.2)
-      '@trpc/server': 10.45.2
+      '@trpc/client': 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
+      '@trpc/server': 11.7.1(typescript@5.9.3)
       proxy-deep: 4.0.1
       svelte: 5.43.8
       typescript: 5.9.3
 
-  trpc-sveltekit@3.6.3(@sveltejs/adapter-node@5.4.0(@sveltejs/kit@2.48.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1))))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)):
+  trpc-sveltekit@3.6.3(@sveltejs/adapter-node@5.4.0(@sveltejs/kit@2.48.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1))))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)):
     dependencies:
       '@sveltejs/adapter-node': 5.4.0(@sveltejs/kit@2.48.5(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))(svelte@5.43.8)(vite@7.2.2(@types/node@22.13.10)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.6.1)))
-      '@trpc/client': 10.45.2(@trpc/server@10.45.2)
-      '@trpc/server': 10.45.2
+      '@trpc/client': 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
+      '@trpc/server': 11.7.1(typescript@5.9.3)
       ws: 8.18.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
 
   ts-algebra@2.0.0:
