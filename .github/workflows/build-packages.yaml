@@ -8,6 +8,7 @@ on:
       - "packages/**"
       - "nomad/jobs/**"
       - ".github/workflows/build-packages.yaml"
+      - ".github/workflows/services.json"
   workflow_dispatch:
 
 jobs:
