@@ -4,7 +4,7 @@ go 1.23.8
 
 require (
 	github.com/slackhq/nebula v1.9.5
-	golang.org/x/crypto v0.26.0
+	golang.org/x/crypto v0.45.0
 )
 
 require (
