@@ -18,9 +18,9 @@ jobs:
     outputs:
       services: ${{ steps.filter.outputs.changes }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
-      - uses: sergeysova/jq-action@v2
+      - uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
         id: filter-rules
         with:
           cmd: "jq 'map_values(., . | to_entries | map(.value))' .github/workflows/services.json -r -c"
@@ -45,7 +45,7 @@ jobs:
         service: ${{ fromJSON(needs.detect-changes.outputs.services) }}
 
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
@@ -69,7 +69,7 @@ jobs:
 
       - name: Get build path
         id: build-path
-        uses: sergeysova/jq-action@v2
+        uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
         with:
           cmd: |
             jq '."${{ matrix.service }}".path | split("/") | .[0:-1] | "./" + join("/") + "/"' .github/workflows/services.json -r -c
@@ -86,7 +86,7 @@ jobs:
 
       - name: Get nomad job file
         id: job-file
-        uses: sergeysova/jq-action@v2
+        uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
         with:
           cmd: |
             jq '."${{ matrix.service }}".job_file' .github/workflows/services.json -r -c
@@ -116,7 +116,7 @@ jobs:
           fi
 
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@28e16e81777b558cc906c8750092100bbb34c5e3 # v7
         with:
           commit_message: "chore: deploy ${{ matrix.service }}@${{ env.SHORT_SHA }} [skip ci]"
           file_pattern: ${{ steps.job-file.outputs.value }}
