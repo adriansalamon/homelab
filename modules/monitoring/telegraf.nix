@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   globals,
   ...
 }:
@@ -22,6 +23,34 @@ let
   cfg = config.meta.telegraf;
 
   mkIfNotEmpty = xs: mkIf (xs != [ ]) xs;
+
+  nixInfoScript = pkgs.writeShellScript "nix-info" ''
+    set -euo pipefail
+
+    # Get system derivation path (runtime)
+    SYSTEM_DRV=$(readlink /run/current-system 2>/dev/null || echo "unknown")
+    KERNEL=$(uname -rs 2>/dev/null || echo "unknown")
+    NIX_VERSION=$(${pkgs.nix}/bin/nix-env --version 2>/dev/null || echo "unknown")
+
+    # Build-time configuration
+    NIXOS_VERSION="${config.system.nixos.version}"
+    PLATFORM="${config.nixpkgs.system}"
+
+    ${pkgs.jq}/bin/jq -n \
+      --arg platform "$PLATFORM" \
+      --arg system_drv "$SYSTEM_DRV" \
+      --arg kernel "$KERNEL" \
+      --arg nix_version "$NIX_VERSION" \
+      --arg nixos_version "$NIXOS_VERSION" \
+      '{
+        platform: $platform,
+        system_drv: $system_drv,
+        kernel: $kernel,
+        nix_version: $nix_version,
+        nixos_version: $nixos_version,
+        value: 1
+      }'
+  '';
 in
 {
 
@@ -86,6 +115,44 @@ in
             unittype = "service";
           };
           temp = { };
+
+          exec = [
+            {
+              name_suffix = "_nix_info";
+              interval = "10m";
+              commands = [ nixInfoScript ];
+              data_format = "json";
+              json_string_fields = [
+                "platform"
+                "system_drv"
+                "kernel"
+                "nix_version"
+                "nixos_version"
+              ];
+            }
+          ]
+          ++ lib.optionals (builtins.hasAttr "zfs" config.boot.supportedFilesystems) [
+            {
+              name_suffix = "_zpool_list";
+              commands = [ "${pkgs.zfs}/bin/zpool list --json --json-int" ];
+              data_format = "json";
+              json_query = "pools.@values.#.{name,state,allocated:properties.allocated.value,capacity:properties.capacity.value,dedupratio:properties.dedupratio.value,fragmentation:properties.fragmentation.value,free:properties.free.value,health:properties.health.value,size:properties.size.value}";
+              json_string_fields = [
+                "state"
+                "dedupratio"
+                "health"
+              ];
+              tag_keys = [ "name" ];
+            }
+            {
+              name_suffix = "_zfs_list";
+              commands = [ "${pkgs.zfs}/bin/zfs list --json --json-int" ];
+              data_format = "json";
+              json_query = "datasets.@values.#.{name,pool,used:properties.used.value,available:properties.available.value,referenced:properties.referenced.value}";
+              json_string_fields = [ "pool" ];
+              tag_keys = [ "name" ];
+            }
+          ];
 
           ping = mkIfNotEmpty (
             concatLists (
