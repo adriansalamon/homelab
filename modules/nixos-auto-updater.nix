@@ -83,7 +83,14 @@ in
       serviceConfig = {
         Type = "oneshot";
         User = "root";
+        Restart = "no";
+
+        KillMode = "mixed";
+        TimeoutStopSec = "infinity";
       };
+
+      restartIfChanged = false;
+      reloadIfChanged = false;
 
       path = [ pkgs.nix ];
     };
