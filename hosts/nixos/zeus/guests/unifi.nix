@@ -1,4 +1,4 @@
-{ globals, ... }:
+{ globals, pkgs, ... }:
 {
   environment.persistence."/persist".directories = [
     {
@@ -11,6 +11,7 @@
 
   services.unifi = {
     enable = true;
+    mongodbPackage = pkgs.mongodb-ce;
   };
 
   globals.monitoring.http.unifi = {

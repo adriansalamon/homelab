@@ -9,7 +9,7 @@ buildGoModule {
 
   src = ./src;
 
-  vendorHash = "sha256-YCUm/Ndq1oAm3xIG16xeuJUgYbIUpCDPGMMSV0Symgw=";
+  vendorHash = "sha256-q0R7ceW5ysNRrqMu/HD1Zzm+BSgegP9JZNzY6fBpsVo=";
 
   meta = with lib; {
     description = "Automatically update NixOS systems with Consul coordination";

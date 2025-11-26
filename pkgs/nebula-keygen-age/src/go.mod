@@ -1,13 +1,15 @@
 module github.com/adriansalamon/nebula-keygen-age
 
-go 1.23.8
+go 1.24.0
+
+toolchain go1.24.2
 
 require (
-	github.com/slackhq/nebula v1.9.5
-	golang.org/x/crypto v0.26.0
+	github.com/slackhq/nebula v1.9.7
+	golang.org/x/crypto v0.45.0
 )
 
 require (
-	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )

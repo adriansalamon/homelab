@@ -17,10 +17,10 @@
     externalPlugins = lib.singleton {
       name = "blocker";
       repo = "github.com/adriansalamon/blocker";
-      version = "5a9d3a2b381bca4c9fe5c25ae050faa800f91577";
+      version = "023895b530f1843ffc0a96d1428e1f3f6da507a6";
       position.before = "forward";
     };
-    vendorHash = "sha256-ypMg98sDSrGiR3QLprvoFZ3Un7dl5zG7NbRCiBgw7WA=";
+    vendorHash = "sha256-TCmCCu5GlzXcoQSshq/rGDI+2Uv5t5ZIwwqsz5PceDA=";
   };
 
   systemd.services.blocklist-downloader = {
