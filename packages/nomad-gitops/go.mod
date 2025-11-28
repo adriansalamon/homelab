@@ -7,7 +7,7 @@ require (
 	github.com/go-git/go-git/v5 v5.16.3
 	github.com/gregdel/pushover v1.4.0
 	github.com/hashicorp/consul/api v1.33.0
-	github.com/hashicorp/nomad/api v0.0.0-20251114154449-b67790fd8bd0
+	github.com/hashicorp/nomad/api v0.0.0-20251128073002-6c6ce7dbd94e
 )
 
 require (
