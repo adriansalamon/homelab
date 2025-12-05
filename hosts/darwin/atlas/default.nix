@@ -21,6 +21,7 @@
     fzf
     git
     git-agecrypt
+    gleam
     inputs.agenix-rekey.packages."${system}".default
     inputs.deploy-rs.packages."${system}".default
     iperf3
