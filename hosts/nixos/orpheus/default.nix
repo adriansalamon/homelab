@@ -12,6 +12,7 @@
     ./snapserver
     ./ai.nix
     ./guests.nix
+    ./services.nix
   ]
   ++ (with profiles; [
     common

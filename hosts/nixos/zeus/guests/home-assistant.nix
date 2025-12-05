@@ -10,58 +10,67 @@ let
   inherit (lib)
     filterAttrs
     mapAttrsToList
+    mapAttrs'
+    flip
     ;
+
+  passwdSecretName = "authelia-hass-oidc-client-secret";
+
+  mqttUsers = {
+    home-assistant = { };
+    tasmota = { };
+    zigbee2mqtt = { };
+  };
+
 in
 {
   # Mosquitto for MQTT
 
-  age.secrets.mosquitto-home-assistant-pass = {
-    mode = "440";
-    owner = "hass";
-    group = "mosquitto";
-    generator.script = "alnum";
-  };
-
-  age.secrets.mosquitto-tasmota-pass = {
-    mode = "440";
-    owner = "hass";
-    group = "mosquitto";
-    generator.script = "alnum";
-  };
-
-  age.secrets."home-assistant-secrets.yaml" = {
-    generator = {
-      dependencies = [ nomadCfg.config.age.secrets.authelia-hass-oidc-client-secret ];
-      script =
-        {
-          lib,
-          decrypt,
-          deps,
-          ...
-        }:
-        lib.concatMapStrings (secret: ''
-          echo "${lib.escapeShellArg secret.name}": "$(${decrypt} ${lib.escapeShellArg secret.file})" \
-            || die "Failure while aggregating secrets"
-        '') deps;
+  age.secrets = {
+    "home-assistant-secrets.yaml" = {
+      generator = {
+        dependencies = [ nomadCfg.config.age.secrets.${passwdSecretName} ];
+        script =
+          {
+            lib,
+            decrypt,
+            deps,
+            ...
+          }:
+          lib.concatMapStrings (secret: ''
+            echo "${lib.escapeShellArg secret.name}": "$(${decrypt} ${lib.escapeShellArg secret.file})" \
+              || die "Failure while aggregating secrets"
+          '') deps;
+      };
+      owner = "hass";
     };
-    owner = "hass";
-  };
+  }
+  // flip mapAttrs' mqttUsers (
+    name: cfg: {
+      name = "mosquitto-${name}-pass";
+      value = {
+        mode = "440";
+        owner = "hass";
+        group = "mosquitto";
+        generator.script = "alnum";
+      };
+    }
+  );
 
   services.mosquitto = {
     enable = true;
     persistence = true;
     listeners = lib.singleton {
       acl = [ "pattern readwrite #" ];
-      users = {
-        home_assistant = {
-          passwordFile = config.age.secrets.mosquitto-home-assistant-pass.path;
-          acl = [ "readwrite #" ];
-        };
-        tasmota = {
-          passwordFile = config.age.secrets.mosquitto-tasmota-pass.path;
-          acl = [ "readwrite #" ];
-        };
-      };
+      users = flip mapAttrs' mqttUsers (
+        name: cfg: {
+          name = flip lib.strings.replaceChars name { "-" = "_"; };
+          value = {
+            passwordFile = config.age.secrets."mosquitto-${name}-pass".path;
+            acl = [ "readwrite #" ];
+          };
+        }
+      );
       settings.allow_anonymous = false;
     };
   };
@@ -153,7 +162,7 @@ in
 
       auth_oidc = {
         client_id = "hass";
-        client_secret = "!secret hass-oidc-client-secret";
+        client_secret = "!secret ${passwdSecretName}";
         discovery_url = "https://auth.${globals.domains.main}/.well-known/openid-configuration";
         roles = {
           admin = "admin";
