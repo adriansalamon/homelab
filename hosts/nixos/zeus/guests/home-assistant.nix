@@ -64,7 +64,7 @@ in
       acl = [ "pattern readwrite #" ];
       users = flip mapAttrs' mqttUsers (
         name: cfg: {
-          name = flip lib.strings.replaceChars name { "-" = "_"; };
+          name = (builtins.replaceStrings [ "-" ] [ "_" ] name);
           value = {
             passwordFile = config.age.secrets."mosquitto-${name}-pass".path;
             acl = [ "readwrite #" ];
