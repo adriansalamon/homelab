@@ -3,7 +3,11 @@
   "nix": {
     "enabled": true
   },
-  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "extends": [
+    "config:recommended",
+    "schedule:earlyMondays",
+    "helpers:pinGitHubActionDigests"
+  ],
   "lockFileMaintenance": {
     "enabled": true
   },
@@ -18,7 +22,7 @@
     {
       "customType": "regex",
       "datasourceTemplate": "docker",
-      "fileMatch": ["\\.hcl$"],
+      "fileMatch": ["\\.nomad\\.hcl$"],
       "matchStrings": [
         "\\s*image\\s*=\\s*\\\"(?<depName>.*?):(?<currentValue>.*?)\\\""
       ]
