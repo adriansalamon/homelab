@@ -88,5 +88,6 @@ in
     "hass"
     "nomad"
     "linkwarden"
+    "memos"
   ] mkOidcSecret;
 }

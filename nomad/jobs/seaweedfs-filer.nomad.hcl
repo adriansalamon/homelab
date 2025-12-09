@@ -165,6 +165,16 @@ EOF
                 }
               ],
               "actions": ["Read:linkwarden", "Write:linkwarden", "List:linkwarden", "Tagging:linkwarden"]
+            },
+            {
+              "name": "memos",
+              "credentials": [
+                {
+                  "accessKey": "memos",
+                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .memos_secret_key }}"{{ end }}
+                }
+              ],
+              "actions": ["Read:memos", "Write:memos", "List:memos", "Tagging:memos"]
             }
           ]
         }
