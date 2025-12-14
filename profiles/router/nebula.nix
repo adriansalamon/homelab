@@ -22,9 +22,10 @@ in
     groups = [ "router" ];
 
     config.settings = {
+      firewall.default_local_cidr_any = true;
+      tun.use_system_route_table = true;
       # We do our own routing below, setting the src to be
       # able to use this route for the router itself
-      tun.use_system_route_table = true;
       tun.unsafe_routes = mapAttrsToList (hostName: hostCfg: {
         route = builtins.head hostCfg.routeSubnets;
         via = hostCfg.ipv4;
