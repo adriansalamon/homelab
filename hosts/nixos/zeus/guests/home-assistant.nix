@@ -92,10 +92,12 @@ in
     enable = true;
     extraComponents = [
       "apple_tv"
+      "anthropic"
       "bluetooth"
       "bluetooth_adapters"
       "braviatv"
       "cast"
+      "daikin"
       "esphome"
       "homekit"
       "homekit_controller"
@@ -106,7 +108,9 @@ in
       "octoprint"
       "snapcast"
       "spotify"
+      "smhi"
       "tasmota"
+      "trafikverket_weatherstation"
       "unifi"
       "verisure"
     ];
