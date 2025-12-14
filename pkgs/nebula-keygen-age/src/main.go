@@ -6,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"net"
+	"net/netip"
 	"os"
 	"strings"
 	"time"
@@ -62,32 +62,41 @@ func main() {
 }
 
 type signFlags struct {
-	set         *flag.FlagSet
-	caKeyPath   *string
-	caCertPath  *string
-	name        *string
-	ip          *string
-	duration    *time.Duration
-	inPubPath   *string
-	outKeyPath  *string
-	outCertPath *string
-	outQRPath   *string
-	groups      *string
-	subnets     *string
+	set            *flag.FlagSet
+	version        *uint
+	caKeyPath      *string
+	caCertPath     *string
+	name           *string
+	networks       *string
+	unsafeNetworks *string
+	duration       *time.Duration
+	inPubPath      *string
+	outKeyPath     *string
+	outCertPath    *string
+	outQRPath      *string
+	groups         *string
+
+	// Deprecated options
+	ip      *string
+	subnets *string
 }
 
 func newSignFlags() *signFlags {
 	sf := signFlags{set: flag.NewFlagSet("sign", flag.ContinueOnError)}
 	sf.set.Usage = func() {}
+	sf.version = sf.set.Uint("version", 0, "Optional: version of the certificate format to use. The default is to match the version of the signing CA")
 	sf.caCertPath = sf.set.String("ca-crt", "ca.crt", "Optional: path to the signing CA cert")
 	sf.name = sf.set.String("name", "", "Required: name of the cert, usually a hostname")
-	sf.ip = sf.set.String("ip", "", "Required: ipv4 address and network in CIDR notation to assign the cert")
+	sf.networks = sf.set.String("networks", "", "Required: comma separated list of ip address and network in CIDR notation to assign to this cert")
 	sf.duration = sf.set.Duration("duration", 0, "Optional: how long the cert should be valid for. The default is 1 second before the signing cert expires. Valid time units are seconds: \"s\", minutes: \"m\", hours: \"h\"")
 	sf.inPubPath = sf.set.String("in-pub", "", "Optional (if out-key not set): path to read a previously generated public key")
 	sf.outKeyPath = sf.set.String("out-key", "", "Optional (if in-pub not set): path to write the private key to")
 	sf.outCertPath = sf.set.String("out-crt", "", "Optional: path to write the certificate to")
 	sf.groups = sf.set.String("groups", "", "Optional: comma separated list of groups")
 	sf.subnets = sf.set.String("subnets", "", "Optional: comma separated list of ipv4 address and network in CIDR notation. Subnets this cert can serve for")
+
+	sf.ip = sf.set.String("ip", "", "Deprecated, see -networks")
+	sf.subnets = sf.set.String("subnets", "", "Deprecated, see -unsafe-networks")
 	return &sf
 }
 
@@ -130,9 +139,9 @@ func genKey(args []string, out io.Writer, errOut io.Writer) error {
 		return fmt.Errorf("invalid curve: %s", *cf.curve)
 	}
 
-	fmt.Fprintf(out, "%s", cert.MarshalPrivateKey(curve, rawPriv))
+	fmt.Fprintf(out, "%s", cert.MarshalPrivateKeyToPEM(curve, rawPriv))
 
-	err = os.WriteFile(*cf.outPubPath, cert.MarshalPublicKey(curve, pub), 0600)
+	err = os.WriteFile(*cf.outPubPath, cert.MarshalPublicKeyToPEM(curve, pub), 0600)
 	if err != nil {
 		return fmt.Errorf("error while writing out-pub: %s", err)
 	}
@@ -160,6 +169,22 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 		return newHelpErrorf("cannot set both -in-pub and -out-key")
 	}
 
+	var v4Networks []netip.Prefix
+	var v6Networks []netip.Prefix
+	if *sf.networks == "" && *sf.ip != "" {
+		// Pull up deprecated -ip flag if needed
+		*sf.networks = *sf.ip
+	}
+
+	if len(*sf.networks) == 0 {
+		return newHelpErrorf("-networks is required")
+	}
+
+	version := cert.Version(*sf.version)
+	if version != 0 && version != cert.Version1 && version != cert.Version2 {
+		return newHelpErrorf("-version must be either %v or %v", cert.Version1, cert.Version2)
+	}
+
 	rawCAKey, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return fmt.Errorf("error while reading ca-key: %s", err)
@@ -169,7 +194,7 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 	var caKey []byte
 
 	// naively attempt to decode the private key as though it is not encrypted
-	caKey, _, curve, err = cert.UnmarshalSigningPrivateKey(rawCAKey)
+	caKey, _, curve, err = cert.UnmarshalSigningPrivateKeyFromPEM(rawCAKey)
 	if err != nil {
 		return fmt.Errorf("error while parsing ca-key: %s", err)
 	}
@@ -179,7 +204,7 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 		return fmt.Errorf("error while reading ca-crt: %s", err)
 	}
 
-	caCert, _, err := cert.UnmarshalNebulaCertificateFromPEM(rawCACert)
+	caCert, _, err := cert.UnmarshalCertificateFromPEM(rawCACert)
 	if err != nil {
 		return fmt.Errorf("error while parsing ca-crt: %s", err)
 	}
@@ -188,30 +213,63 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 		return fmt.Errorf("refusing to sign, root certificate does not match private key")
 	}
 
-	issuer, err := caCert.Sha256Sum()
-	if err != nil {
-		return fmt.Errorf("error while getting -ca-crt fingerprint: %s", err)
-	}
-
 	if caCert.Expired(time.Now()) {
 		return fmt.Errorf("ca certificate is expired")
 	}
 
+	if version == 0 {
+		version = caCert.Version()
+	}
+
 	// if no duration is given, expire one second before the root expires
 	if *sf.duration <= 0 {
-		*sf.duration = time.Until(caCert.Details.NotAfter) - time.Second*1
+		*sf.duration = time.Until(caCert.NotAfter()) - time.Second*1
 	}
 
-	ip, ipNet, err := net.ParseCIDR(*sf.ip)
-	if err != nil {
-		return newHelpErrorf("invalid ip definition: %s", err)
-	}
-	if ip.To4() == nil {
-		return newHelpErrorf("invalid ip definition: can only be ipv4, have %s", *sf.ip)
-	}
-	ipNet.IP = ip
+	if *sf.networks != "" {
+		for _, rs := range strings.Split(*sf.networks, ",") {
+			rs := strings.Trim(rs, " ")
+			if rs != "" {
+				n, err := netip.ParsePrefix(rs)
+				if err != nil {
+					return newHelpErrorf("invalid -networks definition: %s", rs)
+				}
 
-	groups := []string{}
+				if n.Addr().Is4() {
+					v4Networks = append(v4Networks, n)
+				} else {
+					v6Networks = append(v6Networks, n)
+				}
+			}
+		}
+	}
+
+	var v4UnsafeNetworks []netip.Prefix
+	var v6UnsafeNetworks []netip.Prefix
+	if *sf.unsafeNetworks == "" && *sf.subnets != "" {
+		// Pull up deprecated -subnets flag if needed
+		*sf.unsafeNetworks = *sf.subnets
+	}
+
+	if *sf.unsafeNetworks != "" {
+		for _, rs := range strings.Split(*sf.unsafeNetworks, ",") {
+			rs := strings.Trim(rs, " ")
+			if rs != "" {
+				n, err := netip.ParsePrefix(rs)
+				if err != nil {
+					return newHelpErrorf("invalid -unsafe-networks definition: %s", rs)
+				}
+
+				if n.Addr().Is4() {
+					v4UnsafeNetworks = append(v4UnsafeNetworks, n)
+				} else {
+					v6UnsafeNetworks = append(v6UnsafeNetworks, n)
+				}
+			}
+		}
+	}
+
+	var groups []string
 	if *sf.groups != "" {
 		for _, rg := range strings.Split(*sf.groups, ",") {
 			g := strings.TrimSpace(rg)
@@ -221,31 +279,15 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 		}
 	}
 
-	subnets := []*net.IPNet{}
-	if *sf.subnets != "" {
-		for _, rs := range strings.Split(*sf.subnets, ",") {
-			rs := strings.Trim(rs, " ")
-			if rs != "" {
-				_, s, err := net.ParseCIDR(rs)
-				if err != nil {
-					return newHelpErrorf("invalid subnet definition: %s", err)
-				}
-				if s.IP.To4() == nil {
-					return newHelpErrorf("invalid subnet definition: can only be ipv4, have %s", rs)
-				}
-				subnets = append(subnets, s)
-			}
-		}
-	}
-
 	var pub, rawPriv []byte
 	if *sf.inPubPath != "" {
+		var pubCurve cert.Curve
 		rawPub, err := os.ReadFile(*sf.inPubPath)
 		if err != nil {
 			return fmt.Errorf("error while reading in-pub: %s", err)
 		}
-		var pubCurve cert.Curve
-		pub, _, pubCurve, err = cert.UnmarshalPublicKey(rawPub)
+
+		pub, _, pubCurve, err = cert.UnmarshalPublicKeyFromPEM(rawPub)
 		if err != nil {
 			return fmt.Errorf("error while parsing in-pub: %s", err)
 		}
@@ -256,25 +298,6 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 		pub, rawPriv = newKeypair(curve)
 	}
 
-	nc := cert.NebulaCertificate{
-		Details: cert.NebulaCertificateDetails{
-			Name:      *sf.name,
-			Ips:       []*net.IPNet{ipNet},
-			Groups:    groups,
-			Subnets:   subnets,
-			NotBefore: time.Now(),
-			NotAfter:  time.Now().Add(*sf.duration),
-			PublicKey: pub,
-			IsCA:      false,
-			Issuer:    issuer,
-			Curve:     curve,
-		},
-	}
-
-	if err := nc.CheckRootConstrains(caCert); err != nil {
-		return fmt.Errorf("refusing to sign, root certificate constraints violated: %s", err)
-	}
-
 	if *sf.outKeyPath == "" {
 		*sf.outKeyPath = *sf.name + ".key"
 	}
@@ -283,9 +306,71 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 		*sf.outCertPath = *sf.name + ".crt"
 	}
 
-	err = nc.Sign(curve, caKey)
-	if err != nil {
-		return fmt.Errorf("error while signing: %s", err)
+	var crts []cert.Certificate
+
+	notBefore := time.Now()
+	notAfter := notBefore.Add(*sf.duration)
+
+	switch version {
+	case cert.Version1:
+		// Make sure we have only one ipv4 address
+		if len(v4Networks) != 1 {
+			return newHelpErrorf("invalid -networks definition: v1 certificates can only have a single ipv4 address")
+		}
+
+		if len(v6Networks) > 0 {
+			return newHelpErrorf("invalid -networks definition: v1 certificates can only contain ipv4 addresses")
+		}
+
+		if len(v6UnsafeNetworks) > 0 {
+			return newHelpErrorf("invalid -unsafe-networks definition: v1 certificates can only contain ipv4 addresses")
+		}
+
+		t := &cert.TBSCertificate{
+			Version:        cert.Version1,
+			Name:           *sf.name,
+			Networks:       []netip.Prefix{v4Networks[0]},
+			Groups:         groups,
+			UnsafeNetworks: v4UnsafeNetworks,
+			NotBefore:      notBefore,
+			NotAfter:       notAfter,
+			PublicKey:      pub,
+			IsCA:           false,
+			Curve:          curve,
+		}
+
+		var nc cert.Certificate
+		nc, err = t.Sign(caCert, curve, caKey)
+		if err != nil {
+			return fmt.Errorf("error while signing: %w", err)
+		}
+
+		crts = append(crts, nc)
+
+	case cert.Version2:
+		t := &cert.TBSCertificate{
+			Version:        cert.Version2,
+			Name:           *sf.name,
+			Networks:       append(v4Networks, v6Networks...),
+			Groups:         groups,
+			UnsafeNetworks: append(v4UnsafeNetworks, v6UnsafeNetworks...),
+			NotBefore:      notBefore,
+			NotAfter:       notAfter,
+			PublicKey:      pub,
+			IsCA:           false,
+			Curve:          curve,
+		}
+
+		var nc cert.Certificate
+		nc, err = t.Sign(caCert, curve, caKey)
+		if err != nil {
+			return fmt.Errorf("error while signing: %w", err)
+		}
+
+		crts = append(crts, nc)
+	default:
+		// this should be unreachable
+		return fmt.Errorf("invalid version: %d", version)
 	}
 
 	if *sf.inPubPath == "" {
@@ -293,15 +378,19 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 			return fmt.Errorf("refusing to overwrite existing key: %s", *sf.outKeyPath)
 		}
 
-		err = os.WriteFile(*sf.outKeyPath, cert.MarshalPrivateKey(curve, rawPriv), 0600)
+		err = os.WriteFile(*sf.outKeyPath, cert.MarshalPrivateKeyToPEM(curve, rawPriv), 0600)
 		if err != nil {
 			return fmt.Errorf("error while writing out-key: %s", err)
 		}
 	}
 
-	b, err := nc.MarshalToPEM()
-	if err != nil {
-		return fmt.Errorf("error while marshalling certificate: %s", err)
+	var b []byte
+	for _, c := range crts {
+		sb, err := c.MarshalPEM()
+		if err != nil {
+			return fmt.Errorf("error while marshalling certificate: %s", err)
+		}
+		b = append(b, sb...)
 	}
 
 	err = os.WriteFile(*sf.outCertPath, b, 0600)
