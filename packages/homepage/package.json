@@ -21,7 +21,7 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.17",
 		"@tanstack/svelte-query": "^5.90.2",
-		"@trpc/client": "^10.45.2",
+		"@trpc/client": "^11.0.0",
 		"autoprefixer": "^10.4.22",
 		"embla-carousel-autoplay": "^8.6.0",
 		"fast-blurhash": "^1.1.4",
@@ -48,7 +48,7 @@
 	"dependencies": {
 		"@internationalized/date": "^3.10.0",
 		"@jellyfin/sdk": "^0.13.0",
-		"@trpc/server": "^10.45.2",
+		"@trpc/server": "^11.0.0",
 		"bits-ui": "^2.14.3",
 		"clsx": "^2.1.1",
 		"embla-carousel-svelte": "^8.6.0",
