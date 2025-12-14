@@ -74,7 +74,6 @@ in
       "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
       "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
       "traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1"
-      "traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
     ];
   };
 
