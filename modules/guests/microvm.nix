@@ -49,23 +49,22 @@ in
         }
       );
 
-      shares =
-        [
-          # Share the nix-store of the host
-          {
-            source = "/nix/store";
-            mountPoint = "/nix/.ro-store";
-            tag = "ro-store";
-          }
-        ]
-        ++ flip mapAttrsToList guestCfg.zfs (
-          _: zfsCfg: {
-            source = zfsCfg.hostMountpoint;
-            mountPoint = zfsCfg.guestMountpoint;
-            tag = builtins.substring 0 16 (builtins.hashString "sha256" zfsCfg.hostMountpoint);
-            proto = "virtiofs";
-          }
-        );
+      shares = [
+        # Share the nix-store of the host
+        {
+          source = "/nix/store";
+          mountPoint = "/nix/.ro-store";
+          tag = "ro-store";
+        }
+      ]
+      ++ flip mapAttrsToList guestCfg.zfs (
+        _: zfsCfg: {
+          source = zfsCfg.hostMountpoint;
+          mountPoint = zfsCfg.guestMountpoint;
+          tag = builtins.substring 0 16 (builtins.hashString "sha256" zfsCfg.hostMountpoint);
+          proto = "virtiofs";
+        }
+      );
     };
 
     services.udev.extraRules = concatStringsSep "\n" (
