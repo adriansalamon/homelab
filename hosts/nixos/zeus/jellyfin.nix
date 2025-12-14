@@ -57,12 +57,14 @@ in
   consul.services.jellyfin = {
     inherit port;
     tags = [
+      # From https://jellyfin.org/docs/general/post-install/networking/advanced/traefik
       "traefik.enable=true"
       "traefik.external=true"
       "traefik.http.routers.jellyfin.rule=Host(`jellyfin.${globals.domains.main}`)"
-      "traefik.http.routers.jellyfin.entrypoints=websecure"
-      # From https://jellyfin.org/docs/general/post-install/networking/advanced/traefik
-      "traefik.http.routers.jellyfin.middlewares=jellyfin-mw"
+      "traefik.http.routers.jellyfin.middlewares=jellyfin-mw,jellyfin-auth"
+      # WebOS does not like the X-Frame-Options=SAMEORIGIN
+      "traefik.http.routers.jellyfin-webos.rule=Host(`jellyfin.${globals.domains.main}`) && HeadersRegexp(`User-Agent`, `Web0S`)"
+      "traefik.http.routers.jellyfin-webos.middlewares=jellyfin-mw,jellyfin-webos-mw"
       "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
       "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
       "traefik.http.middlewares.jellyfin-mw.headers.SSLHost=jellyfin.${globals.domains.main}"
@@ -74,6 +76,8 @@ in
       "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
       "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
       "traefik.http.middlewares.jellyfin-mw.headers.customresponseheaders.X-XSS-PROTECTION=1"
+      "traefik.http.middlewares.jellyfin-auth.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
+      "traefik.http.middlewares.jellyfin-webos-mw.headers.customResponseHeaders.Access-Control-Allow-Origin=luna://com.webos.service.config"
     ];
   };
 
