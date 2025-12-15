@@ -194,6 +194,10 @@ in
             serve_dns = netCfg.lighthouse.dns.enable;
             dns.host = netCfg.lighthouse.dns.host;
             dns.port = netCfg.lighthouse.dns.port;
+
+            local_allow_list = {
+              "::/0" = false; # don't advertise ipv6 underlay addresses
+            };
           };
           relay = {
             am_relay = netCfg.isRelay;
