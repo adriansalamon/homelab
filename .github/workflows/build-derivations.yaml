@@ -31,7 +31,7 @@ jobs:
           sudo mkdir -p /etc/nix
           echo "machine nix-cache.salamon.xyz password ${{ secrets.ATTIC_TOKEN }}" | sudo tee /etc/nix/netrc > /dev/null
 
-      - uses: cachix/install-nix-action@0b0e072294b088b73964f1d72dfdac0951439dbd # v31
+      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31
         with:
           extra_nix_config: |
             substituters = https://nix-cache.salamon.xyz/homelab https://cache.nixos.org
