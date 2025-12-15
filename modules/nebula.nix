@@ -71,6 +71,8 @@ in
     let
       caKeyPath = inputs.self.outPath + "/secrets/nebula/mesh/ca.key.age";
       caCertPath = inputs.self.outPath + "/secrets/nebula/mesh/ca.crt";
+      caKeyOldPath = inputs.self.outPath + "/secrets/nebula/mesh/ca_old.key.age";
+      caCertOldPath = inputs.self.outPath + "/secrets/nebula/mesh/ca_old.crt";
       hostCfg = cfg.hosts.${config.node.name};
       ipv4cidr = lib.net.cidr.withCidr hostCfg.ipv4 cfg.cidrv4;
     in
@@ -96,11 +98,11 @@ in
             ''
               pub_path=$(mktemp)
               priv=$(${pkgs.nebula-keygen-age}/bin/nebula-keygen-age genkey -out-pub $pub_path)
-              ${decrypt} ${lib.escapeShellArg caKeyPath} \
+              ${decrypt} ${lib.escapeShellArg caKeyOldPath} \
                 | ${pkgs.nebula-keygen-age}/bin/nebula-keygen-age sign -name ${config.node.name} -ip "${ipv4cidr}" \
                   -subnets ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.routeSubnets)} \
                   -groups ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.groups)} \
-                  -ca-crt ${lib.escapeShellArg caCertPath} -version 1 -in-pub $pub_path -out-crt ${pubkeyPath}.v1
+                  -ca-crt ${lib.escapeShellArg caCertOldPath} -version 1 -in-pub $pub_path -out-crt ${pubkeyPath}.v1
               ${decrypt} ${lib.escapeShellArg caKeyPath} \
                 | ${pkgs.nebula-keygen-age}/bin/nebula-keygen-age sign -name ${config.node.name} -ip "${ipv4cidr}" \
                   -subnets ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.routeSubnets)} \
