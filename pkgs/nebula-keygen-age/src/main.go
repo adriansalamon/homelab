@@ -88,12 +88,12 @@ func newSignFlags() *signFlags {
 	sf.caCertPath = sf.set.String("ca-crt", "ca.crt", "Optional: path to the signing CA cert")
 	sf.name = sf.set.String("name", "", "Required: name of the cert, usually a hostname")
 	sf.networks = sf.set.String("networks", "", "Required: comma separated list of ip address and network in CIDR notation to assign to this cert")
+	sf.unsafeNetworks = sf.set.String("unsafe-networks", "", "Optional: comma separated list of ip address and network in CIDR notation. Unsafe networks this cert can route for")
 	sf.duration = sf.set.Duration("duration", 0, "Optional: how long the cert should be valid for. The default is 1 second before the signing cert expires. Valid time units are seconds: \"s\", minutes: \"m\", hours: \"h\"")
 	sf.inPubPath = sf.set.String("in-pub", "", "Optional (if out-key not set): path to read a previously generated public key")
 	sf.outKeyPath = sf.set.String("out-key", "", "Optional (if in-pub not set): path to write the private key to")
 	sf.outCertPath = sf.set.String("out-crt", "", "Optional: path to write the certificate to")
 	sf.groups = sf.set.String("groups", "", "Optional: comma separated list of groups")
-	sf.subnets = sf.set.String("subnets", "", "Optional: comma separated list of ipv4 address and network in CIDR notation. Subnets this cert can serve for")
 
 	sf.ip = sf.set.String("ip", "", "Deprecated, see -networks")
 	sf.subnets = sf.set.String("subnets", "", "Deprecated, see -unsafe-networks")
@@ -160,9 +160,6 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 		return err
 	}
 	if err := mustFlagString("name", sf.name); err != nil {
-		return err
-	}
-	if err := mustFlagString("ip", sf.ip); err != nil {
 		return err
 	}
 	if *sf.inPubPath != "" && *sf.outKeyPath != "" {

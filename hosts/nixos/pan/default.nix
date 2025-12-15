@@ -11,6 +11,7 @@ in
 {
   # dommy router host for now
   node.site = "arcadia";
+  node.dummy = true;
 
   # dommy key
   age.rekey.hostPubkey = lib.mkForce "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";

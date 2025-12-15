@@ -110,22 +110,25 @@
 
       nodes = config.nixosConfigurations // config.guestConfigs;
 
-      deploy.nodes = flip lib.mapAttrs config.nodes (
-        name: cfg:
-        let
-          system = "x86_64-linux";
-          deployCfg = config.globals.deploy.${name};
-        in
-        {
-          hostname = deployCfg.ip;
-          profiles.system = {
-            user = "root";
-            sshUser = "nixos";
-            path = inputs.deploy-rs.lib.${system}.activate.nixos cfg;
-          };
-          sshOpts = deployCfg.sshOpts or [ ];
-          deploy.remoteBuild = true;
-        }
-      );
+      deploy.nodes =
+        flip lib.mapAttrs
+          (lib.filterAttrs (n: cfg: cfg.config.node.dummy == false) config.nixosConfigurations)
+          (
+            name: cfg:
+            let
+              system = "x86_64-linux";
+              deployCfg = config.globals.deploy.${name};
+            in
+            {
+              hostname = deployCfg.ip;
+              profiles.system = {
+                user = "root";
+                sshUser = "nixos";
+                path = inputs.deploy-rs.lib.${system}.activate.nixos cfg;
+              };
+              sshOpts = deployCfg.sshOpts or [ ];
+              deploy.remoteBuild = true;
+            }
+          );
     };
 }

@@ -94,12 +94,20 @@ in
             # Using modified nebula-keygen-age. It generates private key to stdout, which we can then encrypt with age.
             # Also, we need to sign the public key with the CA key, which we can pipe to stdin of the nebula-keygen-age.
             ''
-              priv=$(${pkgs.nebula-keygen-age}/bin/nebula-keygen-age genkey -out-pub ${pubkeyPath})
+              pub_path=$(mktemp)
+              priv=$(${pkgs.nebula-keygen-age}/bin/nebula-keygen-age genkey -out-pub $pub_path)
               ${decrypt} ${lib.escapeShellArg caKeyPath} \
                 | ${pkgs.nebula-keygen-age}/bin/nebula-keygen-age sign -name ${config.node.name} -ip "${ipv4cidr}" \
                   -subnets ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.routeSubnets)} \
                   -groups ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.groups)} \
-                  -ca-crt ${lib.escapeShellArg caCertPath} -in-pub ${pubkeyPath} -out-crt ${pubkeyPath}
+                  -ca-crt ${lib.escapeShellArg caCertPath} -version 1 -in-pub $pub_path -out-crt ${pubkeyPath}.v1
+              ${decrypt} ${lib.escapeShellArg caKeyPath} \
+                | ${pkgs.nebula-keygen-age}/bin/nebula-keygen-age sign -name ${config.node.name} -ip "${ipv4cidr}" \
+                  -subnets ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.routeSubnets)} \
+                  -groups ${lib.escapeShellArg (builtins.concatStringsSep "," hostCfg.groups)} \
+                  -ca-crt ${lib.escapeShellArg caCertPath} -version 2 -in-pub $pub_path -out-crt ${pubkeyPath}.v2
+              cat ${pubkeyPath}.v1 ${pubkeyPath}.v2 > ${pubkeyPath}
+              rm ${pubkeyPath}.v1 ${pubkeyPath}.v2 $pub_path
               echo "$priv"
             '';
         };
@@ -119,7 +127,7 @@ in
     in
     {
       enable = true;
-      ca = inputs.self.outPath + "/secrets/nebula/${name}/ca.crt";
+      ca = inputs.self.outPath + "/secrets/nebula/${name}/ca_combined.crt";
       cert = lib.removeSuffix ".key.age" config.age.secrets."nebula-${name}.key".rekeyFile + ".crt";
       key = config.age.secrets."nebula-${name}.key".path;
 

@@ -6,6 +6,12 @@
       type = lib.types.str;
     };
 
+    dummy = lib.mkOption {
+      description = "Is this node a dummy node";
+      type = lib.types.bool;
+      default = false;
+    };
+
     secretsDir = lib.mkOption {
       description = "Path to the secrets directory for this node.";
       type = lib.types.path;
