@@ -54,14 +54,14 @@ in
     "10-bond0" = {
       matchConfig.Name = [ "bond0" ];
       networkConfig = {
-        VLAN = builtins.attrValues vlans;
+        VLAN = builtins.attrNames vlans;
         DHCP = "no";
       };
     };
   }
   // flip concatMapAttrs vlans (
     vlan: id: {
-      "20-lan" = {
+      "20-${vlan}" = {
         matchConfig.Name = vlan;
         networkConfig = {
           Bridge = "${vlan}Br";

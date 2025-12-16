@@ -1,7 +1,7 @@
 { lib, ... }:
 let
-  ssd1 = "ata-INTEL_SSDSC2BB120G6K_PHWA6413013C120CGN";
-  ssd2 = "ata-INTEL_SSDSC2BB120G6K_PHWA64130217120CGN";
+  main = "ata-INTEL_SSDSC2BB120G6K_PHWA6413013C120CGN";
+  mirror = "ata-INTEL_SSDSC2BB120G6K_PHWA64130217120CGN";
 in
 {
   imports = [ ./disk-config.secret.nix ];
@@ -10,9 +10,9 @@ in
 
   disko.devices = {
     disk = {
-      ssd1 = {
+      main = {
         type = "disk";
-        device = "/dev/disk/by-id/${ssd1}";
+        device = "/dev/disk/by-id/${main}";
         content = {
           type = "gpt";
           partitions = {
@@ -36,9 +36,9 @@ in
           };
         };
       };
-      ssd2 = {
+      mirror = {
         type = "disk";
-        device = "/dev/disk/by-id/${ssd2}";
+        device = "/dev/disk/by-id/${mirror}";
         content = {
           type = "gpt";
           partitions = {
@@ -62,6 +62,7 @@ in
         };
       };
     };
+
     zpool = {
       zroot = lib.disk.zfs.mkZpool {
         mode = "mirror";
