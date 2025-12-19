@@ -33,7 +33,7 @@ job "linkwarden" {
       }
 
       config {
-        image = "ghcr.io/linkwarden/linkwarden:v2.13.1"
+        image = "ghcr.io/linkwarden/linkwarden:v2.13.2"
         ports = ["http"]
       }
 
