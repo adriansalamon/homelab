@@ -16,7 +16,7 @@ let
   };
 in
 {
-  microvm.mem = 1024 * 4;
+  microvm.mem = 1024 * 6;
   microvm.vcpu = 4;
 
   imports = [

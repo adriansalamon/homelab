@@ -87,9 +87,13 @@ in
               provider_id = "authelia";
               name = "Authelia";
               client_id = "paperless";
+              token_endpoint_auth_method = "client_secret_basic";
               # secret will be added dynamically
               #secret = "";
-              settings.server_url = "https://auth.${globals.domains.main}";
+              settings = {
+                server_url = "https://auth.${globals.domains.main}";
+                token_auth_method = "client_secret_basic";
+              };
             }
           ];
         };
