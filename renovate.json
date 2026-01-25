@@ -13,8 +13,12 @@
   },
   "packageRules": [
     {
-      "matchManagers": ["nix"],
-      "matchUpdateTypes": ["!lockFileMaintenance"],
+      "matchManagers": [
+        "nix"
+      ],
+      "matchUpdateTypes": [
+        "!lockFileMaintenance"
+      ],
       "enabled": false
     }
   ],
@@ -22,7 +26,9 @@
     {
       "customType": "regex",
       "datasourceTemplate": "docker",
-      "fileMatch": ["\\.nomad\\.hcl$"],
+      "managerFilePatterns": [
+        "/\\.nomad\\.hcl$/"
+      ],
       "matchStrings": [
         "\\s*image\\s*=\\s*\\\"(?<depName>.*?):(?<currentValue>.*?)\\\""
       ]
