@@ -98,7 +98,6 @@
           echo "Setting smb password for ${user}"
           smb_pass=$(cat ${secretPath})
           echo -e "$smb_pass\n$smb_pass" | ${config.services.samba.package}/bin/smbpasswd -s -a ${user}
-          rm ${secretPath} # clean up, we don't need it anymore
       fi
     '') (lib.genAttrs globals.users (name: config.age.secrets."${name}-smb-password".path))
   );
