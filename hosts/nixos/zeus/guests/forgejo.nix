@@ -98,7 +98,7 @@ in
       "/etc/ssh/authorized_keys.d/%u"
     ];
     # Recommended by forgejo: https://forgejo.org/docs/latest/admin/recommendations/#git-over-ssh
-    settings.AcceptEnv = "GIT_PROTOCOL";
+    settings.AcceptEnv = [ "GIT_PROTOCOL" ];
   };
 
   services.anubis = {

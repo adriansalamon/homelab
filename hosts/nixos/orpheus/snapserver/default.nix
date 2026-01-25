@@ -30,7 +30,7 @@ in
         bind_to_address = globals.nebula.mesh.hosts.orpheus.ipv4;
       };
 
-      tcp = {
+      tcp-control = {
         enabled = true;
         bind_to_address = "0.0.0.0";
       };
@@ -68,7 +68,7 @@ in
       group = "reverse-proxy";
     }
     {
-      inherit (config.services.snapserver.settings.tcp) port;
+      inherit (config.services.snapserver.settings.tcp-control) port;
       proto = "tcp";
       host = "zeus-home-assistant";
     }
