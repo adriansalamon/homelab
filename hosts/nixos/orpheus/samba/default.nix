@@ -8,6 +8,11 @@
 }:
 {
 
+  environment.persistence."/persist".directories = lib.singleton {
+    directory = "/var/lib/samba/";
+    mode = "0700";
+  };
+
   services.samba = {
     package = pkgs.samba4;
     enable = true;
