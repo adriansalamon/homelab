@@ -33,7 +33,7 @@ job "linkwarden" {
       }
 
       config {
-        image = "ghcr.io/linkwarden/linkwarden:v2.13.2"
+        image = "ghcr.io/linkwarden/linkwarden:v2.13.5"
         ports = ["http"]
       }
 
@@ -53,6 +53,7 @@ job "linkwarden" {
          SPACES_REGION="us-east-1"
          SPACES_FORCE_PATH_STYLE="true"
 
+         NEXT_PUBLIC_DISABLE_REGISTRATION="true"
          NEXT_PUBLIC_AUTHELIA_ENABLED="true"
          AUTHELIA_WELLKNOWN_URL="https://auth.${DOMAIN}/.well-known/openid-configuration"
          AUTHELIA_CLIENT_ID="linkwarden"
