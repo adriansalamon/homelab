@@ -5,5 +5,6 @@ _inputs: [
     rustic-exporter = prev.callPackage ./rustic-exporter { };
     homepage = prev.callPackage ./homepage { };
     nixos-auto-updater = prev.callPackage ./nixos-auto-updater { };
+    coredns-blocker = prev.callPackage ./coredns { };
   })
 ]
