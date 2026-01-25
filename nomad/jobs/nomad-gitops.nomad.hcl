@@ -12,7 +12,7 @@ job "nomad-gitops" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/adriansalamon/nomad-gitops:main-b3887fa"
+        image = "ghcr.io/adriansalamon/nomad-gitops:main-fe34ee8"
       }
 
       resources {
