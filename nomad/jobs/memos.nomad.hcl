@@ -34,7 +34,7 @@ job "memos" {
       }
 
       config {
-        image = "neosmemo/memos:0.25.3"
+        image = "neosmemo/memos:0.26.0"
         ports = ["http"]
       }
 

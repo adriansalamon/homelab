@@ -67,7 +67,7 @@ job "seaweedfs-filer" {
       }
 
       config {
-        image = "chrislusf/seaweedfs:4.07"
+        image = "chrislusf/seaweedfs:4.09"
         ports = ["http", "grpc"]
 
         args = [
