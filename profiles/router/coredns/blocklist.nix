@@ -13,7 +13,15 @@
     group = "blocker";
   };
 
-  services.coredns.package = pkgs.coredns-blocker;
+  services.coredns.package = pkgs.coredns.override {
+    externalPlugins = lib.singleton {
+      name = "blocker";
+      repo = "github.com/adriansalamon/blocker";
+      version = "96a074674af3b2089a6f62a8fb3ef46a50503558";
+      position.before = "forward";
+    };
+    vendorHash = "sha256-b7UEtZrHDFb/Wot4WI/sbooUkpxSF9dzlElGL7CM1Sc=";
+  };
 
   systemd.services.blocklist-downloader = {
     description = "Download and merge DNS blocklists";
