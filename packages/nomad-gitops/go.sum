@@ -139,6 +139,8 @@ github.com/hashicorp/nomad/api v0.0.0-20251205094914-d4aba5faf1a5 h1:TRqrA+N2mx1
 github.com/hashicorp/nomad/api v0.0.0-20251205094914-d4aba5faf1a5/go.mod h1:sldFTIgs+FsUeKU3LwVjviAIuksxD8TzDOn02MYwslE=
 github.com/hashicorp/nomad/api v0.0.0-20260124004515-0f2e7fd6d4f4 h1:q84EDflU3m0kAs/6kBmEEmE2ZFi/uUOFjcSpSao95uc=
 github.com/hashicorp/nomad/api v0.0.0-20260124004515-0f2e7fd6d4f4/go.mod h1:sldFTIgs+FsUeKU3LwVjviAIuksxD8TzDOn02MYwslE=
+github.com/hashicorp/nomad/api v0.0.0-20260206215554-dd047d899aac h1:JTBKE6K4vx2fnTWI0Bt6E4YF2tRf/ipQEMiYqnpfRfw=
+github.com/hashicorp/nomad/api v0.0.0-20260206215554-dd047d899aac/go.mod h1:JAmS1nGJ1KcTM+MHAkgyrL0GDbsnKiJsp75KyqO2wWc=
 github.com/hashicorp/serf v0.10.1 h1:Z1H2J60yRKvfDYAOZLd2MU0ND4AH/WDz7xYHDWQsIPY=
 github.com/hashicorp/serf v0.10.1/go.mod h1:yL2t6BqATOLGc5HF7qbFkTfXoPIY0WZdWHfEvMqbG+4=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
