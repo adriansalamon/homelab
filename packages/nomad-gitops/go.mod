@@ -7,7 +7,7 @@ require (
 	github.com/go-git/go-git/v5 v5.16.4
 	github.com/gregdel/pushover v1.4.0
 	github.com/hashicorp/consul/api v1.33.2
-	github.com/hashicorp/nomad/api v0.0.0-20251205094914-d4aba5faf1a5
+	github.com/hashicorp/nomad/api v0.0.0-20260226211936-d304b7de5d67
 )
 
 require (
@@ -21,7 +21,7 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
-	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/cronexpr v1.1.3 // indirect
