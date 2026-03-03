@@ -89,7 +89,7 @@ in
 
   globals.nebula.mesh.hosts.${config.node.name}.firewall.inbound = [
     {
-      "port" = builtins.toString port;
+      "port" = toString port;
       "proto" = "tcp";
       "group" = "reverse-proxy";
     }

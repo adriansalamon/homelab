@@ -15,7 +15,7 @@ let
         inherit id;
         name = attrs.name or id;
       }
-      // (builtins.removeAttrs attrs [ "name" ]);
+      // (removeAttrs attrs [ "name" ]);
     };
   };
 in

@@ -1,19 +1,22 @@
 ## Homelab
 
-This is a place for all infra stuff at home. There are currently three sites + a
+This is a place for all infra stuff at home. There are currently five geographic sites + a
 cloud environment.
 
 - Olympus (G29)
 - Erebus (B22)
-- Pythia (B216)
+- Delphi (B216)
+- Ithaca (N170)
+- Arcadia (F110)
 - Aether (Hetzner)
 
 With the main infra at Olympus.
 
 ### Infra
 
-This repo uses OpenTofu and NixOS to manage the infrastructure. Most of the
-configuration is done using Nix.
+This repo uses OpenTofu and NixOS to manage the infrastructure. All servers (except Pan) are running NixOS and have
+their configurations in this repo. Many services are configured and deployed so that they can still be functional
+in the event of any one site going down.
 
 #### Hosts
 
@@ -21,10 +24,14 @@ configuration is done using Nix.
 | --- | ------ | --------- | ------------------------------------------------ | -------------------------------------------------------------------------------------- |
 | 💻  | laptop | atlas     | M1 Macbook Air                                   | Personal machine, has served me well.                                                  |
 | 🖥️  | server | athena    | Dell R210 II<br>E3-1230v2, 8gb RAM               | Firewall/router. DHCP and DNS server. Internal reverse proxy and VPN gateway.          |
-| 🖥️  | server | orpheus   | Supermicro 1U X9SCM<br>E3-1230, 16gb RAM         | Backup NAS/storage server. Runs not much currently.                                    |
+| 🖥️  | server | demeter   | Supermicro 1U X9SCM<br>E3-1230, 16gb RAM         | Backup NAS/storage server. Runs not much currently.                                    |
 | 🖥️  | server | zeus      | Supermicro X10DRU-i+<br>2xE5-2620v4, 64gb RAM    | Main VM and services host. Runs most of my services.                                   |
 | 🖥️  | server | hermes    | Supermicro 2U X11SSH-LN4F<br>E3-1240v6, 32gb RAM | Storage server/NAS. Has a 16TB ZFS storage pool.                                       |
 | 🖥️  | server | orpheus   | ASUS PN51<br>Ryzen 5 5500U, 16gb RAM             | Edge server at Erebus. Runs some services and VMs and acts as a local NAS at the site. |
+| 🖥️  | server | charon    | Intel N150<br>12gb RAM                           | Firewall/router at Erebus.                                                             |
+| 🖥️  | server | pythia    | Intel N150<br>12gb RAM                           | Firewall/router at Delphi.                                                             |
+| 🖥️  | server | penelope  | Intel N150<br>12gb RAM                           | Firewall/router at Ithaca.                                                             |
+| 🖥️  | server | pan       | UBNT Edgerouter Lite                             | Firewall/router at Arcadia. Runs OpenWrt.                                              |
 | 🖥️  | server | proxmox01 | Dell R610<br>2x5690, 96gb RAM                    | Decommissioned. Very good at heating a home.                                           |
 | ☁️  | VPS    | icarus    | Hetzner Cloud server                             | Proxy for local services. Nebula lighthouse, Headscale server.                         |
 
@@ -42,28 +49,27 @@ configuration is done using Nix.
 | 🗃️ Download client    | Deluge                 | Download client to download and cache files.                                                                       |
 | 🛡️ Reverse Proxy      | Traefik                | Reverse proxy to secure access to services, uses Consul for dynamic service discovery.                             |
 | 🗂️ Network Management | UniFi Controller       | Central network controller for all UniFi devices across all sites.                                                 |
-| 📔 Notes              | Obsidian Livesync      | Synchronizes all my Obsidian clients, where I keep most of my digital notes.                                       |
+| 📔 Notes              | Memos                  | Self-hosted note-taking app.                                                                                       |
+| 🎞️ Link management    | Linkwarden             | Link manager and collector for links.                                                                              |
 | 🔊 Music              | Snapserver             | Acts as a streaming device from Spotify or AirPlay, and syncs multiroom audio. I run Raspberry Pis as snapclients. |
 | 📂 File Server        | Samba                  | NAS file storage for clients on local network.                                                                     |
 | 📦 Git Forge          | Forgejo                | Self-hosted Git forge, alternative to GitHub. I host and back up private stuff here.                               |
 
 #### System
 
-|                      | system     | description                                                                                                                                                                    |
-| -------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 📁 Service Discovery | Consul     | Consul cluster to manage service registrations. I also put DHCP leases as consul services and use the built-in distributed Consul DNS.                                         |
-| 📮 DNS               | CoreDNS    | Flexible DNS server, redirects queries to Consul DNS, and blocks malicious DNS servers using a blocklist.                                                                      |
-| 🌐 Networking        | Nebula     | Overlay encrypted mesh network. All services are connected and communicate over Nebula, and use groups and use strict Nebula firewall rules.                                   |
-| 🔐 Secrets           | Age        | All secrets are stored in this repo, but encrypted using Age. Two YubiKeys (one offline backup) used for decryption. `agenix-rekey` enables me to encrypt per-service secrets. |
-| 📃 Logs              | Loki       | Journald logs are sent to Loki, using vector. They can be queried using Grafana.                                                                                               |
-| ⏱️ Metrics           | Prometheus | Metrics are collected using Prometheus and visualized using Grafana.                                                                                                           |
-| ⛈️ Backups           | Restic     | Automatic backups off all my data to Hetzner Storage Boxes via restic.                                                                                                         |
-| 💾 Nix Cache         | Attic      | Nix cache to speed up Nix builds.                                                                                                                                              |
-
-TODO/add:
-
-- Some simple object storage (always useful)
-- Some GitOps stuff, e.g. auto-deploy
+|                      | system      | description                                                                                                                                                                                                                 |
+| -------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📁 Service Discovery | Consul      | Consul cluster to manage service registrations. I also put DHCP leases as consul services and use the built-in distributed Consul DNS.                                                                                      |
+| 📮 DNS               | CoreDNS     | Flexible DNS server, redirects queries to Consul DNS, and blocks malicious DNS servers using a blocklist.                                                                                                                   |
+| 🎻 Orchestration     | Nomad       | Orchestrates deployment of docker services for high availability, scaling, and failover.                                                                                                                                    |
+| 🌐 Networking        | Nebula      | Overlay encrypted mesh network. All services are connected and communicate over Nebula, and use groups and use strict Nebula firewall rules.                                                                                |
+| 🔐 Secrets           | Age         | All secrets are stored in this repo, but encrypted using Age. Two YubiKeys (one offline backup) used for decryption. `agenix-rekey` enables me to encrypt per-service secrets.                                              |
+| 📃 Logs              | Loki        | Journald logs are sent to Loki, using vector. They can be queried using Grafana.                                                                                                                                            |
+| ⏱️ Metrics           | Prometheus  | Metrics are collected using Prometheus and visualized using Grafana.                                                                                                                                                        |
+| ⛈️ Backups           | Restic      | Automatic backups off all my data to Hetzner Storage Boxes via restic.                                                                                                                                                      |
+| 💾 Nix Cache         | Attic       | Nix cache to speed up Nix builds.                                                                                                                                                                                           |
+| 🗃️ Storage           | SeaweedFS   | Distributed S3 compatible object storage. I keep some files here replicated across multiple sites.                                                                                                                          |
+| 🤖 Automation        | Home-rolled | Custom setup for automatic builds and deployments of NixOS configurations, based on GitHub Actions and Consul written in Go. Also running custom Go service for automatically deploying updates to nomad jobs (ie. GitOps). |
 
 ### Secrets 🔐
 
@@ -71,7 +77,8 @@ All secrets, e.g. passwords, API tokens, etc. are stored as age encrypted files.
 These are encrypted using two YubiKeys (one offline backup). Using
 [`agenix-rekey`](https://github.com/oddlama/agenix-rekey), secrets are
 rekeyed/encrypted per host/server. Please see the documentation for the library
-for more information.
+for more information. I also have scripts for automatically deploying secrets to
+Nomad as Nomad variables.
 
 Semi-secret data, like domain names, email addresses, and IP addresses, which
 are not secrets in the traditional sense (I'm fine if they are in the Nix store)
@@ -147,6 +154,7 @@ them!
 Other sources of inspiration:
 
 - [notthebee](https://github.com/notthebee/nix-config/) - His YouTube video
-  pushed me to finally move to a NixOS based setup. -
-  [PopeRigby](https://codeberg.org/PopeRigby/config) - Authelia setup is based
+  pushed me to finally move to a NixOS based setup.
+- [PopeRigby](https://codeberg.org/PopeRigby/config) - Authelia setup is based
   on his config.
+- [Diogo Correia](https://github.com/diogotcorreia/dotfiles) - My automatic build and deployment setup is heavily inspired by his.

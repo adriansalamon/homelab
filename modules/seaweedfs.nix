@@ -1,3 +1,4 @@
+# Based on https://hg.sr.ht/~dermetfan/seaweedfs-nixos/browse/seaweedfs.nix?rev=8d99b1489f45391be3b6d32988986ccf1367f2a7 but heavily modified
 {
   config,
   lib,
