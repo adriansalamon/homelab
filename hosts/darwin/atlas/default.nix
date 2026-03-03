@@ -39,6 +39,7 @@
     typst
     vim
     yubikey-personalization
+    uv
   ];
 
   launchd.user.agents.backrest = {

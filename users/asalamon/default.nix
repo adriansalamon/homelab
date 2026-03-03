@@ -1,4 +1,7 @@
 { lib, pkgs, ... }:
+let
+  tex = pkgs.texlive.combined.scheme-full;
+in
 {
   imports = [
     ./zsh.nix
@@ -12,6 +15,7 @@
 
     packages = with pkgs; [
       rustup
+      tex
     ];
   };
 }

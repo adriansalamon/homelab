@@ -66,7 +66,7 @@
               inputs.nix-rosetta-builder.darwinModules.default
               {
                 nix-rosetta-builder.onDemand = true;
-                nix-rosetta-builder.enable = true;
+                nix-rosetta-builder.enable = false;
               }
               ../hosts/darwin
               ../hosts/darwin/atlas
