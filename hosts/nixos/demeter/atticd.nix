@@ -42,7 +42,7 @@ in
     environmentFile = config.age.secrets.atticFullEnv.path;
 
     settings = {
-      listen = "${globals.nebula.mesh.hosts.${config.node.name}.ipv4}:${builtins.toString port}";
+      listen = "${globals.nebula.mesh.hosts.${config.node.name}.ipv4}:${toString port}";
       allowed-hosts = [ host ];
       api-endpoint = "https://${host}/";
       storage = {
