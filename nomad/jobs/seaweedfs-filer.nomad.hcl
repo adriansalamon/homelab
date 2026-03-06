@@ -175,6 +175,16 @@ EOF
                 }
               ],
               "actions": ["Read:memos", "Write:memos", "List:memos", "Tagging:memos"]
+            },
+            {
+              "name": "stalwart-mail",
+              "credentials": [
+                {
+                  "accessKey": "stalwart-mail",
+                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .stalwart_secret_key }}"{{ end }}
+                }
+              ],
+              "actions": ["Read:stalwart-mail", "Write:stalwart-mail", "List:stalwart-mail", "Tagging:stalwart-mail"]
             }
           ]
         }

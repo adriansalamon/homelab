@@ -19,6 +19,11 @@ in
       nomadPath = "nomad/jobs/seaweedfs-filer";
       generator.script = "alnum";
     };
+    swaweedfs-stalwart-secret-key = {
+      rekeyFile = localSecretsDir + "/seaweedfs-stalwart-secret-key.age";
+      nomadPath = "nomad/jobs/seaweedfs-filer";
+      generator.script = "alnum";
+    };
     swaweedfs-postgres-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/seaweedfs-postgres-password.age";
       nomadPath = "nomad/jobs/seaweedfs-filer";

@@ -60,7 +60,12 @@
 
         forgejo-ssh.address = ":2222";
 
-        traefik.address = ":9090"; # internal only
+        traefik.address = ":1010"; # internal only
+
+        # Mail
+        smtp.address = ":25";
+        submission.address = ":587";
+        imaps.address = ":993";
       };
 
       providers.consulCatalog = {
@@ -87,11 +92,16 @@
           insecureSkipVerify = true;
         };
       };
+
+      # for email proxy
+      tcp.serversTransports.proxy = {
+        proxyProtocol.version = 2;
+      };
     };
   };
 
   consul.services.traefik-external = {
-    port = 9090;
+    port = 1010;
     tags = [
       "traefik.enable=true"
       "traefik.http.routers.traefik-external.rule=Host(`traefik-external.local.${globals.domains.main}`)"
@@ -102,15 +112,18 @@
 
   globals.nebula.mesh.hosts.icarus.firewall.inbound = [
     {
-      port = 9090;
+      port = 1010;
       proto = "tcp";
       group = "reverse-proxy";
     }
   ];
 
   networking.firewall.allowedTCPPorts = [
+    25
     80
     443
+    587
+    993
     8080
     2222
   ];

@@ -89,5 +89,6 @@ in
     "nomad"
     "linkwarden"
     "memos"
+    "stalwart"
   ] mkOidcSecret;
 }

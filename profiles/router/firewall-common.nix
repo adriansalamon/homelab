@@ -81,11 +81,15 @@ in
           from = trustedZones;
           to = [ "local" ];
           allowedTCPPorts = [
+            25 # smtp
             80
             443
+            587 # Starttls
+            993 # Imaps
             8080 # unifi inform
             1883 # mqtt
             2222 # forgejo ssh
+
           ];
         };
 

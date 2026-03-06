@@ -76,6 +76,10 @@
         unifi-inform.address = ":8080";
         mqtt.address = ":1883";
         forgejo-ssh.address = ":2222";
+
+        smtp.address = ":25";
+        submission.address = ":587";
+        imaps.address = ":993";
       };
 
       providers.consulCatalog = {
@@ -122,6 +126,11 @@
             url = "http://127.0.0.1:8500";
           };
         };
+      };
+
+      # for email proxy
+      tcp.serversTransports.proxy = {
+        proxyProtocol.version = 2;
       };
     };
   };
