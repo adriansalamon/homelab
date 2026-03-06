@@ -11,6 +11,7 @@ job "stalwart" {
       port "submission" { to = 587 }
       port "imaps" { to = 993 }
       port "http" { to = 8080 }
+      port "management" { to = 9090 }
     }
 
     task "stalwart" {
@@ -18,7 +19,7 @@ job "stalwart" {
 
       config {
         image = "stalwartlabs/stalwart:v0.15.5"
-        ports = ["submission", "imaps", "http"]
+        ports = ["submission", "imaps", "http", "management"]
 
         volumes = [
           "local/config.toml:/opt/stalwart/etc/config.toml",
@@ -59,9 +60,22 @@ proxy.trusted-networks = ["10.64.32.0/19"]
 
 
 [server.listener."management"]
+bind = "[::]:9090"
+protocol = "http"
+tls.implicit = false
+
+[server.listener."public-http"]
 bind = "[::]:8080"
 protocol = "http"
 tls.implicit = false
+
+[http]
+allowed-endpoint = [ { if = "listener == 'management' || contains( [ 'jmap', 'robots.txt', '.well-known', 'dav', 'calendar', 'auth' ], split( url_path, '/' )[1] )",
+                       then = "200" },
+                     { else = "404" } ]
+
+[metrics.prometheus]
+enable = true
 
 # ===================
 # Storage: S3 (SeaweedFS)
@@ -137,8 +151,8 @@ secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }
       }
 
       resources {
-        cpu    = 500
-        memory = 512
+        cpu    = 3000
+        memory = 500
       }
 
       template {
@@ -195,8 +209,32 @@ secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }
 
         tags = [
           "traefik.enable=true",
+          "traefik.external=true",
           "traefik.http.routers.stalwart.rule=Host(`mail.${DOMAIN}`)",
           "traefik.http.routers.stalwart.entrypoints=websecure"
+        ]
+
+        check {
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+
+
+      service {
+        name = "stalwart-management"
+        port = "management"
+
+        tags = [
+          "traefik.enable=true",
+          # Hack (?) to prioritize this over the stalwart-http service, since the rule is longer
+          "traefik.http.routers.stalwart-mgmt.rule=Host(`mail.${DOMAIN}`) && PathRegexp(`.*`)",
+          "traefik.http.routers.stalwart-mgmt.entrypoints=websecure",
+          # metrics
+          "prometheus.scrape=true",
+          "prometheus.path=/metrics/prometheus"
         ]
 
         check {
