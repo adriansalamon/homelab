@@ -22,5 +22,6 @@
     {
       agenix-rekey.nixosConfigurations = self.nodes;
       agenix-rekey.homeConfigurations = self.homeConfigurations;
+      agenix-rekey.darwinConfigurations = inputs.self.darwinConfigurations;
     };
 }

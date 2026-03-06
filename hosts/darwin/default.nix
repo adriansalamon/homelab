@@ -14,6 +14,15 @@
     backupFileExtension = "bak";
   };
 
+  age.rekey = {
+    inherit (inputs.self.secretsConfig) masterIdentities;
+
+    storageMode = "local";
+    hostPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq"; # this is a dummy key
+    generatedSecretsDir = inputs.self.outPath + "/secrets/generated/atlas";
+    localStorageDir = inputs.self.outPath + "/secrets/rekeyed/atlas";
+  };
+
   system.primaryUser = "asalamon";
   nixpkgs.config.allowUnfree = true;
 

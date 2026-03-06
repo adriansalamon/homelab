@@ -62,6 +62,7 @@
             };
             modules = [
               inputs.agenix.darwinModules.default
+              inputs.agenix-rekey.darwinModules.default
               #{ nix.linux-builder.enable = true; }
               inputs.nix-rosetta-builder.darwinModules.default
               {
