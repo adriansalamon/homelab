@@ -1,5 +1,5 @@
 job "linkwarden" {
-  type        = "service"
+  type = "service"
 
   group "linkwarden" {
     count = 1
@@ -15,8 +15,8 @@ job "linkwarden" {
       driver = "docker"
 
       service {
-        name     = "linkwarden"
-        port     = "http"
+        name = "linkwarden"
+        port = "http"
 
         tags = [
           "traefik.enable=true",

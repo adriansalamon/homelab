@@ -8,7 +8,7 @@ job "prometheus-pushgateway" {
       mode = "cni/flannel"
 
       port "http" {
-        to     = 9091
+        to = 9091
       }
     }
 

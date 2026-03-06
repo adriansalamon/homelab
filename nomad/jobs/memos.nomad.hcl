@@ -44,7 +44,7 @@ job "memos" {
       }
 
       template {
-        data = <<EOF
+        data        = <<EOF
 DOMAIN="{{ key "config/domains/main" }}"
 MEMOS_MODE=prod
 MEMOS_PORT={{ env "NOMAD_PORT_http"}}
@@ -56,7 +56,7 @@ EOF
       }
 
       template {
-        data = <<EOF
+        data        = <<EOF
 {{ with nomadVar "nomad/jobs/memos" }}
 MEMOS_DSN="postgresql://memos:{{ .postgres_password }}@master.homelab-cluster.service.consul:5432/memos?sslmode=disable"
 {{ end }}

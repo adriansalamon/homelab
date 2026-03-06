@@ -1,5 +1,5 @@
 job "nomad-gitops" {
-  type        = "service"
+  type = "service"
 
   group "operator" {
     count = 1
@@ -28,7 +28,7 @@ job "nomad-gitops" {
       }
 
       template {
-        data = <<EOT
+        data        = <<EOT
           # Git configuration
           GIT_URL = "https://github.com/adriansalamon/homelab"
           GIT_BRANCH = "main"
@@ -42,18 +42,18 @@ job "nomad-gitops" {
 
           LOG_LEVEL = "info"
         EOT
-        env = true
+        env         = true
         destination = "local/config.env"
       }
 
       template {
-        data = <<EOT
+        data        = <<EOT
           {{ with nomadVar "nomad/jobs/nomad-gitops" }}
           CONSUL_HTTP_TOKEN={{ .consul_token }}
           NOMAD_TOKEN={{ .nomad_token }}
           {{ end }}
         EOT
-        env = true
+        env         = true
         destination = "${NOMAD_SECRETS_DIR}/secrets.env"
       }
     }
