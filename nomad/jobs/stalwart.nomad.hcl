@@ -30,6 +30,12 @@ job "stalwart" {
         destination = "local/config.toml"
         data        = <<EOF
 {{ $domain := key "config/domains/main" }}
+[config]
+local-keys = [ "store.*", "directory.*", "tracer.*", "!server.blocked-ip.*", "!server.allowed-ip.*", "server.*",
+               "authentication.fallback-admin.*", "cluster.*",   "config.local-keys.*",
+               "storage.data", "storage.blob", "storage.lookup", "storage.fts", "storage.directory", "certificate.*",
+               "metrics.prometheus.*", "http.*", "!acme.letsencrypt.account-key", "!acme.letsencrypt.cert", "acme.*" ]
+
 [server]
 hostname = "mail.{{ $domain }}"
 
@@ -72,7 +78,8 @@ tls.implicit = false
 [http]
 allowed-endpoint = [ { if = "listener == 'management' || contains( [ 'jmap', 'robots.txt', '.well-known', 'dav', 'calendar', 'auth' ], split( url_path, '/' )[1] )",
                        then = "200" },
-                     { else = "404" } ]
+                     { else = "403" } ]
+url = "'https://' + config_get('server.hostname')"
 
 [metrics.prometheus]
 enable = true
