@@ -17,9 +17,39 @@ let
   passwdSecretName = "authelia-hass-oidc-client-secret";
 
   mqttUsers = {
-    home-assistant = { };
-    tasmota = { };
-    zigbee2mqtt = { };
+    home-assistant = {
+      acl = [
+        "readwrite #"
+      ];
+    };
+    tasmota = {
+      acl = [
+        "write tasmota/discovery/#"
+        "read cmnd/#"
+        "write stat/#"
+        "write tele/#"
+      ];
+    };
+    zigbee2mqtt = {
+      acl = [
+        "readwrite zigbee2mqtt/#"
+        "readwrite homeassistant/#"
+      ];
+    };
+    husdata-olympus = {
+      acl = [
+        "read +/HP/CMD/#"
+        "readwrite +/HP/#"
+        "readwrite homeassistant/#"
+      ];
+    };
+    husdata-arcadia = {
+      acl = [
+        "read +/HP/CMD/#"
+        "readwrite +/HP/#"
+        "readwrite homeassistant/#"
+      ];
+    };
   };
 
 in
@@ -61,13 +91,12 @@ in
     enable = true;
     persistence = true;
     listeners = lib.singleton {
-      acl = [ "pattern readwrite #" ];
       users = flip mapAttrs' mqttUsers (
         name: cfg: {
           name = (builtins.replaceStrings [ "-" ] [ "_" ] name);
           value = {
             passwordFile = config.age.secrets."mosquitto-${name}-pass".path;
-            acl = [ "readwrite #" ];
+            acl = cfg.acl;
           };
         }
       );
