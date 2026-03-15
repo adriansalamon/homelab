@@ -2,7 +2,7 @@ job "seaweedfs-filer" {
   type = "service"
 
   group "filer" {
-    count = 1
+    count = 2
 
     constraint {
       distinct_hosts = true
