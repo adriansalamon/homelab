@@ -52,6 +52,11 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nebula-nomad-cni = {
+      url = "github:adriansalamon/nebula-nomad-cni";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

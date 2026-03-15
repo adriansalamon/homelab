@@ -12,6 +12,7 @@
     inputs.agenix-rekey.nixosModules.default
     inputs.impermanence.nixosModules.impermanence
     inputs.nixos-nftables-firewall.nixosModules.default
+    inputs.nebula-nomad-cni.nixosModules.default
     ../../modules
   ]
   ++ lib.collect builtins.isPath (lib.filterAttrs (n: _: n != "default") (lib.rakeLeaves ./.));
@@ -25,7 +26,7 @@
     jq
     lshw
     lsof
-    neofetch
+    fastfetch
     strace
     tcpdump
     tldr

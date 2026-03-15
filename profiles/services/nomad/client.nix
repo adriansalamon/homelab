@@ -2,9 +2,19 @@
   inputs,
   config,
   pkgs,
+  lib,
+  globals,
+  nodes,
   ...
 }:
 let
+  inherit (lib)
+    filterAttrs
+    mapAttrsToList
+    mapAttrs'
+    nameValuePair
+    ;
+
   host = config.node.name;
   nomadSecretDir = inputs.self.outPath + "/secrets/nomad/";
 in
@@ -20,6 +30,18 @@ in
     rekeyFile = "${nomadSecretDir}/client.json.age";
   };
 
+  age.secrets = {
+    "nebula-ca.key" = {
+      rekeyFile = inputs.self.outPath + "/secrets/nebula/mesh/ca.key.age";
+    };
+
+    # CONSUL_HTTP_TOKEN=xxxxxxx
+    # NOMAD_TOKEN=xxxxxx
+    "nebula-nomad-agent.env" = {
+      rekeyFile = inputs.self.outPath + "/secrets/consul/nebula-nomad-cni.env.age";
+    };
+  };
+
   boot.initrd.kernelModules = [
     "bridge"
     "br_netfilter"
@@ -32,7 +54,7 @@ in
       client = {
         enabled = true;
         network_interface = "nebula.mesh";
-        cni_path = "${pkgs.cni-plugins}/bin:${pkgs.cni-plugin-flannel}/bin";
+        cni_path = "${pkgs.cni-plugins}/bin:${pkgs.cni-plugin-flannel}/bin:${pkgs.nebula-nomad-cni}/bin";
         cni_config_dir = "/etc/cni/net.d";
 
         host_volume."docker-socket" = {
@@ -93,6 +115,121 @@ in
       Type = "vxlan";
     };
   };
+
+  services.nebula-nomad-agent =
+    let
+      externalAddrs = name: [ "${nodes.${name}.config.node.publicIp}:4242" ];
+
+      lighthouses = filterAttrs (_: v: v.lighthouse) globals.nebula.mesh.hosts;
+      lightHouseIps = mapAttrsToList (_: lightHouseCfg: lightHouseCfg.ipv4) lighthouses;
+      staticHostMap = mapAttrs' (
+        name: lighthouseCfg: nameValuePair (lighthouseCfg.ipv4) (externalAddrs name)
+      ) lighthouses;
+    in
+    {
+      enable = true;
+      defaultNebulaConfig = {
+        pki = {
+          # Use both old v1 and v2 CA for compatibility
+          ca = inputs.self.outPath + "/secrets/nebula/mesh/ca_combined.crt";
+        };
+
+        # Default firewall rules
+        firewall = {
+          outound = [
+            {
+              cidr = "0.0.0.0/0";
+              host = "any";
+              port = "any";
+              proto = "any";
+            }
+          ];
+          inbound = [
+            {
+              cidr = "0.0.0.0/0";
+              host = "any";
+              port = "any";
+              proto = "icmp";
+            }
+          ];
+        };
+
+        static_host_map = staticHostMap;
+        lighthouse = {
+          am_lighthouse = false;
+          hosts = lightHouseIps;
+        };
+
+        listen = {
+          host = "0.0.0.0";
+          port = 0;
+        };
+
+        punchy = {
+          punch = true;
+        };
+
+        tun = {
+          disabled = false;
+          dev = "nebula1";
+          drop_local_broadcast = false;
+          drop_multicast = false;
+          tx_queue = 500;
+          mtu = 1300;
+        };
+      };
+
+      caKeyPath = config.age.secrets."nebula-ca.key".path;
+      caCertPath = inputs.self.outPath + "/secrets/nebula/mesh/ca.crt";
+
+      environmentFile = config.age.secrets."nebula-nomad-agent.env".path;
+      nomadAddr = "https://nomad.local.${globals.domains.main}";
+
+      # TODO: use something more sane
+      ipPool = {
+        networkCIDR = globals.nebula.mesh.cidrv4;
+        rangeStart = lib.net.cidr.host 2000 globals.nebula.mesh.cidrv4;
+        rangeEnd = lib.net.cidr.host 3000 globals.nebula.mesh.cidrv4;
+      };
+    };
+
+  environment.etc."cni/net.d/10-nebula.conflist".text = ''
+    {
+      "cniVersion": "1.0.0",
+      "name": "nebula",
+      "plugins": [
+        {
+          "type": "loopback"
+        },
+        {
+          "type": "bridge",
+          "bridge": "nomad",
+          "isGateway": true,
+          "ipMasq": true,
+          "ipam": {
+            "type": "host-local",
+            "ranges": [
+              [
+                {
+                  "subnet": "172.26.64.0/20"
+                }
+              ]
+            ],
+            "routes": [{ "dst": "0.0.0.0/0" }]
+          }
+        },
+        {
+          "type": "firewall",
+          "backend": "iptables"
+        },
+        {
+          "type": "nebula-nomad-cni",
+          "socket_path": "/var/run/nebula-cni.sock",
+          "roles_meta_key": "nebula_roles"
+        }
+      ]
+    }
+  '';
 
   environment.etc."cni/net.d/10-flannel.conflist".text = ''
     {

@@ -146,6 +146,16 @@ key_prefix "nomad-gitops/" {
 EOT
 }
 
+resource "consul_acl_policy" "nebula_cni" {
+  name        = "nebula-cni"
+  description = "Policy for nebula-nomad-cni plugin to manage IP allocations and allocation records"
+  rules       = <<EOT
+key_prefix "nebula-cni/" {
+  policy = "write"
+}
+EOT
+}
+
 resource "consul_acl_token" "server_token" {
   description = "Token for Consul server agents"
   policies = [
@@ -207,6 +217,10 @@ resource "consul_acl_token" "nomad_gitops" {
   policies = [consul_acl_policy.base_agent.name, consul_acl_policy.gitops_nomad.name]
 }
 
+resource "consul_acl_token" "nebula_cni" {
+  policies = [consul_acl_policy.nebula_cni.name]
+}
+
 data "consul_acl_token_secret_id" "server_token" {
   accessor_id = consul_acl_token.server_token.id
 }
@@ -246,6 +260,13 @@ data "consul_acl_token_secret_id" "build_token" {
 data "consul_acl_token_secret_id" "nomad_gitops_token" {
   accessor_id = consul_acl_token.nomad_gitops.id
 }
+
+output "consul_nebula_cni_token" {
+  description = "Consul token for nebula-nomad-cni (use with CONSUL_HTTP_TOKEN)"
+  value       = consul_acl_token.nebula_cni.id
+  sensitive   = true
+}
+
 
 locals {
   acl_tokens = {
@@ -313,12 +334,39 @@ host_volume "*" {
   EOT
 }
 
+resource "nomad_acl_policy" "nebula_cni" {
+  name        = "nebula-cni"
+  description = "Policy for nebula-nomad-cni plugin to read allocations and nodes"
+
+  rules_hcl = <<-POLICY
+    # Required to get allocation details including task metadata
+    namespace "*" {
+      capabilities = ["read-job", "list-jobs"]
+    }
+
+    # To list nodes and get node allocations
+    node {
+      policy = "read"
+    }
+  POLICY
+}
+
 resource "nomad_acl_token" "operator_token" {
   type     = "client"
   policies = [nomad_acl_policy.operator.name]
 }
 
+resource "nomad_acl_token" "nebula_cni" {
+  name     = "nebula-cni"
+  type     = "client"
+  policies = [nomad_acl_policy.nebula_cni.name]
+}
 
+output "nomad_nebula_cni_token" {
+  description = "Nomad token for nebula-nomad-cni"
+  value       = nomad_acl_token.nebula_cni.secret_id
+  sensitive   = true
+}
 
 variable "nomad_oidc_client_secret" {
   type      = string
