@@ -128,6 +128,7 @@ in
                 ca_cert_path = cfg.caCertPath;
                 ca_key_path = cfg.caKeyPath;
                 nebula_config_path = yamlFormat.generate "nebula-config.yaml" (cfg.defaultNebulaConfig);
+                worker_binary_path = "${cfg.package}/bin/nebula-nomad-worker";
                 cert_ttl = cfg.certTTL;
                 ip_pool = {
                   network_cidr = cfg.ipPool.networkCIDR;
