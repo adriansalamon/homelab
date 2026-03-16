@@ -25,7 +25,6 @@ in
     services.nomad.server
     services.traefik
     services.valkey-server
-    services.etcd
     services.seaweedfs.master
     router.nebula
     router.monitoring

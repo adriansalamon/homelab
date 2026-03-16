@@ -54,7 +54,7 @@ in
       client = {
         enabled = true;
         network_interface = "nebula.mesh";
-        cni_path = "${pkgs.cni-plugins}/bin:${pkgs.cni-plugin-flannel}/bin:${pkgs.nebula-nomad-cni}/bin";
+        cni_path = "${pkgs.cni-plugins}/bin:${pkgs.nebula-nomad-cni}/bin";
         cni_config_dir = "/etc/cni/net.d";
 
         host_volume."docker-socket" = {
@@ -99,21 +99,6 @@ in
       "prometheus.scheme=https"
       "prometheus.query.format=prometheus"
     ];
-  };
-
-  services.flannel = {
-    enable = true;
-    iface = "nebula.mesh";
-    etcd = {
-      prefix = "/coreos.com/network";
-      endpoints = [ "http://etcd-client.service.consul:2379" ];
-    };
-    # is auto-provisioned into etcd
-    network = "10.65.0.0/16";
-    subnetLen = 24;
-    backend = {
-      Type = "vxlan";
-    };
   };
 
   services.nebula-nomad-agent =
@@ -256,26 +241,6 @@ in
           ipam = {
             type = "dhcp";
           };
-        };
-      }
-    ];
-  };
-
-  environment.etc."cni/net.d/10-flannel.conflist".text = builtins.toJSON {
-    cniVersion = "0.4.0";
-    name = "flannel";
-    plugins = [
-      {
-        type = "flannel";
-        delegate = {
-          isDefaultGateway = true;
-          hairpinMode = true;
-        };
-      }
-      {
-        type = "portmap";
-        capabilities = {
-          portMappings = true;
         };
       }
     ];
