@@ -5,10 +5,10 @@ job "prometheus-pushgateway" {
     count = 1
 
     network {
-      mode = "cni/flannel"
+      mode = "cni/nebula"
 
       port "http" {
-        to = 9091
+        static = 9091
       }
     }
 
@@ -19,13 +19,32 @@ job "prometheus-pushgateway" {
         image = "prom/pushgateway:latest"
         ports = ["http"]
         args = [
-          "--persistence.file=/alloc/data/metrics"
+          "--persistence.file=/alloc/data/metrics",
+          "--web.listen-address=${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}"
         ]
       }
 
-      resources {
-        cpu    = 100
-        memory = 256
+      meta {
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = concat([for group in ["reverse-proxy", "nomad-client"] : {
+              port  = "9091"
+              proto = "tcp"
+              group = group
+            }], [{
+              host  = "zeus-prometheus" # TODO: migrate to a group
+              proto = "tcp"
+              port  = "9091"
+            }])
+          }
+        })
       }
 
       template {
@@ -37,8 +56,10 @@ job "prometheus-pushgateway" {
       }
 
       service {
-        name = "prometheus-pushgateway"
-        port = "http"
+        name    = "prometheus-pushgateway"
+        port    = "http"
+        address = "${NOMAD_ALLOC_IP_http}"
+
         tags = [
           "prometheus.scrape=true",
           "traefik.enable=true",
@@ -51,6 +72,11 @@ job "prometheus-pushgateway" {
           interval = "10s"
           timeout  = "2s"
         }
+      }
+
+      resources {
+        cpu    = 100
+        memory = 256
       }
     }
   }

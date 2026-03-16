@@ -15,23 +15,74 @@ job "seaweedfs-filer" {
       port "grpc" {
         static = 30090
       }
-      port "s3" {}
+      port "s3" {
+        static = 30091
+      }
 
-      mode = "cni/flannel"
+      mode = "cni/nebula"
     }
 
     service {
       name = "seaweedfs-filer"
       port = "grpc"
       tags = ["grpc"]
+
+      address_mode = "alloc"
     }
 
     task "filer" {
       driver = "docker"
 
+      meta {
+        nebula_roles = jsonencode(["postgres-client", "weed-filer"])
+
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = [
+              # CLIENT STUFF
+              {
+                port  = 30091
+                proto = "tcp"
+                group = "reverse-proxy"
+              },
+              {
+                port  = 30091
+                proto = "tcp"
+                group = "nomad-client"
+              },
+              {
+                port  = 20090
+                proto = "tcp"
+                group = "reverse-proxy"
+              },
+              {
+                port  = 20090
+                proto = "tcp"
+                group = "nomad-client"
+              },
+
+              # RPC
+              {
+                port  = 30090
+                proto = "tcp"
+                group = "weed-filer"
+              }
+            ]
+          }
+        })
+      }
+
       service {
-        name = "seaweedfs-filer"
-        port = "http"
+        name    = "seaweedfs-filer"
+        port    = "http"
+        address = "${NOMAD_ALLOC_IP_http}"
         tags = [
           "http",
           "filer",
@@ -49,8 +100,9 @@ job "seaweedfs-filer" {
       }
 
       service {
-        name = "seaweedfs-s3"
-        port = "s3"
+        name    = "seaweedfs-s3"
+        port    = "s3"
+        address = "${NOMAD_ALLOC_IP_s3}"
         tags = [
           "http",
           "s3",
@@ -73,8 +125,9 @@ job "seaweedfs-filer" {
         args = [
           "filer",
           "-ip=${NOMAD_ALLOC_IP_http}",
-          "-ip.bind=0.0.0.0",
+          "-ip.bind=${NOMAD_ALLOC_IP_http}",
           "-port=${NOMAD_PORT_http}",
+          "-port.grpc=${NOMAD_PORT_grpc}",
           "-master=${MASTERS}",
           "-defaultReplicaPlacement=100",
           "-s3",

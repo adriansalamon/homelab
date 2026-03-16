@@ -4,9 +4,8 @@ job "nomad-gitops" {
   group "operator" {
     count = 1
 
-    network {
-      mode = "cni/flannel"
-    }
+    # nothing to see here
+    network {}
 
     task "nomad-gitops" {
       driver = "docker"

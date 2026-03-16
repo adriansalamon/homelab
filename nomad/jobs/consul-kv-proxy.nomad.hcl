@@ -4,10 +4,10 @@ job "kv-proxy" {
 
     network {
       port "http" {
-        to = 8080
+        static = 8080
       }
 
-      mode = "cni/flannel"
+      mode = "cni/nebula"
     }
 
     task "kv-proxy" {
@@ -15,11 +15,31 @@ job "kv-proxy" {
 
       env {
         CONSUL_HTTP_ADDR = "http://consul.service.consul:8500"
+        ADDR             = "${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}"
       }
 
       config {
         image = "ghcr.io/adriansalamon/consul-kv-proxy:main-e4f43ad"
         ports = ["http"]
+      }
+
+      meta {
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = [for group in ["reverse-proxy", "nomad-client"] : {
+              port  = "8080"
+              proto = "tcp"
+              group = group
+            }]
+          }
+        })
       }
 
 
@@ -32,8 +52,9 @@ job "kv-proxy" {
       }
 
       service {
-        name = "kv-proxy"
-        port = "http"
+        name    = "kv-proxy"
+        port    = "http"
+        address = "${NOMAD_ALLOC_IP_http}"
 
         check {
           type     = "http"

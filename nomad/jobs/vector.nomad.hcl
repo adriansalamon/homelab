@@ -22,8 +22,10 @@ job "vector" {
     }
 
     network {
-      port "api" {}
-      mode = "cni/flannel"
+      port "api" {
+        static = 8686
+      }
+      mode = "cni/nebula"
     }
 
     # docker socket volume
@@ -42,7 +44,27 @@ job "vector" {
       driver = "docker"
       config {
         image = "timberio/vector:0.53.0-alpine"
-        ports = ["api"]
+      }
+
+      meta {
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = [
+              {
+                port  = "8686"
+                proto = "tcp"
+                group = "nomad-client"
+              }
+            ]
+          }
+        })
       }
 
       # docker socket volume mount
@@ -74,8 +96,8 @@ job "vector" {
           data_dir = "alloc/data/vector/"
           [api]
             enabled = true
-            address = "0.0.0.0:[[ env "NOMAD_PORT_api" ]]"
-            playground = true
+            address = "[[ env "NOMAD_ALLOC_IP_api" ]]:[[ env "NOMAD_PORT_api" ]]"
+            playground = false
           [sources.logs]
             type = "docker_logs"
             exclude_containers = ["vector"]
@@ -104,6 +126,8 @@ job "vector" {
       }
 
       service {
+        address = "${NOMAD_ALLOC_IP_api}"
+
         check {
           port     = "api"
           type     = "http"

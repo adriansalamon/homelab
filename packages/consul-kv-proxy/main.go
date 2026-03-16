@@ -12,16 +12,16 @@ import (
 )
 
 func main() {
-	port := getEnv("PORT", "8080")
+	bindAddr := getEnv("ADDR", ":8080")
 	consulAddr := getEnv("CONSUL_HTTP_ADDR", "http://127.0.0.1:8500")
 
 	http.HandleFunc("/", handleRequest(consulAddr))
 	http.HandleFunc("/health", handleHealth)
 
-	log.Printf("Starting Consul KV proxy on port %s", port)
+	log.Printf("Starting Consul KV proxy on %s", bindAddr)
 	log.Printf("Consul address: %s", consulAddr)
 
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	if err := http.ListenAndServe(bindAddr, nil); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -5,11 +5,10 @@ job "authelia" {
     count = 2
 
     network {
-      mode = "cni/flannel"
+      mode = "cni/nebula"
 
       port "http" {
-        static = 29091
-        to     = 9091
+        static = 9091
       }
     }
 
@@ -29,6 +28,27 @@ job "authelia" {
         ]
       }
 
+      meta {
+        nebula_roles = jsonencode(["postgres-client", "ldap-client", "redis-client"])
+
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = [for group in ["reverse-proxy", "nomad-client"] : {
+              port  = "9091"
+              proto = "tcp"
+              group = group
+            }]
+          }
+        })
+      }
+
       template {
         data = <<EOF
 {{ $domain := key "config/domains/main" }}
@@ -36,7 +56,7 @@ log:
   level: info
 
 server:
-  address: "0.0.0.0:9091"
+  address: "{{ env "NOMAD_ALLOC_IP_http" }}:{{ env "NOMAD_PORT_http" }}"
 
 webauthn:
   enable_passkey_login: true
@@ -397,8 +417,9 @@ EOF
       }
 
       service {
-        port = "http"
-        name = "authelia"
+        port    = "http"
+        name    = "authelia"
+        address = "${NOMAD_ALLOC_IP_http}"
 
         check {
           type     = "http"
@@ -412,7 +433,7 @@ EOF
           "traefik.enable=true",
           "traefik.http.routers.authelia.rule=Host(`auth.${DOMAIN}`)",
           "traefik.http.routers.authelia.entrypoints=websecure",
-          "traefik.http.middlewares.authelia.forwardAuth.address=http://authelia.service.consul:29091/api/authz/forward-auth",
+          "traefik.http.middlewares.authelia.forwardAuth.address=http://authelia.service.consul:${NOMAD_PORT_http}/api/authz/forward-auth",
           "traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true",
           "traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email",
         ]

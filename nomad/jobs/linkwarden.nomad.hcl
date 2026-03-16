@@ -5,41 +5,38 @@ job "linkwarden" {
     count = 1
 
     network {
-      mode = "cni/flannel"
+      mode = "cni/nebula"
       port "http" {
-        to = 3000
+        static = 3000
       }
     }
 
     task "linkwarden" {
       driver = "docker"
 
-      service {
-        name = "linkwarden"
-        port = "http"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.linkwarden.rule=Host(`linkwarden.${DOMAIN}`)",
-          "traefik.http.routers.linkwarden.entrypoints=websecure"
-        ]
-
-        check {
-          type     = "tcp"
-          port     = "http"
-          interval = "30s"
-          timeout  = "10s"
-        }
-      }
-
       config {
         image = "ghcr.io/linkwarden/linkwarden:v2.13.5"
-        ports = ["http"]
       }
 
-      resources {
-        cpu    = 500
-        memory = 2048 # OMG what bloat?
+      meta {
+        nebula_roles = jsonencode(["postgres-client"])
+
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = [for group in ["reverse-proxy", "nomad-client"] : {
+              port  = "3000"
+              proto = "tcp"
+              group = group
+            }]
+          }
+        })
       }
 
       template {
@@ -74,6 +71,23 @@ job "linkwarden" {
         EOF
         destination = "${NOMAD_SECRETS_DIR}/secrets.env"
         env         = true
+      }
+
+      service {
+        name    = "linkwarden"
+        port    = "http"
+        address = "${NOMAD_ALLOC_IP_http}"
+
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.linkwarden.rule=Host(`linkwarden.${DOMAIN}`)",
+          "traefik.http.routers.linkwarden.entrypoints=websecure"
+        ]
+      }
+
+      resources {
+        cpu    = 500
+        memory = 2048 # OMG what bloat?
       }
     }
   }

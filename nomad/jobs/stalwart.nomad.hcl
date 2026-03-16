@@ -5,17 +5,52 @@ job "stalwart" {
     count = 1
 
     network {
-      mode = "cni/flannel"
+      mode = "cni/nebula"
 
-      port "smtp" { to = 25 }
-      port "submission" { to = 587 }
-      port "imaps" { to = 993 }
-      port "http" { to = 8080 }
-      port "management" { to = 9090 }
+      port "smtp" { static = 25 }
+      port "submission" { static = 587 }
+      port "imaps" { static = 993 }
+      port "http" { static = 8080 }
+      port "management" { static = 9090 }
     }
 
     task "stalwart" {
       driver = "docker"
+
+      meta {
+        nebula_roles = jsonencode(["postgres-client"])
+
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = concat(
+              flatten([
+                for group, ports in {
+                  "reverse-proxy" = ["25", "587", "993", "8080", "9090"]
+                  "nomad-client" = ["8080", "9090"]
+                  } : [
+                  for port in ports : {
+                    group = group
+                    proto = "tcp"
+                    port  = port
+                  }
+                ]
+              ]),
+              [{
+                host  = "zeus-prometheus" # TODO: migrate to a group
+                proto = "tcp"
+                port  = "9090"
+              }]
+            )
+          }
+        })
+      }
 
       config {
         image = "stalwartlabs/stalwart:v0.15.5"
@@ -40,13 +75,13 @@ local-keys = [ "store.*", "directory.*", "tracer.*", "!server.blocked-ip.*", "!s
 hostname = "mail.{{ $domain }}"
 
 [server.listener."smtp"]
-bind = "[::]:25"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:25"
 protocol = "smtp"
 proxy.override = true
 proxy.trusted-networks = ["10.64.32.0/19"]
 
 [server.listener."submission"]
-bind = "[::]:587"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:587"
 protocol = "smtp"
 tls.implicit = false
 proxy.override = true
@@ -54,11 +89,11 @@ proxy.trusted-networks = ["10.64.32.0/19"]
 
 
 [server.listener."imap"]
-bind = "[::]:143"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:143"
 protocol = "imap"
 
 [server.listener."imaps"]
-bind = "[::]:993"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:993"
 protocol = "imap"
 tls.implicit = true
 proxy.override = true
@@ -66,12 +101,12 @@ proxy.trusted-networks = ["10.64.32.0/19"]
 
 
 [server.listener."management"]
-bind = "[::]:9090"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:9090"
 protocol = "http"
 tls.implicit = false
 
 [server.listener."public-http"]
-bind = "[::]:8080"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:8080"
 protocol = "http"
 tls.implicit = false
 
@@ -172,8 +207,9 @@ secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }
 
 
       service {
-        name = "stalwart-smtp"
-        port = "smtp"
+        name    = "stalwart-smtp"
+        port    = "smtp"
+        address = "${NOMAD_ALLOC_IP_smtp}"
 
         tags = [
           "traefik.enable=true",
@@ -185,8 +221,9 @@ secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }
       }
 
       service {
-        name = "stalwart-submission"
-        port = "submission"
+        name    = "stalwart-submission"
+        port    = "submission"
+        address = "${NOMAD_ALLOC_IP_smtp}"
 
         tags = [
           "traefik.enable=true",
@@ -198,8 +235,9 @@ secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }
       }
 
       service {
-        name = "stalwart-imaps"
-        port = "imaps"
+        name    = "stalwart-imaps"
+        port    = "imaps"
+        address = "${NOMAD_ALLOC_IP_smtp}"
 
         tags = [
           "traefik.enable=true",
@@ -211,8 +249,9 @@ secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }
       }
 
       service {
-        name = "stalwart-http"
-        port = "http"
+        name    = "stalwart-http"
+        port    = "http"
+        address = "${NOMAD_ALLOC_IP_smtp}"
 
         tags = [
           "traefik.enable=true",
@@ -231,8 +270,9 @@ secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }
 
 
       service {
-        name = "stalwart-management"
-        port = "management"
+        name    = "stalwart-management"
+        port    = "management"
+        address = "${NOMAD_ALLOC_IP_smtp}"
 
         tags = [
           "traefik.enable=true",

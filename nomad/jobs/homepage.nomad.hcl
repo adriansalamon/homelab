@@ -4,10 +4,10 @@ job "homepage" {
 
     network {
       port "http" {
-        to = 3000
+        static = 3000
       }
 
-      mode = "cni/flannel"
+      mode = "cni/nebula"
     }
 
     task "homepage" {
@@ -15,6 +15,8 @@ job "homepage" {
 
       env {
         CONSUL_HTTP_ADDR = "http://consul.service.consul:8500"
+        PORT             = "${NOMAD_PORT_http}"
+        HOST             = "${NOMAD_ALLOC_IP_http}"
       }
 
       config {
@@ -22,6 +24,26 @@ job "homepage" {
         ports = ["http"]
       }
 
+      meta {
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = [
+              {
+                port  = "3000"
+                proto = "tcp"
+                group = "reverse-proxy"
+              }
+            ]
+          }
+        })
+      }
 
       template {
         data        = <<EOF
@@ -62,8 +84,9 @@ job "homepage" {
       }
 
       service {
-        name = "homepage"
-        port = "http"
+        name    = "homepage"
+        port    = "http"
+        address = "${NOMAD_ALLOC_IP_http}"
 
         tags = [
           "traefik.enable=true",

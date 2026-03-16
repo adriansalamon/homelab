@@ -5,14 +5,14 @@ job "lldap" {
     count = 2
 
     network {
-      mode = "cni/flannel"
+      mode = "cni/nebula"
 
       port "http" {
-        to = 17170
+        static = 17170
       }
 
       port "ldap" {
-        to = 3890
+        static = 3890
       }
     }
 
@@ -22,6 +22,31 @@ job "lldap" {
       config {
         image = "lldap/lldap:latest-alpine"
         ports = ["http", "ldap"]
+      }
+
+      meta {
+        nebula_roles = jsonencode(["postgres-client"])
+
+        nebula_config = yamlencode({
+          firewall = {
+            outbound = [
+              {
+                port  = "any"
+                proto = "any"
+                host  = "any"
+              }
+            ]
+            inbound = concat([for group in ["reverse-proxy", "nomad-client"] : {
+              port  = "17170"
+              proto = "tcp"
+              group = group
+              }], [for group in ["ldap-client", "nomad-client"] : {
+              port  = "3890"
+              proto = "tcp"
+              group = group
+            }])
+          }
+        })
       }
 
       template {
@@ -35,6 +60,12 @@ job "lldap" {
       }
 
       env {
+        LLDAP_LDAP_HOST = "${NOMAD_ALLOC_IP_ldap}"
+        LLDAP_LDAP_PORT = "${NOMAD_PORT_ldap}"
+
+        LLDAP_HTTP_HOST = "${NOMAD_ALLOC_IP_http}"
+        LLDAP_HTTP_PORT = "${NOMAD_PORT_http}"
+
         LLDAP_LDAP_BASE_DN    = "dc=salamon,dc=xyz"
         LLDAP_LDAP_USER_EMAIL = "admin@${DOMAIN_ALT}"
         LLDAP_HTTP_URL        = "https://lldap.local.${DOMAIN}"
@@ -60,8 +91,9 @@ EOF
       }
 
       service {
-        port = "http"
-        name = "lldap"
+        port    = "http"
+        name    = "lldap"
+        address = "${NOMAD_ALLOC_IP_http}"
 
         check {
           type     = "http"
@@ -78,8 +110,9 @@ EOF
       }
 
       service {
-        port = "ldap"
-        name = "lldap"
+        port    = "ldap"
+        name    = "lldap"
+        address = "${NOMAD_ALLOC_IP_ldap}"
 
         check {
           type     = "tcp"
