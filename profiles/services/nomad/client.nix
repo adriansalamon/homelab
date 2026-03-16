@@ -193,63 +193,93 @@ in
       };
     };
 
-  environment.etc."cni/net.d/10-nebula.conflist".text = ''
-    {
-      "cniVersion": "1.0.0",
-      "name": "nebula",
-      "plugins": [
-        {
-          "type": "loopback"
-        },
-        {
-          "type": "bridge",
-          "bridge": "nomad",
-          "isGateway": true,
-          "ipMasq": true,
-          "ipam": {
-            "type": "host-local",
-            "ranges": [
-              [
-                {
-                  "subnet": "172.26.64.0/20"
-                }
-              ]
-            ],
-            "routes": [{ "dst": "0.0.0.0/0" }]
-          }
-        },
-        {
-          "type": "firewall",
-          "backend": "iptables"
-        },
-        {
-          "type": "nebula-nomad-cni",
-          "socket_path": "/var/run/nebula-cni.sock",
-          "roles_meta_key": "nebula_roles"
-        }
-      ]
-    }
-  '';
+  systemd = {
+    services.cni-dhcp = {
+      wantedBy = [ "multi-user.target" ];
+      after = [
+        "network.target"
+        "cni-dhcp.socket"
+      ];
+      requires = [ "cni-dhcp.socket" ];
+      description = "CNI DHCP service ";
+      serviceConfig = {
+        ExecStart = "${pkgs.cni-plugins}/bin/dhcp daemon";
+        Restart = "always";
+        RestartSec = "10s";
+      };
+    };
 
-  environment.etc."cni/net.d/10-flannel.conflist".text = ''
-    {
-      "cniVersion": "0.4.0",
-      "name": "flannel",
-      "plugins": [
-        {
-          "type": "flannel",
-          "delegate": {
-            "isDefaultGateway": true,
-            "hairpinMode": true
-          }
-        },
-        {
-          "type": "portmap",
-          "capabilities": { "portMappings": true }
-        }
-      ]
-    }
-  '';
+    sockets.cni-dhcp = {
+      wantedBy = [ "sockets.target" ];
+      description = "CNI DHCP service socket";
+      partOf = [ "cni-dhcp.service" ];
+      socketConfig = {
+        ListenStream = "/run/cni/dhcp.sock";
+        SocketMode = "0660";
+        # TODO: is this safe?
+        SocketUser = "root";
+        SocketGroup = "root";
+        RemoveOnStop = true;
+      };
+    };
+  };
+
+  environment.etc."cni/net.d/10-nebula.conflist".text = builtins.toJSON {
+    cniVersion = "1.0.0";
+    name = "nebula";
+    plugins = [
+      { type = "loopback"; }
+      {
+        type = "bridge";
+        name = "brNomad";
+        bridge = "nomad";
+        isGateway = true;
+        ipMasq = true;
+        ipam = {
+          type = "host-local";
+          ranges = [ [ { subnet = "172.26.64.0/20"; } ] ];
+          routes = [ ];
+        };
+      }
+      {
+        type = "firewall";
+        backend = "iptables";
+      }
+      {
+        type = "nebula-nomad-cni";
+        socket_path = "/var/run/nebula-cni.sock";
+        roles_meta_key = "nebula_roles";
+        macvlan = {
+          enable = true;
+          name = "macv0";
+          master = "eth0"; # TODO: make this configurable per host
+          ipam = {
+            type = "dhcp";
+          };
+        };
+      }
+    ];
+  };
+
+  environment.etc."cni/net.d/10-flannel.conflist".text = builtins.toJSON {
+    cniVersion = "0.4.0";
+    name = "flannel";
+    plugins = [
+      {
+        type = "flannel";
+        delegate = {
+          isDefaultGateway = true;
+          hairpinMode = true;
+        };
+      }
+      {
+        type = "portmap";
+        capabilities = {
+          portMappings = true;
+        };
+      }
+    ];
+  };
 
   globals.nebula.mesh.hosts.${host} = {
     groups = [ "nomad-client" ];
