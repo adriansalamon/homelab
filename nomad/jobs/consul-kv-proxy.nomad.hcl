@@ -4,7 +4,7 @@ job "kv-proxy" {
 
     network {
       port "http" {
-        static = 8080
+        static = 2349
       }
 
       mode = "cni/nebula"
@@ -24,6 +24,8 @@ job "kv-proxy" {
       }
 
       meta {
+        nebula_roles = jsonencode(["consul-client"])
+
         nebula_config = yamlencode({
           firewall = {
             outbound = [
@@ -34,7 +36,7 @@ job "kv-proxy" {
               }
             ]
             inbound = [for group in ["reverse-proxy", "nomad-client"] : {
-              port  = "8080"
+              port  = "2349"
               proto = "tcp"
               group = group
             }]

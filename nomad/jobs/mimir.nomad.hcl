@@ -1,4 +1,13 @@
 job "mimir" {
+
+  update {
+     max_parallel      = 1
+     health_check      = "checks"
+     healthy_deadline  = "10m"
+     progress_deadline = "20m"
+     stagger           = "30s"
+   }
+
   group "mimir" {
     count = 1
 
@@ -95,6 +104,9 @@ ingester:
 store_gateway:
   sharding_ring:
     replication_factor: 1
+
+compactor:
+  data_dir: /alloc/data/compactor
 
 limits:
   compactor_block_upload_enabled: true
