@@ -38,11 +38,18 @@ job "prometheus-pushgateway" {
               port  = "9091"
               proto = "tcp"
               group = group
-            }], [{
-              host  = "zeus-prometheus" # TODO: migrate to a group
-              proto = "tcp"
-              port  = "9091"
-            }])
+              }], [
+              {
+                host  = "zeus-prometheus" # TODO: migrate to a group
+                proto = "tcp"
+                port  = "9091"
+              },
+              {
+                group = "prometheus"
+                proto = "tcp"
+                port  = "9091"
+              }
+            ])
           }
         })
       }

@@ -7,6 +7,8 @@
 let
   cfg = config.meta.zrepl;
   me = config.node.name;
+
+  monitorPort = 9811;
 in
 {
   # interface
@@ -30,7 +32,7 @@ in
 
     # register metrics in Consul
     consul.services."zrepl" = {
-      port = 9811;
+      port = monitorPort;
       tags = [ "prometheus.scrape=true" ];
     };
 
@@ -41,9 +43,14 @@ in
       # allow the prometheus scrape server to access
       firewall.inbound = [
         {
-          port = "9811";
+          port = monitorPort;
           proto = "tcp";
           host = "zeus-prometheus";
+        }
+        {
+          port = monitorPort;
+          proto = "tcp";
+          group = "prometheus";
         }
       ];
     };
@@ -63,7 +70,7 @@ in
           monitoring = [
             {
               type = "prometheus";
-              listen = "${globals.nebula.mesh.hosts.${me}.ipv4}:9811";
+              listen = "${globals.nebula.mesh.hosts.${me}.ipv4}:${toString monitorPort}";
               listen_freebind = true;
             }
           ];

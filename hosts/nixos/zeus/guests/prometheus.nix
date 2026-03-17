@@ -67,6 +67,11 @@
       proto = "tcp";
       host = "zeus-grafana";
     }
+    {
+      port = "9090";
+      proto = "tcp";
+      group = "grafana";
+    }
   ];
 
   consul.services.prometheus = {

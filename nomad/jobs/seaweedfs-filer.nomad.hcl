@@ -46,6 +46,12 @@ job "seaweedfs-filer" {
               }
             ]
             inbound = [
+              # temp
+              {
+                port  = "any"
+                proto = "tcp"
+                host  = "any"
+              },
               # CLIENT STUFF
               {
                 port  = 30091
@@ -67,12 +73,21 @@ job "seaweedfs-filer" {
                 proto = "tcp"
                 group = "nomad-client"
               },
-
+              {
+                port  = 20090
+                proto = "tcp"
+                group = "weed-filer-client"
+              },
               # RPC
               {
                 port  = 30090
                 proto = "tcp"
                 group = "weed-filer"
+              },
+              {
+                port  = 30090
+                proto = "tcp"
+                group = "weed-filer-client"
               }
             ]
           }
@@ -197,50 +212,42 @@ EOF
 
       template {
         data        = <<EOF
+        {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}
         {
           "identities": [
             {
               "name": "admin",
-              "credentials": [
-                {
-                  "accessKey": "admin",
-                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .admin_secret_key }}"{{ end }}
-                }
-              ],
+              "credentials": [{ "accessKey": "admin", "secretKey": "{{ .admin_secret_key }}" }],
               "actions": ["Admin", "Read", "Write", "List", "Tagging"]
             },
             {
               "name": "linkwarden",
-              "credentials": [
-                {
-                  "accessKey": "linkwarden",
-                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .linkwarden_secret_key }}"{{ end }}
-                }
-              ],
+              "credentials": [{ "accessKey": "linkwarden", "secretKey": "{{ .linkwarden_secret_key }}" }],
               "actions": ["Read:linkwarden", "Write:linkwarden", "List:linkwarden", "Tagging:linkwarden"]
             },
             {
               "name": "memos",
-              "credentials": [
-                {
-                  "accessKey": "memos",
-                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .memos_secret_key }}"{{ end }}
-                }
-              ],
+              "credentials": [{ "accessKey": "memos", "secretKey": "{{ .memos_secret_key }}" }],
               "actions": ["Read:memos", "Write:memos", "List:memos", "Tagging:memos"]
             },
             {
               "name": "stalwart-mail",
-              "credentials": [
-                {
-                  "accessKey": "stalwart-mail",
-                  "secretKey": {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}"{{ .stalwart_secret_key }}"{{ end }}
-                }
-              ],
+              "credentials": [{ "accessKey": "stalwart-mail", "secretKey": "{{ .stalwart_secret_key }}" }],
               "actions": ["Read:stalwart-mail", "Write:stalwart-mail", "List:stalwart-mail", "Tagging:stalwart-mail"]
+            },
+            {
+              "name": "mimir",
+              "credentials": [{ "accessKey": "mimir", "secretKey": "{{ .mimir_secret_key }}" }],
+              "actions": ["Read:mimir-storage", "Write:mimir-storage", "List:mimir-storage", "Tagging:mimir-storage"]
+            },
+            {
+              "name": "loki",
+              "credentials": [{ "accessKey": "loki", "secretKey": "{{ .loki_secret_key }}" }],
+              "actions": ["Read:loki", "Write:loki", "List:loki", "Tagging:loki"]
             }
           ]
         }
+        {{ end }}
       EOF
         destination = "local/s3-config.json"
       }

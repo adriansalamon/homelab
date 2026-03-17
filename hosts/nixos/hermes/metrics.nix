@@ -134,5 +134,10 @@ in
       proto = "tcp";
       host = "zeus-prometheus";
     }
+    {
+      port = toString config.services.prometheus.exporters.rustic.port;
+      proto = "tcp";
+      group = "prometheus";
+    }
   ];
 }

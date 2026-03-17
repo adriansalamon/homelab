@@ -1,29 +1,33 @@
 { inputs, ... }:
 let
   localSecretsDir = ./files;
+  nomadPath = "nomad/jobs/seaweedfs-filer";
+
+  mkWeedSecret =
+    clienName:
+    let
+      name = "seaweedfs-${clienName}-secret-key";
+    in
+    {
+      inherit name;
+      value = {
+        rekeyFile = localSecretsDir + "/${name}.age";
+        inherit nomadPath;
+        generator.script = "alnum";
+      };
+    };
+
+  secrets = map mkWeedSecret [
+    "admin"
+    "linkwarden"
+    "memos"
+    "stalwart"
+    "mimir"
+    "loki"
+  ];
 in
 {
-  age.secrets = {
-    seaweedfs-admin-secret-key = {
-      rekeyFile = localSecretsDir + "/seaweedfs-admin-secret-key.age";
-      nomadPath = "nomad/jobs/seaweedfs-filer";
-      generator.script = "alnum";
-    };
-    swaweedfs-linkwarden-secret-key = {
-      rekeyFile = localSecretsDir + "/seaweedfs-linkwarden-secret-key.age";
-      nomadPath = "nomad/jobs/seaweedfs-filer";
-      generator.script = "alnum";
-    };
-    swaweedfs-memos-secret-key = {
-      rekeyFile = localSecretsDir + "/seaweedfs-memos-secret-key.age";
-      nomadPath = "nomad/jobs/seaweedfs-filer";
-      generator.script = "alnum";
-    };
-    swaweedfs-stalwart-secret-key = {
-      rekeyFile = localSecretsDir + "/seaweedfs-stalwart-secret-key.age";
-      nomadPath = "nomad/jobs/seaweedfs-filer";
-      generator.script = "alnum";
-    };
+  age.secrets = builtins.listToAttrs secrets // {
     swaweedfs-postgres-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/seaweedfs-postgres-password.age";
       nomadPath = "nomad/jobs/seaweedfs-filer";

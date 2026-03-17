@@ -47,6 +47,11 @@ in
     "br_netfilter"
   ];
 
+  systemd.tmpfiles.rules = [
+    "d /var/run/seaweedfs-csi/socket 0700 root root"
+    "d /var/run/seaweedfs-csi/staging 0700 root root"
+  ];
+
   services.nomad = {
     enableDocker = true;
 
@@ -61,6 +66,16 @@ in
           path = "/var/run/docker.sock";
           read_only = true;
         };
+
+        host_volume."seaweedfs-socket" = {
+          path = "/var/run/seaweedfs-csi/socket";
+          read_only = false;
+        };
+
+        host_volume."seaweedfs-staging" = {
+          path = "/var/run/seaweedfs-csi/staging";
+          read_only = false;
+        };
       };
 
       tls = {
@@ -74,13 +89,17 @@ in
         prometheus_metrics = true;
       };
 
-      plugin.docker.config.extra_labels = [
-        "job_name"
-        "task_group_name"
-        "task_name"
-        "namespace"
-        "node_name"
-      ];
+      plugin.docker.config = {
+        allow_privileged = true; # needed for CSI
+
+        extra_labels = [
+          "job_name"
+          "task_group_name"
+          "task_name"
+          "namespace"
+          "node_name"
+        ];
+      };
     };
 
     credentials.secrets = config.age.secrets."nomad-secrets.json".path;
@@ -121,7 +140,7 @@ in
 
         # Default firewall rules
         firewall = {
-          outound = [
+          outbound = [
             {
               cidr = "0.0.0.0/0";
               host = "any";

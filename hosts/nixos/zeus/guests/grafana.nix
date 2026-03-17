@@ -99,7 +99,7 @@
           name = "Prometheus";
           type = "prometheus";
           access = "proxy";
-          url = "http://${globals.nebula.mesh.hosts.zeus-prometheus.ipv4}:${builtins.toString nodes.zeus-prometheus.config.services.prometheus.port}";
+          url = "http://${globals.nebula.mesh.hosts.zeus-prometheus.ipv4}:${toString nodes.zeus-prometheus.config.services.prometheus.port}";
           jsonData.timeInterval = "60s";
         }
       ];

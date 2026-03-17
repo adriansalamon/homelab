@@ -10,8 +10,8 @@ job "stalwart" {
       port "smtp" { static = 25 }
       port "submission" { static = 587 }
       port "imaps" { static = 993 }
-      port "http" { static = 8080 }
-      port "management" { static = 9090 }
+      port "http" { static = 8083 }
+      port "management" { static = 9191 }
     }
 
     task "stalwart" {
@@ -32,8 +32,8 @@ job "stalwart" {
             inbound = concat(
               flatten([
                 for group, ports in {
-                  "reverse-proxy" = ["25", "587", "993", "8080", "9090"]
-                  "nomad-client" = ["8080", "9090"]
+                  "reverse-proxy" = ["25", "587", "993", "8083", "9191"]
+                  "nomad-client"  = ["8083", "9191"]
                   } : [
                   for port in ports : {
                     group = group
@@ -42,11 +42,18 @@ job "stalwart" {
                   }
                 ]
               ]),
-              [{
-                host  = "zeus-prometheus" # TODO: migrate to a group
-                proto = "tcp"
-                port  = "9090"
-              }]
+              [
+                {
+                  host  = "zeus-prometheus" # TODO: migrate to a group
+                  proto = "tcp"
+                  port  = "9191"
+                },
+                {
+                  group = "prometheus"
+                  proto = "tcp"
+                  port  = "9191"
+                }
+              ]
             )
           }
         })
@@ -101,12 +108,12 @@ proxy.trusted-networks = ["10.64.32.0/19"]
 
 
 [server.listener."management"]
-bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:9090"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:9191"
 protocol = "http"
 tls.implicit = false
 
 [server.listener."public-http"]
-bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:8080"
+bind = "{{ env "NOMAD_ALLOC_IP_smtp" }}:8083"
 protocol = "http"
 tls.implicit = false
 
