@@ -25,6 +25,7 @@
         modules = [
           inputs.agenix.homeManagerModules.default
           inputs.agenix-rekey.homeManagerModules.default
+          ../modules/global.nix
           ../modules/nomad/secrets.nix
           {
             age.rekey = {

@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   nodes,
   ...
@@ -9,7 +10,7 @@ let
 in
 {
 
-  #globals.loki-secrets = [ config.age.secrets.grafana-loki-basic-auth-password ];
+  globals.loki-secrets = [ config.age.secrets.grafana-loki-basic-auth-password ];
 
   age.secrets = {
     grafana-postgres-password = {

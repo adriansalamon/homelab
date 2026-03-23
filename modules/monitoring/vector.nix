@@ -17,13 +17,18 @@ in
     age.secrets.vector-loki-basic-auth-password = {
       # we don't need this file on the server
       intermediary = true;
-      generator.script = "alnum";
+
+      generator = {
+        tags = [ "loki-basic-auth" ];
+        script = "alnum";
+      };
     };
 
     # Loki can read secrets from json files, we create one
     age.secrets.vector-loki-auth-json = {
       generator = {
         dependencies = [ config.age.secrets.vector-loki-basic-auth-password ];
+        tags = [ "loki-basic-auth-json" ];
         script =
           {
             pkgs,
@@ -34,9 +39,10 @@ in
           }:
           let
             dep = lib.head deps;
+            formatName = name: (builtins.replaceStrings [ ":" ] [ "/" ] (lib.escapeShellArg name));
           in
           ''
-            username=${lib.escapeShellArg dep.host}"+"${lib.escapeShellArg dep.name}
+            username=${formatName dep.host}"+"${formatName dep.name}
             password=$(${decrypt} ${lib.escapeShellArg dep.file})
             echo {} | ${pkgs.jq}/bin/jq --arg password $password --arg username $username \
               '{username: $username, password: $password}'
