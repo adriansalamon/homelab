@@ -59,7 +59,7 @@ in
           postgresql = {
             use_pg_rewind = true;
             parameters = {
-              max_connections = 100;
+              max_connections = 500;
               shared_buffers = "256MB";
             };
           };
@@ -75,6 +75,10 @@ in
         authentication = {
           replication.username = "replicator";
           superuser.username = "postgres";
+        };
+
+        parameters = {
+          max_connections = 500;
         };
 
         listen = lib.mkForce "127.0.0.1,${nebulaIp}:5432";
