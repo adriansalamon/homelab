@@ -42,6 +42,23 @@ in
     };
   };
 
+  # Since we use docker, keep docker state please
+  environment.persistence."/state".directories = [
+    {
+      directory = "/var/lib/docker";
+      mode = "0700";
+      user = "root";
+    }
+  ];
+
+  virtualisation.docker = {
+    daemon.settings = {
+      # overlay2 does not work with virtiofs
+      storage-driver = "fuse-overlayfs";
+    };
+    extraPackages = [ pkgs.fuse-overlayfs ];
+  };
+
   boot.initrd.kernelModules = [
     "bridge"
     "br_netfilter"
