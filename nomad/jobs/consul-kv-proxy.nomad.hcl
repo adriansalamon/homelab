@@ -4,7 +4,7 @@ job "kv-proxy" {
 
     network {
       port "http" {
-        static = 1072
+        static = 2349
       }
 
       mode = "cni/nebula"
@@ -36,7 +36,7 @@ job "kv-proxy" {
               }
             ]
             inbound = [for group in ["reverse-proxy", "nomad-client"] : {
-              port  = "1072"
+              port  = "2349"
               proto = "tcp"
               group = group
             }]
