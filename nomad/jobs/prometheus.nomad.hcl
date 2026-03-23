@@ -10,6 +10,7 @@ job "prometheus" {
       mode = "cni/nebula"
     }
 
+
     task "prometheus" {
       driver = "docker"
 
@@ -48,13 +49,14 @@ job "prometheus" {
       }
 
       config {
-        image = "prom/prometheus:latest"
+        image = "prom/prometheus:v3.10.0-distroless"
         ports = ["http"]
         args = [
           "--config.file=${NOMAD_ALLOC_DIR}/prometheus.yaml",
           "--storage.tsdb.path=/tmp/prometheus",
           "--storage.tsdb.retention.time=2h",
           "--web.listen-address=${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}",
+          "--web.enable-remote-write-receiver",
         ]
       }
 
@@ -65,7 +67,13 @@ global:
   evaluation_interval: 15s
 
 remote_write:
-  - url: "http://{{ range service "mimir" }}{{ .Address }}:{{ .Port }}{{ end }}/api/v1/push"
+{{ range service "victoriametrics"}}
+  - url: "http://{{ .Address }}:{{ .Port }}/api/v1/write"
+{{ end }}
+
+storage:
+  tsdb:
+    out_of_order_time_window: 24h # for vmalert to write to
 
 scrape_configs:
   - job_name: "consul"
@@ -109,7 +117,7 @@ EOF
       }
 
       service {
-        name    = "prometheus2"
+        name    = "prometheus"
         port    = "http"
         address = "${NOMAD_ALLOC_IP_http}"
 
@@ -123,8 +131,9 @@ EOF
         tags = [
           "traefik.enable=true",
           "traefik.external=false",
-          "traefik.http.routers.prometheus2.rule=Host(`prometheus2.local.${DOMAIN}`)",
-          "traefik.http.routers.prometheus2.middlewares=authelia",
+          "traefik.http.routers.prometheus.rule=Host(`prometheus.local.${DOMAIN}`)",
+          "traefik.http.routers.prometheus-health.rule=Host(`prometheus.local.${DOMAIN}`) && Path(`/-/healthy`)",
+          "traefik.http.routers.prometheus.middlewares=authelia",
         ]
       }
     }

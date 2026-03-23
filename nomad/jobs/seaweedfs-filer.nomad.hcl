@@ -236,11 +236,6 @@ EOF
               "actions": ["Read:stalwart-mail", "Write:stalwart-mail", "List:stalwart-mail", "Tagging:stalwart-mail"]
             },
             {
-              "name": "mimir",
-              "credentials": [{ "accessKey": "mimir", "secretKey": "{{ .mimir_secret_key }}" }],
-              "actions": ["Read:mimir-storage", "Write:mimir-storage", "List:mimir-storage", "Tagging:mimir-storage"]
-            },
-            {
               "name": "loki",
               "credentials": [{ "accessKey": "loki", "secretKey": "{{ .loki_secret_key }}" }],
               "actions": ["Read:loki", "Write:loki", "List:loki", "Tagging:loki"]

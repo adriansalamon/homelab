@@ -1,7 +1,6 @@
 {
   config,
   inputs,
-  nodes,
   ...
 }:
 let
@@ -19,7 +18,7 @@ in
       generator.script = "alnum";
     };
     grafana-secret-key = {
-      inherit (nodes.zeus-grafana.config.age.secrets.grafana-secret-key) rekeyFile;
+      rekeyFile = localSecretsDir + "/grafana-secret-key.age";
       inherit nomadPath;
     };
     grafana-loki-basic-auth-password = {

@@ -23,6 +23,7 @@ in
     hardware
     services.consul-client
     services.seaweedfs.volume
+    services.victoriametrics
     storage-users
     auto-update
   ];

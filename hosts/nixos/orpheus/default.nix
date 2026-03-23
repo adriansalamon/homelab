@@ -23,6 +23,7 @@
     services.consul-client
     services.seaweedfs.volume
     services.patroni
+    services.victoriametrics
     auto-update
   ]);
 

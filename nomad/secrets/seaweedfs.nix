@@ -22,7 +22,6 @@ let
     "linkwarden"
     "memos"
     "stalwart"
-    "mimir"
     "loki"
   ];
 in
