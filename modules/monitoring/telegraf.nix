@@ -253,11 +253,6 @@ in
       {
         inherit (cfg) port;
         proto = "tcp";
-        host = "zeus-prometheus";
-      }
-      {
-        inherit (cfg) port;
-        proto = "tcp";
         group = "prometheus";
       }
     ];

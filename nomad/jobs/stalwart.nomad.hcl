@@ -44,11 +44,6 @@ job "stalwart" {
               ]),
               [
                 {
-                  host  = "zeus-prometheus" # TODO: migrate to a group
-                  proto = "tcp"
-                  port  = "9191"
-                },
-                {
                   group = "prometheus"
                   proto = "tcp"
                   port  = "9191"

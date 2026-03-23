@@ -45,11 +45,6 @@ in
         {
           port = monitorPort;
           proto = "tcp";
-          host = "zeus-prometheus";
-        }
-        {
-          port = monitorPort;
-          proto = "tcp";
           group = "prometheus";
         }
       ];

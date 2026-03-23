@@ -158,11 +158,6 @@ in
     {
       port = "9811";
       proto = "tcp";
-      host = "zeus-prometheus";
-    }
-    {
-      port = "9811";
-      proto = "tcp";
       group = "prometheus";
     }
   ];

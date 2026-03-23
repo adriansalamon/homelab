@@ -16,7 +16,7 @@ job "prometheus-pushgateway" {
       driver = "docker"
 
       config {
-        image = "prom/pushgateway:latest"
+        image = "prom/pushgateway:v1.11.2"
         ports = ["http"]
         args = [
           "--persistence.file=/alloc/data/metrics",
@@ -39,11 +39,6 @@ job "prometheus-pushgateway" {
               proto = "tcp"
               group = group
               }], [
-              {
-                host  = "zeus-prometheus" # TODO: migrate to a group
-                proto = "tcp"
-                port  = "9091"
-              },
               {
                 group = "prometheus"
                 proto = "tcp"

@@ -76,8 +76,6 @@
       (mkMicrovm "nomad" { id = 2052; })
       (mkMicrovm "paperless" { id = 2053; })
       (mkMicrovm "loki" { id = 2054; })
-      (mkMicrovm "prometheus" { id = 2055; })
-      (mkMicrovm "grafana" { id = 2056; })
       (mkMicrovm "forgejo" { id = 2057; })
     ];
 
