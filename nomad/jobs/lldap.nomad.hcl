@@ -20,7 +20,7 @@ job "lldap" {
       driver = "docker"
 
       config {
-        image = "lldap/lldap:latest-alpine"
+        image = "lldap/lldap:2026-03-04-alpine" # todo: pin to a specific version?
         ports = ["http", "ldap"]
       }
 
