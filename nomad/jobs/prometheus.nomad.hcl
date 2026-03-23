@@ -15,7 +15,7 @@ job "prometheus" {
       driver = "docker"
 
       meta {
-        nebula_roles = jsonencode(["prometheus", "consul-client"])
+        nebula_roles = jsonencode(["metrics-collector", "consul-client"])
 
 
         nebula_config = yamlencode({
@@ -41,7 +41,7 @@ job "prometheus" {
               {
                 port  = "9094"
                 proto = "tcp"
-                group = "grafana"
+                group = "metrics-ruler"
               }
             ]
           }

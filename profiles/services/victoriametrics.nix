@@ -43,30 +43,20 @@ in
   };
 
   globals.nebula.mesh.hosts.${host} = {
-    groups = [ "vmetrics" ];
+    groups = [ "metrics-store" ];
 
-    # todo: fix rules/groups
-    firewall.inbound = [
-      {
-        inherit port;
-        proto = "tcp";
-        group = "prometheus";
-      }
-      {
-        inherit port;
-        proto = "tcp";
-        group = "consul-client";
-      }
-      {
-        inherit port;
-        proto = "tcp";
-        group = "reverse-proxy";
-      }
-      {
-        inherit port;
-        proto = "tcp";
-        group = "grafana";
-      }
-    ];
+    firewall.inbound =
+      map
+        (group: {
+          inherit port group;
+          proto = "tcp";
+        })
+        [
+          "metrics-collector"
+          "metrics-proxy"
+          "metrics-ruler"
+          "reverse-proxy"
+          "consul-client"
+        ];
   };
 }

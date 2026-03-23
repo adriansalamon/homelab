@@ -14,7 +14,7 @@ job "vmalert" {
       driver = "docker"
 
       meta {
-        nebula_roles = jsonencode(["grafana"])
+        nebula_roles = jsonencode(["metrics-ruler"])
         nebula_config = yamlencode({
           firewall = {
             outbound = [
@@ -38,7 +38,7 @@ job "vmalert" {
               {
                 port  = "13691"
                 proto = "tcp"
-                group = "vmetrics" # TODO: change to vmetrics
+                group = "metrics-store"
               }
             ]
           }

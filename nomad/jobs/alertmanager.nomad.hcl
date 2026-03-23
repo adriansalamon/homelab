@@ -43,7 +43,7 @@ job "alertmanager" {
               {
                 port  = "24837"
                 proto = "tcp"
-                group = "grafana"
+                group = "metrics-ruler"
               }
             ]
           }

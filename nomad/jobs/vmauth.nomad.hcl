@@ -17,7 +17,8 @@ job "vmauth" {
       driver = "docker"
 
       meta {
-        nebula_roles = jsonencode(["grafana"])
+        nebula_roles = jsonencode(["metrics-proxy"])
+
         nebula_config = yamlencode({
           firewall = {
             outbound = [
@@ -32,6 +33,11 @@ job "vmauth" {
                 port  = "28428"
                 proto = "tcp"
                 group = "nomad-client"
+              },
+              {
+                port  = "28427"
+                proto = "tcp"
+                group = "metrics-ruler"
               },
               {
                 port  = "28427"
