@@ -44,7 +44,7 @@ job "stalwart" {
               ]),
               [
                 {
-                  group = "prometheus"
+                  group = "metrics-collector"
                   proto = "tcp"
                   port  = "9191"
                 }

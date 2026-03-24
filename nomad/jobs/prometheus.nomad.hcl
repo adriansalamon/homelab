@@ -15,7 +15,7 @@ job "prometheus" {
       driver = "docker"
 
       meta {
-        nebula_roles = jsonencode(["metrics-collector", "consul-client"])
+        nebula_roles = jsonencode(["metrics-collector", "consul-client", "prometheus"])
 
 
         nebula_config = yamlencode({

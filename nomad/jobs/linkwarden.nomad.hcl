@@ -80,6 +80,7 @@ job "linkwarden" {
 
         tags = [
           "traefik.enable=true",
+          "traefik.external=true",
           "traefik.http.routers.linkwarden.rule=Host(`linkwarden.${DOMAIN}`)",
           "traefik.http.routers.linkwarden.entrypoints=websecure"
         ]

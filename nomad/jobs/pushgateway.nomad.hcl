@@ -40,7 +40,7 @@ job "prometheus-pushgateway" {
               group = group
               }], [
               {
-                group = "prometheus"
+                group = "metrics-collector"
                 proto = "tcp"
                 port  = "9091"
               }
