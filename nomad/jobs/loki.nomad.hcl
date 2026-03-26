@@ -73,6 +73,10 @@ ingester:
     ring:
       kvstore:
         store: memberlist
+  chunk_idle_period: 1h
+  max_chunk_age: 1h
+  chunk_target_size: 1048576
+  chunk_retain_period: 30s
 
 schema_config:
   configs:

@@ -8,6 +8,7 @@ let
   inherit (lib)
     mapAttrsToList
     filterAttrs
+    mapAttrs'
     ;
 
   site = globals.sites.${config.node.site};
@@ -30,6 +31,12 @@ in
         route = builtins.head hostCfg.routeSubnets;
         via = hostCfg.ipv4;
         install = false;
+      }) otherRouters;
+
+      # don't try to connect to other remote nodes via remote local IPs
+      lighthouse.remote_allow_list = mapAttrs' (hostName: hostCfg: {
+        name = builtins.head hostCfg.routeSubnets;
+        value = false;
       }) otherRouters;
     };
 

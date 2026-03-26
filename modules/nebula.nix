@@ -129,6 +129,8 @@ in
     in
     {
       enable = true;
+      enableReload = true;
+
       ca = inputs.self.outPath + "/secrets/nebula/${name}/ca_combined.crt";
       cert = lib.removeSuffix ".key.age" config.age.secrets."nebula-${name}.key".rekeyFile + ".crt";
       key = config.age.secrets."nebula-${name}.key".path;
@@ -172,68 +174,5 @@ in
       ++ hostCfg.firewall.inbound;
     }
     // hostCfg.config
-  );
-
-  # We want to predictable config in /etc/nebula, so we don't need to restart nebula on config change
-  # Helps with deploying to systems that become unresponsive while nebula is restarting (e.g. with NFS mounts)
-  environment.etc = mkMerge (
-    flip mapAttrsToList enabledNetworks (
-      netName: netCfg:
-      let
-        # from https://github.com/NixOS/nixpkgs/blob/76e269a01c66e539c6d76f0417913e25936d3b00/nixos/modules/services/networking/nebula.nix
-        settings = lib.recursiveUpdate {
-          pki = {
-            ca = netCfg.ca;
-            cert = netCfg.cert;
-            key = netCfg.key;
-          };
-          static_host_map = netCfg.staticHostMap;
-          lighthouse = {
-            am_lighthouse = netCfg.isLighthouse;
-            hosts = netCfg.lighthouses;
-            serve_dns = netCfg.lighthouse.dns.enable;
-            dns.host = netCfg.lighthouse.dns.host;
-            dns.port = netCfg.lighthouse.dns.port;
-
-            local_allow_list = {
-              "::/0" = false; # don't advertise ipv6 underlay addresses
-            };
-          };
-          relay = {
-            am_relay = netCfg.isRelay;
-            relays = netCfg.relays;
-            use_relays = true;
-          };
-          listen = {
-            host = netCfg.listen.host;
-            port = resolveFinalPort netCfg;
-          };
-          tun = {
-            disabled = netCfg.tun.disable;
-            dev = if (netCfg.tun.device != null) then netCfg.tun.device else "nebula.${netName}";
-          };
-          firewall = {
-            inbound = netCfg.firewall.inbound;
-            outbound = netCfg.firewall.outbound;
-          };
-        } netCfg.settings;
-        format = pkgs.formats.yaml { };
-      in
-      {
-        "nebula/${netName}.yml".source = format.generate "nebula-${netName}.yml" settings;
-      }
-    )
-  );
-
-  # Reload instead of restarting nebula
-  systemd.services = flip mapAttrs' enabledNetworks (
-    netName: _: {
-      name = "nebula@${netName}";
-      value = {
-        stopIfChanged = false;
-        reloadTriggers = lib.singleton config.environment.etc."nebula/${netName}.yml".source;
-        serviceConfig.ExecStart = mkForce "${pkgs.nebula}/bin/nebula -config /etc/nebula/${netName}.yml";
-      };
-    }
   );
 }
