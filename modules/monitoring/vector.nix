@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  globals,
   ...
 }:
 let
@@ -101,7 +100,7 @@ in
           loki = {
             type = "loki";
             inputs = [ "parse_journald" ];
-            endpoint = "http://${globals.nebula.mesh.hosts.zeus-loki.ipv4}";
+            endpoint = "http://loki.service.consul:19832";
             auth = {
               strategy = "basic";
               user = "SECRET[basic_auth.username]";

@@ -104,7 +104,7 @@ job "vector" {
           [sinks.loki]
             type = "loki"
             inputs = [ "logs" ]
-            endpoint = "http://zeus-loki.node.consul"
+            endpoint = "http://loki.service.consul:19832"
             encoding.codec = "json"
             healthcheck.enabled = true
             batch.max_bytes = 262144

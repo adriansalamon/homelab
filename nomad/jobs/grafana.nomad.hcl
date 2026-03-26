@@ -123,7 +123,7 @@ datasources:
   - name: Loki
     type: loki
     access: proxy
-    url: http://10.64.40.6 #todo: fix
+    url: http://loki.service.consul:19832
     basicAuth: true
     basicAuthUser: "nomad+grafana-loki-basic-auth-password"
     secureJsonData:

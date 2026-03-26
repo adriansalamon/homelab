@@ -75,7 +75,6 @@
       })
       (mkMicrovm "nomad" { id = 2052; })
       (mkMicrovm "paperless" { id = 2053; })
-      (mkMicrovm "loki" { id = 2054; })
       (mkMicrovm "forgejo" { id = 2057; })
     ];
 
