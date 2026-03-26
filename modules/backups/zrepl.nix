@@ -45,7 +45,7 @@ in
         {
           port = monitorPort;
           proto = "tcp";
-          group = "prometheus";
+          group = "metrics-collector";
         }
       ];
     };

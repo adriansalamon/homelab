@@ -132,7 +132,7 @@ in
     {
       port = toString config.services.prometheus.exporters.rustic.port;
       proto = "tcp";
-      group = "prometheus";
+      group = "metrics-collector";
     }
   ];
 }

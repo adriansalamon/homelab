@@ -253,7 +253,7 @@ in
       {
         inherit (cfg) port;
         proto = "tcp";
-        group = "prometheus";
+        group = "metrics-collector";
       }
     ];
   };

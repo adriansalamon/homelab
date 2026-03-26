@@ -10,6 +10,11 @@ job "prometheus" {
       mode = "cni/nebula"
     }
 
+    ephemeral_disk {
+      size   = 100
+      sticky = true
+      migrate = true
+    }
 
     task "prometheus" {
       driver = "docker"

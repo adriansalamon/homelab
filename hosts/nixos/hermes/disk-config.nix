@@ -158,7 +158,7 @@ in
     {
       port = "9811";
       proto = "tcp";
-      group = "prometheus";
+      group = "metrics-collector";
     }
   ];
 }
