@@ -3,15 +3,12 @@
   config,
   nodes,
   lib,
-  pkgs,
   globals,
   ...
 }:
 let
   inherit (lib)
     mkIf
-    mkMerge
-    mkForce
     concatLists
     flip
     mapAttrsToList
@@ -29,17 +26,6 @@ let
   memberNets = filterAttrs (
     _: cfg: any (x: x == config.node.name) (attrNames cfg.hosts)
   ) globals.nebula;
-
-  nebulaCfg = config.services.nebula;
-  enabledNetworks = lib.filterAttrs (n: v: v.enable) nebulaCfg.networks;
-
-  resolveFinalPort =
-    netCfg:
-    if netCfg.listen.port == null then
-      if (netCfg.isLighthouse || netCfg.isRelay) then 4242 else 0
-    else
-      netCfg.listen.port;
-
 in
 {
   assertions = concatLists (
