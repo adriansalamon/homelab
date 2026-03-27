@@ -52,7 +52,7 @@ job "vmauth" {
       config {
         image = "victoriametrics/vmauth:v1.138.0"
         ports = ["http", "internal_http"]
-        args  = [
+        args = [
           "-auth.config=${NOMAD_ALLOC_DIR}/vmauth.yaml",
           "-httpListenAddr=${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}",
           "-httpInternalListenAddr=${NOMAD_ALLOC_IP_internal_http}:${NOMAD_PORT_internal_http}",

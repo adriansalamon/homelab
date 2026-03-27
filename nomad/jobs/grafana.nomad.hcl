@@ -143,7 +143,7 @@ GF_DATABASE_PASSWORD={{ .postgres_password }}
 DOMAIN="{{ key "config/domains/main" }}"
 GF_PATHS_PROVISIONING="{{ env "NOMAD_ALLOC_DIR" }}/provisioning"
 EOF
-        env = true
+        env         = true
         destination = "${NOMAD_SECRETS_DIR}/secrets.env"
       }
 

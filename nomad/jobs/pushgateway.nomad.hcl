@@ -8,7 +8,7 @@ job "prometheus-pushgateway" {
       mode = "cni/nebula"
 
       port "http" {
-        static = 9091
+        static = 11261
       }
     }
 
@@ -35,14 +35,14 @@ job "prometheus-pushgateway" {
               }
             ]
             inbound = concat([for group in ["reverse-proxy", "nomad-client"] : {
-              port  = "9091"
+              port  = "11261"
               proto = "tcp"
               group = group
               }], [
               {
                 group = "metrics-collector"
                 proto = "tcp"
-                port  = "9091"
+                port  = "11261"
               }
             ])
           }

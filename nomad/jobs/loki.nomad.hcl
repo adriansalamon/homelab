@@ -48,15 +48,15 @@ job "loki" {
 
 
       template {
-        data            = <<EOF
+        data        = <<EOF
 S3_SECRET_KEY={{ with nomadVar "nomad/jobs/loki" }}{{ .s3_secret_key }}{{ end }}
 EOF
-        env        = true
+        env         = true
         destination = "${NOMAD_SECRETS_DIR}/secret.env"
       }
 
       template {
-        data            = <<EOF
+        data        = <<EOF
 auth_enabled: false
 
 analytics:
@@ -128,7 +128,7 @@ EOF
       }
 
       template {
-        data            = <<EOF
+        data        = <<EOF
 events {}
 
 http {
@@ -157,7 +157,7 @@ EOF
       }
 
       template {
-        data            = <<EOF
+        data        = <<EOF
 {{ with nomadVar "nomad/jobs/loki" }}{{ .basic_auth_hashes }}{{ end }}
 EOF
         destination = "${NOMAD_SECRETS_DIR}/basic-auth-hashes"

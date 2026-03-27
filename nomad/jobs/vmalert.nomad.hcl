@@ -48,7 +48,7 @@ job "vmalert" {
       config {
         image = "victoriametrics/vmalert:v1.138.0"
         ports = ["http"]
-        args  = [
+        args = [
           "-datasource.url=http://srv+lb-metrics.service.consul",
           "-remoteWrite.url=http://srv+prometheus.service.consul",
           "-remoteRead.url=http://srv+lb-metrics.service.consul",

@@ -11,8 +11,8 @@ job "alertmanager" {
     }
 
     ephemeral_disk {
-      size   = 300
-      sticky = true
+      size    = 300
+      sticky  = true
       migrate = true
     }
 
@@ -53,7 +53,7 @@ job "alertmanager" {
       config {
         image = "prom/alertmanager:v0.31.1"
         ports = ["http"]
-        args  = [
+        args = [
           "--config.file=${NOMAD_SECRETS_DIR}/alertmanager.yaml",
           "--web.listen-address=${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}",
           "--web.external-url=https://alertmanager.local.salamon.xyz",
