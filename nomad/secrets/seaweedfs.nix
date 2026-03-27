@@ -23,6 +23,7 @@ let
     "memos"
     "stalwart"
     "loki"
+    "affine"
   ];
 in
 {

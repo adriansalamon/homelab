@@ -239,6 +239,11 @@ EOF
               "name": "loki",
               "credentials": [{ "accessKey": "loki", "secretKey": "{{ .loki_secret_key }}" }],
               "actions": ["Read:loki", "Write:loki", "List:loki", "Tagging:loki"]
+            },
+            {
+              "name": "affine",
+              "credentials": [{ "accessKey": "affine", "secretKey": "{{ .affine_secret_key }}" }],
+              "actions": ["Read:affine-blobs", "Write:affine-blobs", "List:affine-blobs", "Tagging:affine-blobs"]
             }
           ]
         }

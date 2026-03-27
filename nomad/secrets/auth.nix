@@ -90,5 +90,7 @@ in
     "linkwarden"
     "memos"
     "stalwart"
+    "affine"
+    "opengist"
   ] mkOidcSecret;
 }

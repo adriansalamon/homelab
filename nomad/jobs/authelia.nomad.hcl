@@ -8,7 +8,7 @@ job "authelia" {
       mode = "cni/nebula"
 
       port "http" {
-        static = 9091
+        static = 27353
       }
     }
 
@@ -41,7 +41,7 @@ job "authelia" {
               }
             ]
             inbound = [for group in ["reverse-proxy", "nomad-client"] : {
-              port  = "9091"
+              port  = "27353"
               proto = "tcp"
               group = group
             }]
@@ -345,6 +345,39 @@ identity_providers:
         access_token_signed_response_alg: 'none'
         userinfo_signed_response_alg: 'none'
         token_endpoint_auth_method: 'client_secret_basic'
+
+      - client_id: 'affine'
+        client_name: 'Affine'
+        client_secret: {{ .affine_oidc_client_secret }}
+        public: false
+        pre_configured_consent_duration: "3 months"
+        redirect_uris:
+          - 'https://affine.{{ $domain }}/oauth/callback'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+          - 'offline_access'
+        grant_types:
+          - 'authorization_code'
+          - 'refresh_token'
+        token_endpoint_auth_method: 'client_secret_post'
+
+      - client_id: 'opengist'
+        client_name: 'Opengist'
+        client_secret: {{ .opengist_oidc_client_secret }}
+        public: false
+        pre_configured_consent_duration: "3 months"
+        redirect_uris:
+          - 'https://gist.{{ $domain }}/oauth/openid-connect/callback'
+        scopes:
+          - 'openid'
+          - 'email'
+          - 'profile'
+          - 'groups'
+        grant_types:
+          - 'authorization_code'
+        token_endpoint_auth_method: 'client_secret_post'
 {{ end }}
 EOF
 
