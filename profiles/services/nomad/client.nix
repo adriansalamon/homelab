@@ -89,8 +89,8 @@ in
           read_only = false;
         };
 
-        host_volume."seaweedfs-staging" = {
-          path = "/var/run/seaweedfs-csi/staging";
+        host_volume."csi-data" = {
+          path = "/var/lib/nomad/client/csi";
           read_only = false;
         };
       };
