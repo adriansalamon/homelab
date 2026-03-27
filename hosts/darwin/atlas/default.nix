@@ -30,7 +30,7 @@
     nebula
     nil
     nixd
-    nixfmt-rfc-style
+    nixfmt
     nodejs
     nomad
     rage
