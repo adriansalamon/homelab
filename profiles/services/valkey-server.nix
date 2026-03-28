@@ -92,6 +92,9 @@ in
   };
 
   systemd.services.redis-server = {
+    after = [ "nebula@mesh.service" ];
+    requires = [ "nebula@mesh.service" ];
+
     serviceConfig.ExecStartPre = lib.mkAfter [
       (
         "+"
@@ -106,6 +109,9 @@ in
   };
 
   systemd.services.redis-sentinel = {
+    after = [ "nebula@mesh.service" ];
+    requires = [ "nebula@mesh.service" ];
+
     serviceConfig.ExecStartPre = lib.mkAfter [
       (
         "+"
