@@ -169,7 +169,9 @@ in
         (callPackage ./hass-components/hass-plejd.nix {
           pyplejd = (callPackage ./hass-components/pyplejd.nix { });
         })
-        (callPackage ./hass-components/wiim.nix { })
+        (callPackage ./hass-components/wiim.nix {
+          pywiim = (callPackage ./hass-components/pywiim.nix { });
+        })
         prometheus_sensor
       ];
 
@@ -183,7 +185,7 @@ in
         );
       };
 
-      lovelace.mode = "yaml";
+      lovelace.resource_mode = "yaml";
 
       frontend = {
         themes = "!include_dir_merge_named themes";

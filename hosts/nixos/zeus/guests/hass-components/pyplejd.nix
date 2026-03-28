@@ -1,23 +1,27 @@
 {
-  pkgs,
   lib,
   buildPythonPackage,
   fetchFromGitHub,
   setuptools,
+  aiohttp,
+  bleak,
+  bleak-retry-connector,
+  pydantic,
+  cryptography,
 }:
 
 buildPythonPackage {
   pname = "pyplejd";
-  version = "0.14.7";
+  version = "0.20.6";
 
   src = fetchFromGitHub {
     owner = "thomasloven";
     repo = "pyplejd";
-    rev = "e2b4e40c1dbb09bccb6c5e573f57b8309e48ab5c";
-    sha256 = "sha256-B9jHENiv60xCgPpKcV1ezj2n1bsSegCxtZfd3/cBwvo=";
+    rev = "ee8cde205b6b7557191e183f6657e489fc3b3149";
+    sha256 = "sha256-o9cUvtAUJgMGpqJ1KhTHkNYw1GvZ8zdQhNcmxoJ3k5g=";
   };
 
-  propagatedBuildInputs = with pkgs.python3Packages; [
+  propagatedBuildInputs = [
     aiohttp
     bleak
     bleak-retry-connector

@@ -1,19 +1,24 @@
 {
   buildHomeAssistantComponent,
   fetchFromGitHub,
+  pywiim,
 }:
 
 buildHomeAssistantComponent rec {
   owner = "mjcumming";
   domain = "wiim";
-  version = "0.2.18";
+  version = "1.0.74";
 
   src = fetchFromGitHub {
     inherit owner;
     repo = domain;
     tag = "v${version}";
-    hash = "sha256-9Z7xoOPvQh3aGVi6TPO82cBQUhqHTxf4gW5Nfo7Wg0k=";
+    hash = "sha256-HHseOX/FJzSnBLlwmXUFtWqUcebutpte0sZLfx62U70=";
   };
+
+  propagatedBuildInputs = [
+    pywiim
+  ];
 
   meta = {
     changelog = "https://github.com/mjcumming/wiim/releases/tag/v${version}";

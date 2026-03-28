@@ -2,22 +2,27 @@
   buildHomeAssistantComponent,
   fetchFromGitHub,
   pyplejd,
+  pydantic,
 }:
 
 buildHomeAssistantComponent rec {
   owner = "thomasloven";
   domain = "plejd";
-  version = "0.14.7";
+  version = "0.20.6";
 
   src = fetchFromGitHub {
     inherit owner;
     repo = "hass-plejd";
     tag = "v${version}";
-    hash = "sha256-nEwD48q2cOHHP8+4Rb83uyr8JbZXOa4Tvm9e0QbMllQ=";
+    hash = "sha256-lDDqFYCBsIWX4mICHX2MVVrfkSWiXmu8/G/OfSf4GKk=";
   };
 
   propagatedBuildInputs = [
     pyplejd
+  ];
+
+  dependencies = [
+    pydantic
   ];
 
   meta = {
