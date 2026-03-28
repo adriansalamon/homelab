@@ -374,10 +374,11 @@ variable "nomad_oidc_client_secret" {
 }
 
 resource "nomad_acl_auth_method" "authelia" {
-  name           = "authelia"
-  max_token_ttl  = "24h0m0s"
-  token_locality = "global"
-  type           = "OIDC"
+  name              = "authelia"
+  max_token_ttl     = "24h0m0s"
+  token_locality    = "global"
+  type              = "OIDC"
+  token_name_format = "authelia-$${value.username}"
   config {
     oidc_discovery_url = "https://auth.${var.domain}"
     oidc_client_id     = "nomad"
@@ -387,8 +388,9 @@ resource "nomad_acl_auth_method" "authelia" {
       "${var.nomad_url}/ui/settings/tokens",
       "http://localhost:4649/oidc/callback"
     ]
-    oidc_scopes    = ["openid", "profile", "groups"]
-    claim_mappings = { "sub" : "username" }
+    oidc_scopes         = ["openid", "profile", "groups"]
+    claim_mappings      = { "preferred_username" : "username" }
+    list_claim_mappings = { "groups" : "groups" }
   }
 }
 
