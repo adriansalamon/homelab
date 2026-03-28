@@ -19,7 +19,7 @@ job "kv-proxy" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/consul-kv-proxy:main-e5c6d46"
+        image = "ghcr.io/adriansalamon/consul-kv-proxy:main-a3e7f25"
         ports = ["http"]
       }
 
