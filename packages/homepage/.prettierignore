@@ -1,5 +1,0 @@
-# Package Managers
-pnpm-lock.yaml
-yarn.lock
-/src/lib/generatedApiClients
-/src/lib/apiSpecs

@@ -1,3 +1,3 @@
-### Hacky homepage
+## Homepage
 
-Hacky simple homepage, this is copied and modified from [brunostjohn](https://github.com/brunostjohn/homelab) homelab config for my needs.
+A simple homepage for self-hosted services. Automatic service discovery from file, e.g. from consul-template.

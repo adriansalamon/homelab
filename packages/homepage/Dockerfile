@@ -1,27 +1,32 @@
-FROM node:24-slim AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-COPY . /app
+# Build stage
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /build
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source
+COPY main.go ./
+
+# Build static binary
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-w -s" -o homepage .
+
+# Runtime stage
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
 WORKDIR /app
-RUN rm -rf node_modules
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod
+# Copy binary
+COPY --from=builder /build/homepage .
 
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
-RUN pnpm run build
+RUN adduser -D -u 1000 appuser
+USER appuser
 
-FROM node:24-slim
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-WORKDIR /app
+# Copy templates
+COPY templates ./templates
 
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/build /app/build
-COPY package.json /app/
-
-EXPOSE 3000
-CMD [ "node", "build/index.js" ]
+CMD ["./homepage"]

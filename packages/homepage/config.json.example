@@ -1,0 +1,20 @@
+{
+  "services": [
+    {
+      "id": "jellyfin",
+      "url": "https://jellyfin.example.com",
+    },
+    {
+      "id": "grafana",
+      "url": "https://grafana.local.example.com",
+    },
+    {
+      "id": "memos",
+      "url": "https://memos.example.com",
+    },
+    {
+      "id": "opengist",
+      "url": "https://gist.example.com"
+    }
+  ]
+}

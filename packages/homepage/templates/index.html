@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Services</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+            rel="stylesheet"
+        />
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: [
+                                "-apple-system",
+                                "BlinkMacSystemFont",
+                                "Inter",
+                                "Segoe UI",
+                                "sans-serif",
+                            ],
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            body {
+                font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+            }
+            @media (prefers-color-scheme: dark) {
+                html {
+                    color-scheme: dark;
+                }
+            }
+            .service-link {
+                transition: all 0.15s ease;
+            }
+
+            .service-link:hover {
+                transform: translateX(4px);
+            }
+            .service-icon {
+                transition: opacity 0.15s ease;
+            }
+            .service-link:hover .service-icon {
+                opacity: 1;
+            }
+        </style>
+    </head>
+    <body
+        class="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200"
+    >
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <header class="mt-24 mb-8 px-4 md:px-0">
+                <h1
+                    class="text-4xl sm:text-5xl font-semibold tracking-tight mb-3"
+                >
+                    Services
+                </h1>
+                <p class="text-lg text-neutral-600 dark:text-neutral-400">
+                    Self-hosted applications and tools
+                </p>
+            </header>
+
+            <!-- Services by Category -->
+            <main class="px-4 md:px-0 flex flex-col gap-4">
+                {{range .Categories}}
+                <section>
+                    <h2
+                        class="text-xl font-semibold tracking-tight mb-2 text-neutral-800 dark:text-neutral-300 capitalize"
+                    >
+                        {{.}}
+                    </h2>
+
+                    <ul class="space-y-1 grid md:grid-cols-2">
+                        {{range (index $.Services .)}}
+                        <li>
+                            <a
+                                href="{{.URL}}{{.Path}}"
+                                class="service-link group flex items-start gap-4 py-3 px-4 -mx-4 md:mx-0 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/50"
+                            >
+                                <!-- Icon -->
+                                <div class="shrink-0 mt-1">
+                                    {{if eq .Icon "none"}}
+                                    <div
+                                        class="w-5 h-5 rounded bg-neutral-200 dark:bg-neutral-800"
+                                    ></div>
+                                    {{else if .Icon}}
+                                    <!-- Light mode icon -->
+                                    <img
+                                        src="{{.Icon}}"
+                                        alt="{{.Name}} icon"
+                                        class="service-icon w-5 h-5 group-hover:opacity-100 {{if .IconDark}}dark:hidden inline{{end}}"
+                                        loading="lazy"
+                                    />
+                                    {{else}}
+                                    <img
+                                        src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/{{ lower .Name}}.svg"
+                                        alt="{{.Name}} icon"
+                                        class="service-icon w-5 h-5 group-hover:opacity-100 {{if .IconDark}}dark:hidden inline{{end}}"
+                                        loading="lazy"
+                                    />
+                                    {{end}} {{if .IconDark}}
+                                    <!-- Dark mode icon -->
+                                    <img
+                                        src="{{.IconDark}}"
+                                        alt="{{.Name}} icon"
+                                        class="service-icon w-5 h-5 group-hover:opacity-100 dark:inline hidden"
+                                        loading="lazy"
+                                    />
+                                    {{end}}
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline gap-3">
+                                        <h3
+                                            class="font-medium text-neutral-900 dark:text-neutral-300"
+                                        >
+                                            {{.Name}}
+                                        </h3>
+                                    </div>
+
+                                    {{if .Description}}
+                                    <p
+                                        class="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5"
+                                    >
+                                        {{.Description}}
+                                    </p>
+                                    {{end}}
+                                </div>
+
+                                <!-- Arrow indicator -->
+                                <div
+                                    class="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <svg
+                                        class="w-4 h-4 text-neutral-400"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 5l7 7-7 7"
+                                        />
+                                    </svg>
+                                </div>
+                            </a>
+                        </li>
+                        {{end}}
+                    </ul>
+                </section>
+                {{end}}
+            </main>
+
+            <!-- Footer -->
+            <footer
+                class="mt-24 pt-8 border-t border-neutral-200 dark:border-neutral-800 px-4 md:px-0 pb-16"
+            >
+                <p
+                    class="text-sm flex flex-row gap-2 text-neutral-500 dark:text-neutral-500"
+                >
+                    <span>
+                        {{$total := 0}}{{range .Categories}}{{$total = add
+                        $total (len (index $.Services .))}}{{end}}{{$total}}
+                        services
+                    </span>
+                    <span>•</span>
+                    <span>{{len .Categories}} categories </span>
+                    <span>•</span>
+                    <a
+                        href="https://github.com/adriansalamon/homelab"
+                        class="hover:underline"
+                    >
+                        Source
+                    </a>
+                </p>
+            </footer>
+        </div>
+    </body>
+</html>

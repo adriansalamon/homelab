@@ -1,0 +1,26 @@
+# Service metadata configuration
+# Each service ID should match the json service name
+
+[jellyfin]
+name = "Jellyfin"
+description = "Movies, TV shows, and music"
+category = "entertainment"
+
+[grafana]
+name = "Grafana"
+description = "Metrics and monitoring"
+category = "management"
+# explicitly set icon url
+icon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/grafana.svg"
+
+[memos]
+name = "Memos"
+description = "Note-taking and journaling"
+category = "productivity"
+
+[opengist]
+name = "Opengist"
+description = "Self-hosted pastebin"
+category = "productivity"
+# shown when dark mode is enabled
+icon_dark = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/opengist-light.svg"
