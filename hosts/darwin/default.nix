@@ -5,7 +5,12 @@
 }:
 {
 
-  system.stateVersion = 5;
+  system = {
+    stateVersion = 5;
+    primaryUser = "asalamon";
+  };
+
+  networking.hostName = "atlas";
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
@@ -18,12 +23,11 @@
     inherit (inputs.self.secretsConfig) masterIdentities;
 
     storageMode = "local";
-    hostPubkey = "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq"; # this is a dummy key
+    hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOB8IHga1YmPPxMGRzmcX08aAf34Szmt9HLsohZd/CBW";
     generatedSecretsDir = inputs.self.outPath + "/secrets/generated/atlas";
     localStorageDir = inputs.self.outPath + "/secrets/rekeyed/atlas";
   };
 
-  system.primaryUser = "asalamon";
   nixpkgs.config.allowUnfree = true;
 
   nix = {

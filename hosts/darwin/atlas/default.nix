@@ -32,7 +32,7 @@
     nixd
     nixfmt
     nodejs
-    nomad
+    nomad_1_11
     rage
     restic
     tldr

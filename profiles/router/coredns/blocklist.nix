@@ -20,7 +20,7 @@
       version = "96a074674af3b2089a6f62a8fb3ef46a50503558";
       position.before = "forward";
     };
-    vendorHash = "sha256-b7UEtZrHDFb/Wot4WI/sbooUkpxSF9dzlElGL7CM1Sc=";
+    vendorHash = "sha256-YfEvRrlIIzHws37VefKWKfKG8GGthjdp/yMsAD/EOGQ=";
   };
 
   systemd.services.blocklist-downloader = {
