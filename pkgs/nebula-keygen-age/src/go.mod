@@ -2,7 +2,7 @@ module github.com/adriansalamon/nebula-keygen-age
 
 go 1.25
 
-toolchain go1.26.0
+toolchain go1.26.1
 
 require (
 	github.com/slackhq/nebula v1.10.2
