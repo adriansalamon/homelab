@@ -42,7 +42,7 @@ job "loki" {
       }
 
       config {
-        image = "grafana/loki:3.6"
+        image = "grafana/loki:3.7"
         args  = ["-config.file=${NOMAD_ALLOC_DIR}/loki.yaml", "-config.expand-env"]
       }
 
