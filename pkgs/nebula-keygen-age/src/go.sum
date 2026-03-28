@@ -1,3 +1,5 @@
+filippo.io/bigmod v0.1.0 h1:UNzDk7y9ADKST+axd9skUpBQeW7fG2KrTZyOE4uGQy8=
+filippo.io/bigmod v0.1.0/go.mod h1:OjOXDNlClLblvXdwgFFOQFJEocLhhtai8vGLy0JCZlI=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
@@ -10,6 +12,8 @@ github.com/slackhq/nebula v1.10.0 h1:uhu4Cpzw3pXyDJ8G1fMSppsvG7aE9XCt4UaauggHax0
 github.com/slackhq/nebula v1.10.0/go.mod h1:PmYcyoGhAX4X8lCzJjGv7aLTBbFbPy7QeWbpwWvJf+Y=
 github.com/slackhq/nebula v1.10.2 h1:gaeEEcJ7thW0Yirp59H1wND246YYj3S9RXV059loJnw=
 github.com/slackhq/nebula v1.10.2/go.mod h1:UloLC5/KuYkNyxD4qki4Zl3t/Wh78aTA5cE8xyyZR4c=
+github.com/slackhq/nebula v1.10.3 h1:EstYj8ODEcv6T0R9X5BVq1zgWZnyU5gtPzk99QF1PMU=
+github.com/slackhq/nebula v1.10.3/go.mod h1:IL5TUQm4x9IFx2kCKPYm1gP47pwd5b8QGnnBH2RHnvs=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 golang.org/x/crypto v0.45.0 h1:jMBrvKuj23MTlT0bQEOBcAE0mjg8mK9RXFhRH6nyF3Q=
