@@ -2,6 +2,7 @@
   pkgs,
   inputs,
   decryptIdentity,
+  ...
 }:
 let
   inherit (pkgs.lib)
@@ -10,6 +11,8 @@ let
     groupBy
     mapAttrsToList
     ;
+
+  nomadPkg = pkgs.nomad_1_11;
 
   nomadHomeConfig = inputs.self.homeConfigurations."nomad".config;
 
@@ -36,10 +39,10 @@ in
   program = getExe (
     pkgs.writeShellApplication {
       name = "provision-nomad-secrets";
-      runtimeInputs = with pkgs; [
-        nomad
-        rage
-        jq
+      runtimeInputs = [
+        pkgs.rage
+        pkgs.jq
+        nomadPkg
       ];
       text =
         let
@@ -64,7 +67,7 @@ in
               ${decryptSecrets}
               echo "}" >> "$tmpfile"
 
-              cat "$tmpfile" | ${pkgs.nomad}/bin/nomad var put -in hcl -force ${nomadPath} -
+              cat "$tmpfile" | ${pkgs.lib.getExe nomadPkg} var put -in hcl -force ${nomadPath} -
             '';
 
         in

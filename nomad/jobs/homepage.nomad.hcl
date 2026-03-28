@@ -71,6 +71,11 @@ name = "Paperless"
 description = "Document management system"
 category = "productivity"
 
+[linkding]
+name = "Linkding"
+description = "Bookmark and link manager"
+category = "productivity"
+
 # Development & Code
 [forgejo]
 name = "Forgejo"
