@@ -15,7 +15,7 @@ job "linkwarden" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/linkwarden/linkwarden:v2.13.5"
+        image = "ghcr.io/linkwarden/linkwarden:v2.14.0"
       }
 
       meta {
