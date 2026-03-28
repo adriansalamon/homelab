@@ -42,7 +42,7 @@ job "loki" {
       }
 
       config {
-        image = "grafana/loki:3.6"
+        image = "grafana/loki:3.7"
         args  = ["-config.file=${NOMAD_ALLOC_DIR}/loki.yaml", "-config.expand-env"]
       }
 
@@ -120,7 +120,7 @@ EOF
       driver = "docker"
 
       config {
-        image = "nginx:1.28.3-alpine"
+        image = "nginx:1.29.7-alpine"
         ports = ["http"]
         volumes = [
           "local/nginx.conf:/etc/nginx/nginx.conf",

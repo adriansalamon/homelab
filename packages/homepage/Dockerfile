@@ -1,5 +1,5 @@
 # CSS build stage
-FROM node:22-alpine AS css-builder
+FROM node:24-alpine AS css-builder
 
 WORKDIR /build
 

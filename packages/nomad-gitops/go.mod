@@ -3,11 +3,11 @@ module nomad-gitops
 go 1.25.5
 
 require (
-	github.com/caarlos0/env/v11 v11.3.1
+	github.com/caarlos0/env/v11 v11.4.0
 	github.com/go-git/go-git/v5 v5.17.0
 	github.com/gregdel/pushover v1.4.0
 	github.com/hashicorp/consul/api v1.33.2
-	github.com/hashicorp/nomad/api v0.0.0-20260226211936-d304b7de5d67
+	github.com/hashicorp/nomad/api v0.0.0-20260325144059-0c3fa0187887
 )
 
 require (
