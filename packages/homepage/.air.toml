@@ -4,14 +4,14 @@ tmp_dir = "tmp"
 
 [build]
   bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main ."
+  cmd = "npx @tailwindcss/cli -i ./styles.css -o ./static/styles.css --minify && go build -o ./tmp/main ."
   delay = 1000
-  exclude_dir = ["tmp"]
+  exclude_dir = ["tmp", "node_modules", "static"]
   exclude_file = []
   exclude_regex = ["_test\\.go"]
   exclude_unchanged = true
   follow_symlink = false
-  include_ext = ["go", "html", "toml", "json"]
+  include_ext = ["go", "html", "toml", "json", "css"]
   include_dir = []
   kill_delay = "0s"
   log = "build-errors.log"

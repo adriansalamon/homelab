@@ -3,54 +3,8 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Services</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
-            rel="stylesheet"
-        />
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        fontFamily: {
-                            sans: [
-                                "-apple-system",
-                                "BlinkMacSystemFont",
-                                "Inter",
-                                "Segoe UI",
-                                "sans-serif",
-                            ],
-                        },
-                    },
-                },
-            };
-        </script>
-        <style>
-            body {
-                font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-            }
-            @media (prefers-color-scheme: dark) {
-                html {
-                    color-scheme: dark;
-                }
-            }
-            .service-link {
-                transition: all 0.15s ease;
-            }
-
-            .service-link:hover {
-                transform: translateX(4px);
-            }
-            .service-icon {
-                transition: opacity 0.15s ease;
-            }
-            .service-link:hover .service-icon {
-                opacity: 1;
-            }
-        </style>
+        <title>Home</title>
+        <link rel="stylesheet" href="/static/styles.css" />
     </head>
     <body
         class="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200"
@@ -178,7 +132,7 @@
                     <span>{{len .Categories}} categories </span>
                     <span>•</span>
                     <a
-                        href="https://github.com/adriansalamon/homelab"
+                        href="https://github.com/adriansalamon/homelab/tree/main/packages/homepage"
                         class="hover:underline"
                     >
                         Source

@@ -171,6 +171,7 @@ func main() {
 	}()
 
 	// HTTP server
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.Handle("/", config)
 
 	addr := os.Getenv("ADDR")

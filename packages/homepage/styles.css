@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+
+@import "tailwindcss";
+
+/* Import Google Fonts */
+
+@theme {
+    /* Tailwind v4 theme customization goes here */
+    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        color-scheme: dark;
+    }
+}
+
+.service-link {
+    transition: all 0.15s ease;
+}
+
+.service-link:hover {
+    transform: translateX(4px);
+}
+
+.service-icon {
+    transition: opacity 0.15s ease;
+}
+
+.service-link:hover .service-icon {
+    opacity: 1;
+}

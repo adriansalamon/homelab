@@ -12,3 +12,5 @@ config.json
 *.swo
 
 tmp/
+node_modules/
+static/
