@@ -54,6 +54,7 @@ job "it-tools" {
 
 
       service {
+        name    = "it-tools"
         port    = "http"
         address = "${NOMAD_ALLOC_IP_http}"
 
