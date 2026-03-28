@@ -19,6 +19,7 @@ job "homepage" {
 
       env {
         ADDR = "${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}"
+        CONFIG_DIR = "${NOMAD_ALLOC_DIR}/config"
       }
 
       meta {
@@ -239,7 +240,7 @@ category = "tools"
 icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/it-tools.svg"
 
 EOH
-        destination   = "/app/services.toml"
+        destination   = "${NOMAD_ALLOC_DIR}/config/services.toml"
       }
 
       # Discovered services (dynamic from Consul)
@@ -276,10 +277,20 @@ EOH
   ]
 }
 EOH
-        destination   = "/app/config.json"
+        destination   = "${NOMAD_ALLOC_DIR}/config/config.json"
         change_mode   = "signal"
         change_signal = "SIGHUP" # reload on change
       }
+
+
+      template {
+        data        = <<EOF
+        DOMAIN="{{ key "config/domains/main" }}"
+        EOF
+        destination = "local/domain.env"
+        env         = true
+      }
+
 
       service {
         name    = "homepage"
@@ -288,8 +299,7 @@ EOH
 
         tags = [
           "traefik.enable=true",
-          "traefik.http.routers.homepage.rule=Host(`home.${PUBLIC_DOMAIN}`) || Host(`home.local.${PUBLIC_DOMAIN}`)",
-          "traefik.http.routers.homepage.middlewares=authelia"
+          "traefik.http.routers.homepage.rule=Host(`home.${DOMAIN}`) || Host(`home.local.${DOMAIN}`)"
         ]
       }
 

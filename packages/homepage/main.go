@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
 	"sync"
 	"syscall"
 
@@ -50,9 +51,15 @@ func (c *Config) Load() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	// Get config paths from env or use defaults
+	configDirPath := os.Getenv("CONFIG_DIR")
+	if configDirPath == "" {
+		configDirPath = "."
+	}
+
 	// Load metadata with order preservation
 	var metadata map[string]ServiceMeta
-	metaData, err := toml.DecodeFile("services.toml", &metadata)
+	metaData, err := toml.DecodeFile(path.Join(configDirPath, "services.toml"), &metadata)
 	if err != nil {
 		return err
 	}
@@ -66,7 +73,7 @@ func (c *Config) Load() error {
 	}
 
 	// Load discovered services
-	data, err := os.ReadFile("config.json")
+	data, err := os.ReadFile(path.Join(configDirPath, "config.json"))
 	if err != nil {
 		return err
 	}
