@@ -26,11 +26,14 @@ let
 
 in
 {
-  imports = with profiles; [
+  imports = with profiles.router; [
     ./external-vpn.nix
     ./dns.nix
-    router.dhcp
-    router.tailscale
+    dhcp
+    nebula
+    monitoring
+    tailscale
+    dyndns
   ];
 
   boot.kernel.sysctl = {

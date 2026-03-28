@@ -26,8 +26,6 @@ in
     services.traefik
     services.valkey-server
     services.seaweedfs.master
-    router.nebula
-    router.monitoring
     auto-update
   ];
 
@@ -95,12 +93,6 @@ in
       generator.dependencies = [ config.age.secrets.traefik-token ];
       generator.script = lib.helpers.generateWithEnv "TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_TOKEN";
     };
-  };
-
-  services.cloudflare-dyndns = {
-    enable = true;
-    apiTokenFile = config.age.secrets.cloudflare-dns-api-token.path;
-    domains = [ "olympus.site.${globals.domains.main}" ];
   };
 
   system.stateVersion = "24.11";

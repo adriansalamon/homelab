@@ -20,6 +20,7 @@ in
     firewall-common
     nebula
     tailscale
+    dyndns
   ];
 
   networking.hostId = "2a48ff8c";
