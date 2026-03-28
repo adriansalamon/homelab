@@ -1,5 +1,4 @@
 {
-  nodes,
   profiles,
   ...
 }:

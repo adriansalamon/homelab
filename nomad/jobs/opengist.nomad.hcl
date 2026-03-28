@@ -90,7 +90,7 @@ EOF
 
         tags = [
           "traefik.enable=true",
-          #"traefik.external=true",
+          "traefik.external=true",
           "traefik.http.routers.opengist.rule=Host(`gist.${DOMAIN}`)",
           "traefik.http.routers.opengist.entrypoints=websecure"
         ]
