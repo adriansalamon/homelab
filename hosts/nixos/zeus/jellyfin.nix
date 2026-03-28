@@ -62,9 +62,11 @@ in
       "traefik.external=true"
       "traefik.http.routers.jellyfin.rule=Host(`jellyfin.${globals.domains.main}`)"
       "traefik.http.routers.jellyfin.middlewares=jellyfin-mw,jellyfin-auth"
+      "traefik.http.routers.jellyfin.entryPoints=websecure"
       # WebOS does not like the X-Frame-Options=SAMEORIGIN
       "traefik.http.routers.jellyfin-webos.rule=Host(`jellyfin.${globals.domains.main}`) && HeaderRegexp(`User-Agent`, `Web0S`)"
       "traefik.http.routers.jellyfin-webos.middlewares=jellyfin-mw,jellyfin-webos-mw"
+      "traefik.http.routers.jellyfin-webos.entryPoints=websecure"
       "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
       "traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true"
       "traefik.http.middlewares.jellyfin-mw.headers.SSLHost=jellyfin.${globals.domains.main}"

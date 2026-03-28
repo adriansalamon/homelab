@@ -20,6 +20,9 @@ let
         log
         errors
 
+        # Exception: traefik-external.local.<domain> → falls through to second rule behavior
+        rewrite stop name regex traefik-external\.local\.${lib.escapeRegex globals.domains.main} traefik-${config.node.site}.service.consul answer auto
+
         # First: rewrite traefik-<site>.local.<domain> → traefik-<site>.service.consul
         rewrite stop name regex traefik-(.*)\.local\.${lib.escapeRegex globals.domains.main} traefik-{1}.service.consul answer auto
 

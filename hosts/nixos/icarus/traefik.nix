@@ -100,6 +100,8 @@
     };
   };
 
+  # We only want to expose admin ui from internal network, so we make it reachable
+  # only from other reverse proxies on port 1010.
   consul.services.traefik-external = {
     port = 1010;
     tags = [

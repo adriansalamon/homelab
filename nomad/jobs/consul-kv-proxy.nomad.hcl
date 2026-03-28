@@ -69,6 +69,7 @@ job "kv-proxy" {
           "traefik.enable=true",
           "traefik.external=true",
           "traefik.http.routers.kv-proxy.rule=Host(`kv-proxy.${DOMAIN}`)",
+          "traefik.http.routers.kv-proxy.entryPoints=websecure",
         ]
       }
     }
