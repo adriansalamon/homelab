@@ -20,7 +20,7 @@ in
 
   services.nomad = {
     enable = true;
-    package = pkgs.nomad;
+    package = pkgs.nomad_1_11;
     dropPrivileges = false;
 
     settings = {
