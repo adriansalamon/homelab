@@ -2,11 +2,11 @@ terraform {
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 4.0"
+      version = "5.19.0-beta.3"
     }
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
     hcloud = {
       source  = "hetznercloud/hcloud"
@@ -29,6 +29,11 @@ provider "aws" {
 
 provider "hcloud" {
   token = var.hcloud_token
+}
+
+provider "cloudflare" {
+  api_key = var.cloudflare_api_token
+  email   = var.cloudflare_email
 }
 
 resource "aws_iam_user" "smtp_user" {
@@ -57,17 +62,24 @@ resource "aws_iam_user_policy_attachment" "ses_attachment" {
   policy_arn = aws_iam_policy.ses_sender.arn
 }
 
-data "cloudflare_api_token_permission_groups" "all" {}
+data "cloudflare_accounts" "main" {}
+
+data "cloudflare_account_api_token_permission_groups_list" "all" {
+  account_id = data.cloudflare_accounts.main.result[0].id
+}
+
+
+locals {
+  dns_permissions = {
+    for x in data.cloudflare_account_api_token_permission_groups_list.all.result :
+    x.name => x.id
+    if contains(["DNS Write"], x.name)
+  }
+}
+
+
 resource "cloudflare_api_token" "acme_dns_challenge" {
   name = "acme token"
-  policy {
-    permission_groups = [
-      data.cloudflare_api_token_permission_groups.all.zone["DNS Write"],
-    ]
-    resources = {
-      "com.cloudflare.api.account.zone.*" = "*"
-    }
-  }
   provisioner "local-exec" {
     command     = <<BASH
       filename="hosts/nixos/athena/secrets/cloudflare-dns-api-token.env"
@@ -78,6 +90,15 @@ resource "cloudflare_api_token" "acme_dns_challenge" {
     BASH
     working_dir = "."
   }
+  policies = [{
+    resources = jsonencode({
+      "com.cloudflare.api.account.zone.*" = "*"
+    })
+    effect = "allow"
+    permission_groups = [{
+      id = local.dns_permissions["DNS Write"]
+    }]
+  }]
 }
 
 resource "hcloud_network" "main" {
