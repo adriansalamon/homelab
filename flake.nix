@@ -57,6 +57,16 @@
       url = "github:adriansalamon/nebula-nomad-cni";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-nomad = {
+      url = "github:tristanpemble/nix-nomad";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    terranix = {
+      url = "github:terranix/terranix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -75,6 +85,7 @@
         ./nix/apps.nix
         ./nix/global.nix
         ./nix/nomad.nix
+        ./nix/terraform-jobs.nix
       ];
     };
 }

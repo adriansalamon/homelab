@@ -114,14 +114,20 @@
           middlewares = [ "authelia@consulcatalog" ];
         };
 
+        routers.consul = {
+          rule = "Host(`consul.local.${globals.domains.main}`) && PathPrefix(`/v1`)";
+          entryPoints = [ "websecure" ];
+          service = "consul";
+        };
+
         routers.consulUi = {
           rule = "Host(`consul.local.${globals.domains.main}`)";
           entryPoints = [ "websecure" ];
-          service = "consul-ui";
+          service = "consul";
           middlewares = [ "authelia@consulcatalog" ];
         };
 
-        services.consul-ui = {
+        services.consul = {
           loadBalancer.servers.local = {
             url = "http://127.0.0.1:8500";
           };

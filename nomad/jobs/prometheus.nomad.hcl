@@ -11,7 +11,7 @@ job "prometheus" {
     }
 
     ephemeral_disk {
-      size    = 100
+      size    = 300
       sticky  = true
       migrate = true
     }

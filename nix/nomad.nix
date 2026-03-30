@@ -4,6 +4,42 @@
     inputs.home-manager.flakeModules.home-manager
   ];
 
+  # Nomad jobs derivation
+  perSystem =
+    {
+      pkgs,
+      ...
+    }:
+    let
+      jobsConfig = inputs.nix-nomad.lib.mkNomadJobs {
+        inherit pkgs;
+
+        config = builtins.attrValues (pkgs.lib.rakeLeaves ../nomad/jobs);
+
+        extraArgs = {
+          # helper functions for job files
+          helpers = import ../nomad/lib/helpers.nix {
+            lib = pkgs.lib;
+            inherit (inputs.self) globals;
+          };
+
+          inherit (inputs.self) globals;
+        };
+      };
+    in
+    {
+      packages.nomad-jobs =
+        pkgs.runCommand "nomad-jobs"
+          {
+            _ = jobsConfig; # Ensure jobsConfig derivation is built
+          }
+          ''
+            mkdir -p $out
+            cp -r ${jobsConfig}/. $out/
+            echo $out
+          '';
+    };
+
   flake =
     { config, lib, ... }:
     let

@@ -23,7 +23,7 @@ jobs:
       - uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
         id: filter-rules
         with:
-          cmd: "jq 'map_values(., . | to_entries | map(.value))' .github/workflows/services.json -r -c"
+          cmd: "jq 'map_values([.path])' .github/workflows/services.json -r -c"
 
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
         id: filter
