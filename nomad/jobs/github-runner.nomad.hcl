@@ -32,7 +32,7 @@ job "github-runner" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/adriansalamon/github-runner:main-4b09750"
+        image = "ghcr.io/adriansalamon/github-runner:self-hosted-runner-e2089d1"
       }
 
       volume_mount {

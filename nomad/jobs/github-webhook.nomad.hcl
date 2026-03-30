@@ -35,7 +35,7 @@ job "github-webhook" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/github-runner-webhook:main-4b09750"
+        image = "ghcr.io/adriansalamon/github-runner-webhook:self-hosted-runner-4b09750"
 
         ports = ["http"]
       }
@@ -45,7 +45,7 @@ job "github-webhook" {
         GITHUB_ORG         = "adriansalamon"
         GITHUB_REPO        = "homelab"
         NOMAD_JOB_TEMPLATE = "github-runner"
-        PORT               = "${NOMAD_PORT_http}"
+        ADDR               = ":${NOMAD_PORT_http}"
       }
 
       # Get secrets from Nomad variables

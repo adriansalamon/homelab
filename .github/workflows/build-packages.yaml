@@ -105,7 +105,7 @@ jobs:
           cat <<EOF > build-results/${{ matrix.service }}.json
           {
             "service": "${{ matrix.service }}",
-            "tag": "main-${{ env.SHORT_SHA }}",
+            "tag": "${{branch}}-${{ env.SHORT_SHA }}",
             "job_file": "${{ steps.job-file.outputs.value }}",
             "image": "ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}",
             "digest": "${{ steps.build-push.outputs.digest }}"
