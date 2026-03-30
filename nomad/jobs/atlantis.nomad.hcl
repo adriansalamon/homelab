@@ -143,15 +143,26 @@ EOF
       }
 
       service {
-        name    = "atlantis"
+        name    = "atlantis-pub"
         port    = "http"
         address = "${NOMAD_ALLOC_IP_http}"
 
         tags = [
           "traefik.enable=true",
           "traefik.external=true",
+          "traefik.http.routers.atlantis-pub.rule=Host(`atlantis.${DOMAIN}`) && Path(`/events`)",
+          "traefik.http.routers.atlantis-pub.entrypoints=websecure"
+        ]
+      }
+
+      service {
+        name    = "atlantis"
+        port    = "http"
+        address = "${NOMAD_ALLOC_IP_http}"
+
+        tags = [
+          "traefik.enable=true",
           "traefik.http.routers.atlantis.rule=Host(`atlantis.${DOMAIN}`)",
-          "traefik.http.routers.atlantis.entrypoints=websecure"
         ]
       }
     }
