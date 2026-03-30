@@ -13,7 +13,7 @@ job "homepage" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/adriansalamon/homepage:main-6357106"
+        image = "ghcr.io/adriansalamon/homepage:main-31c6cab"
         ports = ["http"]
       }
 
