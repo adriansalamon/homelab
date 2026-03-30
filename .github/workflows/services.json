@@ -10,5 +10,9 @@
   "nomad-gitops": {
     "path": "packages/nomad-gitops/**",
     "job_file": "nomad/jobs/nomad-gitops.nomad.hcl"
+  },
+  "atlantis": {
+    "path": "packages/atlantis/**",
+    "job_file": "nomad/jobs/atlantis.nomad.hcl"
   }
 }
