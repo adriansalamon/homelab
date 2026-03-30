@@ -4,7 +4,7 @@ version: 3
 # This prevents Atlantis from auto-detecting terraform/infra as a separate project
 projects:
   - dir: .
-    workspace: terraform-jobs
+    workspace: default
     workflow: terraform-jobs
 
     autoplan:
