@@ -155,6 +155,11 @@ resource "consul_acl_policy" "atlantis" {
 key_prefix "terraform/" {
   policy = "write"
 }
+
+# Session write for state locking
+session_prefix "" {
+  policy = "write"
+}
 EOT
 }
 
