@@ -18,7 +18,7 @@ job "homepage" {
       }
 
       env {
-        ADDR = "${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}"
+        ADDR       = "${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}"
         CONFIG_DIR = "${NOMAD_ALLOC_DIR}/config"
       }
 
@@ -45,7 +45,7 @@ job "homepage" {
 
       # Service metadata (static, edit to add/remove services)
       template {
-        data = <<EOH
+        data        = <<EOH
 # Service metadata configuration
 
 # Productivity & Knowledge
@@ -245,12 +245,12 @@ category = "tools"
 icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/it-tools.svg"
 
 EOH
-        destination   = "${NOMAD_ALLOC_DIR}/config/services.toml"
+        destination = "${NOMAD_ALLOC_DIR}/config/services.toml"
       }
 
       # Discovered services (dynamic from Consul)
       template {
-        data = <<EOH
+        data          = <<EOH
 {{ $domain := key "config/domains/main" }}
 {
   "services": [
