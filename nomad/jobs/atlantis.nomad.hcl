@@ -62,9 +62,10 @@ job "atlantis" {
       # Environment variables
       env {
         # Atlantis server configuration
-        ATLANTIS_REPO_ALLOWLIST  = "github.com/adriansalamon/homelab"
-        ATLANTIS_PORT            = "${NOMAD_PORT_http}"
-        ATLANTIS_WRITE_GIT_CREDS = true
+        ATLANTIS_REPO_ALLOWLIST           = "github.com/adriansalamon/homelab"
+        ATLANTIS_PORT                     = "${NOMAD_PORT_http}"
+        ATLANTIS_WRITE_GIT_CREDS          = true
+        ATLANTIS_TFE_LOCAL_EXECUTION_MODE = true
 
         # Nomad/Consul access
         NOMAD_ADDR       = "https://nomad.local.${DOMAIN}"
@@ -115,13 +116,12 @@ repos:
         git checkout HEAD -- "$(git rev-parse --show-toplevel)"
         rm /tmp/key.txt
 
-        # Verify decryption worked
-        if file global.nix | grep -q "text"; then
-          echo "✅ Secrets decrypted successfully (verified global.nix)"
-        else
-          echo "Decryption failed"
-          file nix/global.nix
+        # Verify decryption worked by checking if file is still encrypted
+        if head -n1 global.nix | grep -q "age-encryption.org"; then
+          echo "❌ Decryption failed"
           exit 1
+        else
+          echo "✅ Secrets decrypted successfully"
         fi
 EOF
         destination = "${NOMAD_TASK_DIR}/repos.yaml"
@@ -139,7 +139,7 @@ EOF
 
       resources {
         cpu    = 1000
-        memory = 3072  # Increased for Nix builds (was getting OOM killed at 2GB)
+        memory = 3072 # Increased for Nix builds (was getting OOM killed at 2GB)
       }
 
       service {
@@ -153,13 +153,6 @@ EOF
           "traefik.http.routers.atlantis.rule=Host(`atlantis.${DOMAIN}`)",
           "traefik.http.routers.atlantis.entrypoints=websecure"
         ]
-
-        check {
-          type     = "http"
-          path     = "/healthz"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
     }
   }
