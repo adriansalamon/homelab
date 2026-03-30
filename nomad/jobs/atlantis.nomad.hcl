@@ -97,16 +97,17 @@ EOF
       }
 
       # Server-side repo configuration
+      # Note: Workflows are defined in atlantis.yaml in the repo
       template {
         data        = <<EOF
 repos:
 - id: github.com/adriansalamon/homelab
   allow_custom_workflows: true
   allowed_overrides: [workflow, apply_requirements]
-  workflow: terraform-jobs
 
   pre_workflow_hooks:
     - run: |
+        echo "🔐 Decrypting age-encrypted files..."
         echo "$AGECRYPT_KEY" | base64 -d > /tmp/key.txt
         nix run nixpkgs#git-agecrypt init
         nix run nixpkgs#git-agecrypt config -- add -i /tmp/key.txt
@@ -114,15 +115,14 @@ repos:
         git checkout HEAD -- "$(git rev-parse --show-toplevel)"
         rm /tmp/key.txt
 
-workflows:
-  terraform-jobs:
-    plan:
-      steps:
-      - run: nix run .#terraform-jobs.plan -- -out=plan.tfplan
-
-    apply:
-      steps:
-      - run: nix run .#terraform-jobs.apply -- plan.tfplan
+        # Verify decryption worked
+        if file global.nix | grep -q "text"; then
+          echo "✅ Secrets decrypted successfully (verified global.nix)"
+        else
+          echo "Decryption failed"
+          file nix/global.nix
+          exit 1
+        fi
 EOF
         destination = "${NOMAD_TASK_DIR}/repos.yaml"
         perms       = "0644"
@@ -138,8 +138,8 @@ EOF
       }
 
       resources {
-        cpu    = 500
-        memory = 1024
+        cpu    = 1000
+        memory = 3072  # Increased for Nix builds (was getting OOM killed at 2GB)
       }
 
       service {
