@@ -20,7 +20,7 @@ job "atlantis" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/adriansalamon/atlantis:latest"
+        image = "ghcr.io/adriansalamon/atlantis:main-994244f"
         ports = ["http"]
 
         # Use server-side repo config
