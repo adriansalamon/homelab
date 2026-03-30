@@ -93,6 +93,21 @@ in
           path = "/var/lib/nomad/client/csi";
           read_only = false;
         };
+
+        host_volume."nix-store" = {
+          path = "/nix/store";
+          read_only = true;
+        };
+
+        host_volume."nix-daemon-socket" = {
+          path = "/nix/var/nix/daemon-socket";
+          read_only = false;
+        };
+
+        host_volume."nix-bin" = {
+          path = "${pkgs.nix}/bin";
+          read_only = true;
+        };
       };
 
       tls = {

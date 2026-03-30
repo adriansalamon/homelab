@@ -26,5 +26,7 @@
       formatter = pkgs.nixfmt;
 
       inherit pkgs;
+
+      packages.git-agecrypt = pkgs.git-agecrypt;
     };
 }

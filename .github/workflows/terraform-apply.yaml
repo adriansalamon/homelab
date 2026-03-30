@@ -1,0 +1,59 @@
+name: Terraform Apply
+
+on:
+  push:
+    paths:
+      - "nomad/jobs/**"
+      - "nix/terraform-jobs.nix"
+      - "nomad/lib/**"
+      - ".github/workflows/terraform-apply.yaml"
+
+concurrency:
+  group: terraform-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Apply Nomad Jobs
+    runs-on: [self-hosted, nomad]
+
+    env:
+      NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
+      NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+      CONSUL_HTTP_ADDR: ${{ secrets.CONSUL_HTTP_ADDR }}
+      CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Decrypt repo secrets
+        run: |
+          echo ${{ secrets.AGECRYPT_KEY }} | base64 -d > key.txt
+          nix run --inputs-from . nixpkgs#git-agecrypt init
+          nix run --inputs-from . nixpkgs#git-agecrypt config -- add -i key.txt
+          rm .git/index
+          git checkout HEAD -- "$(git rev-parse --show-toplevel)"
+          rm key.txt
+          if head -n1 global.nix | grep -q "age-encryption.org"; then
+            echo "❌ Decryption failed"
+            exit 1
+          else
+            echo "✅ Secrets decrypted successfully"
+          fi
+
+      - name: Initialize Terraform
+        run: nix run path:.#terraform-jobs.init
+
+      - name: Plan Terraform changes
+        id: plan
+        run: |
+          nix run path:.#terraform-jobs.terraform plan -- -out=plan.tfplan
+
+      - name: Apply Terraform changes
+        run: |
+          nix run path:.#terraform-jobs.terraform apply -- plan.tfplan
+
+      - name: Cleanup plan file
+        if: always()
+        run: rm -f plan.tfplan
