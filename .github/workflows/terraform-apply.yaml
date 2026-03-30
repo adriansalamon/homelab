@@ -2,11 +2,13 @@ name: Terraform Apply
 
 on:
   push:
+    branches:
+      - "main"
     paths:
-      - "nomad/jobs/**"
+      - "nomad/**"
       - "nix/terraform-jobs.nix"
-      - "nomad/lib/**"
       - ".github/workflows/terraform-apply.yaml"
+  workflow_dispatch:
 
 concurrency:
   group: terraform-apply

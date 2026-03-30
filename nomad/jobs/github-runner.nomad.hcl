@@ -7,6 +7,7 @@ job "github-runner" {
     meta_required = ["github_url", "runner_token", "runner_labels"]
   }
 
+  # made for building nix derivations
   group "runner" {
 
     volume "nix-store" {
@@ -64,7 +65,7 @@ job "github-runner" {
 
       resources {
         cpu    = 2000
-        memory = 3072
+        memory = 3072 # Needs a lot of memory for nix builds
       }
 
       # No automatic restarts - ephemeral runners are one-time use

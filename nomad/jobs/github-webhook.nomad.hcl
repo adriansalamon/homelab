@@ -35,7 +35,12 @@ job "github-webhook" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/github-webhook:latest"
+        # Python version (original):
+        # image = "ghcr.io/adriansalamon/github-webhook:latest"
+
+        # Go version (recommended - uses native Nomad API):
+        image = "ghcr.io/adriansalamon/github-webhook-go:latest"
+
         ports = ["http"]
       }
 
@@ -53,7 +58,7 @@ job "github-webhook" {
 {{ $domain := key "config/domains/main" }}
 {{ with nomadVar "nomad/jobs/github-webhook" }}
 GITHUB_WEBHOOK_SECRET={{ .webhook_secret }}
-GITHUB_PAT={{ .github_pat }}
+GITHUB_PAT={{ .pat }}
 NOMAD_TOKEN={{ .nomad_token }}
 {{ end }}
 NOMAD_ADDR=https://nomad.local.{{ $domain }}
