@@ -12,8 +12,8 @@ job "atlantis" {
     }
 
     ephemeral_disk {
-      size    = 1000
-      sticky  = true
+      size   = 1000
+      sticky = true
     }
 
     task "atlantis" {
@@ -62,22 +62,22 @@ job "atlantis" {
       # Environment variables
       env {
         # Atlantis server configuration
-        ATLANTIS_ATLANTIS_URL = "https://atlantis.${DOMAIN}"
-        ATLANTIS_REPO_ALLOWLIST = "github.com/adriansalamon/homelab"
-        ATLANTIS_PORT         = "${NOMAD_PORT_http}"
-
+        ATLANTIS_REPO_ALLOWLIST  = "github.com/adriansalamon/homelab"
+        ATLANTIS_PORT            = "${NOMAD_PORT_http}"
+        ATLANTIS_WRITE_GIT_CREDS = true
 
         # Nomad/Consul access
-        NOMAD_ADDR   = "https://nomad.local.${DOMAIN}"
+        NOMAD_ADDR       = "https://nomad.local.${DOMAIN}"
         CONSUL_HTTP_ADDR = "https://consul.local.${DOMAIN}"
       }
 
       # Secrets from Nomad variables
       template {
-        data = <<EOF
+        data        = <<EOF
+ATLANTIS_ATLANTIS_URL = "https://atlantis.{{ key "config/domains/main" }}"
 {{ with nomadVar "nomad/jobs/atlantis" }}
-ATLANTIS_GH_USER={{ .github_user }}
-ATLANTIS_GH_TOKEN={{ .github_token }}
+ATLANTIS_GH_APP_ID={{ .github_app_id }}
+ATLANTIS_GH_APP_KEY_FILE={{ env "NOMAD_SECRETS_DIR" }}/app-key.pem
 ATLANTIS_GH_WEBHOOK_SECRET={{ .github_webhook_secret }}
 AGECRYPT_KEY={{ .agecrypt_key }}
 NOMAD_TOKEN={{ .nomad_token }}
@@ -89,9 +89,16 @@ EOF
         perms       = "0600"
       }
 
+      template {
+        data        = <<EOF
+{{ with nomadVar "nomad/jobs/atlantis" }}{{ .github_app_key }}{{ end }}
+EOF
+        destination = "${NOMAD_SECRETS_DIR}/app-key.pem"
+      }
+
       # Server-side repo configuration
       template {
-        data = <<EOF
+        data        = <<EOF
 repos:
 - id: github.com/adriansalamon/homelab
   allow_custom_workflows: true
@@ -100,7 +107,7 @@ repos:
 
   pre_workflow_hooks:
     - run: |
-        echo "$AGECRYPT_KEY" > /tmp/key.txt
+        echo "$AGECRYPT_KEY" | base64 -d > /tmp/key.txt
         nix run nixpkgs#git-agecrypt init
         nix run nixpkgs#git-agecrypt config -- add -i /tmp/key.txt
         rm .git/index
@@ -142,7 +149,7 @@ EOF
 
         tags = [
           "traefik.enable=true",
-          #"traefik.external=true",
+          "traefik.external=true",
           "traefik.http.routers.atlantis.rule=Host(`atlantis.${DOMAIN}`)",
           "traefik.http.routers.atlantis.entrypoints=websecure"
         ]

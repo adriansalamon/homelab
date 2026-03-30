@@ -1,12 +1,3 @@
-// If you are not in the nebula network, you need to set up an ssh tunnel
-// to a host in the nebula network and with access to a consul server.
-// You can do this by running:
-// ssh -L 15432:<nebula-ip-of-consul-server>:8500 <user>@<host>
-provider "consul" {
-  address = "http://localhost:15432"
-  token   = var.consul_bootstrap_token
-}
-
 resource "consul_acl_policy" "base_agent" {
   name        = "base-agent-policy"
   description = "Base policy for all Consul agent nodes to register services and nodes"
@@ -156,6 +147,17 @@ key_prefix "nebula-cni/" {
 EOT
 }
 
+resource "consul_acl_policy" "atlantis" {
+  name        = "atlantis-policy"
+  description = "Policy for Atlantis to manage Terraform state"
+  rules       = <<EOT
+# Write Terraform state
+key_prefix "terraform/" {
+  policy = "write"
+}
+EOT
+}
+
 resource "consul_acl_token" "server_token" {
   description = "Token for Consul server agents"
   policies = [
@@ -221,6 +223,11 @@ resource "consul_acl_token" "nebula_cni" {
   policies = [consul_acl_policy.nebula_cni.name]
 }
 
+resource "consul_acl_token" "atlantis" {
+  description = "Token for Atlantis"
+  policies    = [consul_acl_policy.atlantis.name, consul_acl_policy.base_agent.name]
+}
+
 data "consul_acl_token_secret_id" "server_token" {
   accessor_id = consul_acl_token.server_token.id
 }
@@ -264,6 +271,12 @@ data "consul_acl_token_secret_id" "nomad_gitops_token" {
 output "consul_nebula_cni_token" {
   description = "Consul token for nebula-nomad-cni (use with CONSUL_HTTP_TOKEN)"
   value       = consul_acl_token.nebula_cni.id
+  sensitive   = true
+}
+
+output "consul_atlantis_token" {
+  description = "Consul token for Atlantis (use with CONSUL_HTTP_TOKEN)"
+  value       = consul_acl_token.atlantis.id
   sensitive   = true
 }
 
@@ -362,9 +375,21 @@ resource "nomad_acl_token" "nebula_cni" {
   policies = [nomad_acl_policy.nebula_cni.name]
 }
 
+resource "nomad_acl_token" "atlantis" {
+  name     = "atlantis"
+  type     = "client"
+  policies = [nomad_acl_policy.operator.name]
+}
+
 output "nomad_nebula_cni_token" {
   description = "Nomad token for nebula-nomad-cni"
   value       = nomad_acl_token.nebula_cni.secret_id
+  sensitive   = true
+}
+
+output "nomad_atlantis_token" {
+  description = "Nomad token for Atlantis"
+  value       = nomad_acl_token.atlantis.secret_id
   sensitive   = true
 }
 
