@@ -35,11 +35,7 @@ job "github-webhook" {
       }
 
       config {
-        # Python version (original):
-        # image = "ghcr.io/adriansalamon/github-webhook:latest"
-
-        # Go version (recommended - uses native Nomad API):
-        image = "ghcr.io/adriansalamon/github-webhook-go:latest"
+        image = "ghcr.io/adriansalamon/github-runner-webhook:latest"
 
         ports = ["http"]
       }

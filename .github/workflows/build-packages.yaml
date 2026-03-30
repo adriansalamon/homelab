@@ -7,6 +7,7 @@ on:
     paths:
       - "packages/**"
       - "nomad/jobs/**"
+      - "nomad/github-runner/**"
       - ".github/workflows/build-packages.yaml"
       - ".github/workflows/services.json"
   workflow_dispatch:
@@ -36,7 +37,6 @@ jobs:
     if: needs.detect-changes.outputs.services != '[]'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
       packages: write
 
     strategy:
@@ -75,6 +75,7 @@ jobs:
             jq '."${{ matrix.service }}".path | split("/") | .[0:-1] | "./" + join("/") + "/"' .github/workflows/services.json -r -c
 
       - name: Build and push
+        id: build-push
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7
         with:
           context: ${{ steps.build-path.outputs.value }}
@@ -97,26 +98,94 @@ jobs:
           sha=$(git rev-parse --short ${{ github.sha }})
           echo "SHORT_SHA=$sha" >> $GITHUB_ENV
 
-      - name: Update nomad job
+      - name: Create build result artifact
+        if: steps.build-push.outcome == 'success'
         run: |
-          NOMAD_JOB="${{ steps.job-file.outputs.value }}"
-          NEW_TAG="main-${{ env.SHORT_SHA }}"
-          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}"
+          mkdir -p build-results
+          cat <<EOF > build-results/${{ matrix.service }}.json
+          {
+            "service": "${{ matrix.service }}",
+            "tag": "main-${{ env.SHORT_SHA }}",
+            "job_file": "${{ steps.job-file.outputs.value }}",
+            "image": "ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}",
+            "digest": "${{ steps.build-push.outputs.digest }}"
+          }
+          EOF
 
-          if [ ! -f "${NOMAD_JOB}" ]; then
-            echo "Warning: ${NOMAD_JOB} not found, skipping"
-            exit 0
+      - name: Upload build result
+        if: steps.build-push.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: build-result-${{ matrix.service }}
+          path: build-results/${{ matrix.service }}.json
+          retention-days: 1
+
+  # Commit all updates in a single commit
+  commit:
+    needs: [detect-changes, build]
+    if: always() && needs.detect-changes.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Download all build results
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+        with:
+          pattern: build-result-*
+          path: build-results
+          merge-multiple: true
+
+      - name: Apply all updates
+        id: apply
+        run: |
+          DEPLOYED_SERVICES=""
+          UPDATED_FILES=""
+
+          # Process each successful build result
+          for result_file in build-results/*.json; do
+            if [ ! -f "$result_file" ]; then
+              echo "No build results found"
+              continue
+            fi
+
+            SERVICE=$(jq -r '.service' "$result_file")
+            TAG=$(jq -r '.tag' "$result_file")
+            NOMAD_JOB=$(jq -r '.job_file' "$result_file")
+            IMAGE_NAME=$(jq -r '.image' "$result_file")
+
+            if [ ! -f "${NOMAD_JOB}" ]; then
+              echo "Warning: ${NOMAD_JOB} not found, skipping ${SERVICE}"
+              continue
+            fi
+
+            echo "Updating ${SERVICE} to ${TAG} in ${NOMAD_JOB}"
+            sed -i -E "s|(image[[:space:]]*=[[:space:]]*\"${IMAGE_NAME}:)[^\"]+|\1${TAG}|g" "${NOMAD_JOB}"
+
+            if ! git diff --quiet "${NOMAD_JOB}" 2>/dev/null; then
+              if [ -z "$DEPLOYED_SERVICES" ]; then
+                DEPLOYED_SERVICES="${SERVICE}@${TAG}"
+                UPDATED_FILES="${NOMAD_JOB}"
+              else
+                DEPLOYED_SERVICES="${DEPLOYED_SERVICES}, ${SERVICE}@${TAG}"
+                UPDATED_FILES="${UPDATED_FILES} ${NOMAD_JOB}"
+              fi
+            fi
+          done
+
+          if [ -n "$DEPLOYED_SERVICES" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "deployed_services=${DEPLOYED_SERVICES}" >> $GITHUB_OUTPUT
+            echo "updated_files=${UPDATED_FILES}" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
 
-          sed -i -E "s|(image[[:space:]]*=[[:space:]]*\"${IMAGE_NAME}:)[^\"]+|\1${NEW_TAG}|g" "${NOMAD_JOB}"
-
-          if git diff --quiet "${NOMAD_JOB}"; then
-            echo "No changes to ${NOMAD_JOB}"
-            exit 0
-          fi
-
-      - name: Commit changes
+      - name: Commit all changes
+        if: steps.apply.outputs.has_changes == 'true'
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7
         with:
-          commit_message: "chore: deploy ${{ matrix.service }}@${{ env.SHORT_SHA }} [skip ci]"
-          file_pattern: ${{ steps.job-file.outputs.value }}
+          commit_message: "chore: deploy ${{ steps.apply.outputs.deployed_services }} [skip ci]"
+          file_pattern: ${{ steps.apply.outputs.updated_files }}

@@ -7,12 +7,12 @@
     "path": "packages/homepage/**",
     "job_file": "nomad/jobs/homepage.nomad.hcl"
   },
-  "nomad-gitops": {
-    "path": "packages/nomad-gitops/**",
-    "job_file": "nomad/jobs/nomad-gitops.nomad.hcl"
+  "github-runner-webhook": {
+    "path": "nomad/github-runner/webhook/**",
+    "job_file": "nomad/jobs/github-webhook.nomad.hcl"
   },
-  "atlantis": {
-    "path": "packages/atlantis/**",
-    "job_file": "nomad/jobs/atlantis.nomad.hcl"
+  "github-runner": {
+    "path": "nomad/github-runner/runner/**",
+    "job_file": "nomad/jobs/github-runner.nomad.hcl"
   }
 }
