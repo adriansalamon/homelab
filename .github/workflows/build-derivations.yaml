@@ -9,6 +9,8 @@ on:
       - "nomad/**"
       - "packages/**"
       - "terraform/**"
+      - ".github/workflows/build-packages.yaml"
+      - ".github/workflows/terraform-apply.yaml"
   workflow_dispatch:
 
 jobs:
