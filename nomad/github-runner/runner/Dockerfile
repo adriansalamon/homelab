@@ -1,4 +1,4 @@
-FROM ghcr.io/actions/actions-runner:latest
+FROM ghcr.io/actions/actions-runner:2.333.1
 
 USER root
 COPY entrypoint.sh /entrypoint.sh
