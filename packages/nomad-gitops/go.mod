@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	github.com/caarlos0/env/v11 v11.4.0
-	github.com/go-git/go-git/v5 v5.17.0
+	github.com/go-git/go-git/v5 v5.17.1
 	github.com/gregdel/pushover v1.4.0
 	github.com/hashicorp/consul/api v1.33.2
 	github.com/hashicorp/nomad/api v0.0.0-20260325144059-0c3fa0187887
@@ -15,7 +15,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
-	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
