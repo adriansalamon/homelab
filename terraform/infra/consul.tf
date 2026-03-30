@@ -431,6 +431,9 @@ resource "nomad_acl_binding_rule" "authelia_admin" {
   bind_name   = nomad_acl_policy.admin.name
 }
 
+resource "nomad_scheduler_config" "scheduler" {
+  memory_oversubscription_enabled = true
+}
 
 # Optional: Uncomment to generate gossip key file for encryption
 # resource "local_file" "nomad_gossip_key" {
