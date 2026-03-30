@@ -35,7 +35,7 @@ job "github-webhook" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/github-runner-webhook:latest"
+        image = "ghcr.io/adriansalamon/github-runner-webhook:main-4b09750"
 
         ports = ["http"]
       }
