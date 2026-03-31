@@ -49,7 +49,7 @@ let
                 type = types.attrs;
                 default = {
                   file = "${submod.config.name}";
-                  key = "${secretSubmod.config._module.args.name}";
+                  key = "${secretSubmod.config.nomadName}";
                   format = "${secretSubmod.config.sopsFormat}";
                 };
               };
@@ -78,7 +78,6 @@ in
               default = null;
               description = "Nomad name for the variable for this secret.";
             };
-
             nomadPath = mkOption {
               type = types.nullOr types.str;
               default = null;

@@ -65,6 +65,7 @@
               rekey = {
                 inherit (inputs.self.secretsConfig) masterIdentities;
 
+                recipientIdentifier = "nomad";
                 storageMode = "local";
                 generatedSecretsDir = inputs.self.outPath + "/secrets/generated/nomad";
                 localStorageDir = inputs.self.outPath + "/secrets/rekeyed/nomad";

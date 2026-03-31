@@ -30,6 +30,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup SOPS key
+        run: |
+          KEYFILE=$(mktemp)
+          echo "${{ secrets.TERRAFORM_SOPS_KEY }}" > "$KEYFILE"
+          chmod 600 "$KEYFILE"
+          echo "SOPS_AGE_SSH_PRIVATE_KEY_FILE=$KEYFILE" >> "$GITHUB_ENV"
+
       - name: Decrypt repo secrets
         run: |
           echo ${{ secrets.AGECRYPT_KEY }} | base64 -d > key.txt
@@ -59,4 +66,4 @@ jobs:
 
       - name: Cleanup plan file
         if: always()
-        run: rm -f plan.tfplan
+        run: rm -f plan.tfplan key.txt "$SOPS_AGE_SSH_PRIVATE_KEY_FILE"
