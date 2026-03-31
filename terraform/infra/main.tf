@@ -1,4 +1,10 @@
 terraform {
+  backend "consul" {
+    address = "consul.local.salamon.xyz"
+    scheme  = "https"
+    path    = "terraform/infra"
+  }
+
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
