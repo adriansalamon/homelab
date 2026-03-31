@@ -68,6 +68,34 @@ let
     day = 24 * hour;
     week = 7 * day;
   };
+
+  mkNomadConfiguration =
+    {
+      modules,
+      pkgs,
+      lib ? pkgs.lib,
+      inputs,
+      extraSpecialArgs ? { },
+    }:
+    let
+      module = lib.evalModules {
+        specialArgs = {
+          inherit pkgs lib inputs;
+        }
+        // extraSpecialArgs;
+
+        modules = [
+          inputs.agenix-rekey-to-sops.sopsModules.default
+          ../modules/global.nix
+          ../modules/nomad/secrets.nix
+        ]
+        ++ modules;
+      };
+    in
+    {
+      inherit (module) config;
+    };
+
 in
 {
   lib = prev.lib // {
@@ -98,7 +126,7 @@ in
         );
     };
 
-    inherit rakeLeaves time;
+    inherit rakeLeaves time mkNomadConfiguration;
 
   };
 }

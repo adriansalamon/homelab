@@ -1,6 +1,9 @@
 { inputs, self, ... }:
 {
-  imports = [ inputs.agenix-rekey.flakeModule ];
+  imports = [
+    inputs.agenix-rekey.flakeModule
+    inputs.agenix-rekey-to-sops.flakeModule
+  ];
 
   flake = {
     secretsConfig = {
@@ -18,10 +21,15 @@
   };
 
   perSystem =
-    { ... }:
+    { config, pkgs, ... }:
     {
       agenix-rekey.nixosConfigurations = self.nodes;
       agenix-rekey.homeConfigurations = self.homeConfigurations;
       agenix-rekey.darwinConfigurations = inputs.self.darwinConfigurations;
+      agenix-rekey.extraConfigurations = inputs.self.nomadConfigurations;
+
+      devShells.default = pkgs.mkShell {
+        nativeBuildInputs = [ config.agenix-rekey-sops.package ];
+      };
     };
 }

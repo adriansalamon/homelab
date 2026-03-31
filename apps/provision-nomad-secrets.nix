@@ -14,7 +14,7 @@ let
 
   nomadPkg = pkgs.nomad_1_11;
 
-  nomadHomeConfig = inputs.self.homeConfigurations."nomad".config;
+  nomadConfig = inputs.self.nomadConfigurations."homelab".config;
 
   decryptSecret = (
     secret:
@@ -29,7 +29,7 @@ let
       ''
   );
 
-  secrets = mapAttrsToList (name: cfg: cfg // { inherit name; }) nomadHomeConfig.age.secrets;
+  secrets = mapAttrsToList (name: cfg: cfg // { inherit name; }) nomadConfig.age.secrets;
 
   # Group secrets by nomadPath
   secretsByPath = groupBy (s: s.nomadPath) secrets;
@@ -53,7 +53,7 @@ in
                 map (secret: ''
                   echo "Decrypting ${secret.name}"
                   secret=$(${decryptSecret secret})
-                  name=$(echo "${secret.name}" | sed 's/-/_/g' | sed -E 's/[^_]+_(.+)/\1/g')
+                  name=${secret.nomadName}
                   echo "Uploading to $name"
                   printf "%s\n" "$name = \"$secret\"" >> "$tmpfile"
                 '') secrets

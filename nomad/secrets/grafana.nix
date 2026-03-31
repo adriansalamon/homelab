@@ -1,33 +1,28 @@
 {
   config,
   inputs,
+  lib,
   ...
 }:
 let
   localSecretsDir = ./files;
-  nomadPath = "nomad/jobs/grafana";
 in
 {
-
-  globals.loki-secrets = [ config.age.secrets.grafana-loki-basic-auth-password ];
-
-  age.secrets = {
-    grafana-postgres-password = {
+  nomadJobs.grafana.secrets = {
+    postgres-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/grafana-postgres-password.age";
-      inherit nomadPath;
       generator.script = "alnum";
     };
-    grafana-secret-key = {
+    secret-key = {
       rekeyFile = localSecretsDir + "/grafana-secret-key.age";
-      inherit nomadPath;
     };
-    grafana-loki-basic-auth-password = {
+    loki-basic-auth-password = {
       rekeyFile = localSecretsDir + "/grafana-loki-basic-auth-password.age";
-      inherit nomadPath;
     };
-    grafana-oidc-client-secret = {
+    oidc-client-secret = {
       rekeyFile = localSecretsDir + "/oidc/grafana-oidc-client-secret.txt.age";
-      inherit nomadPath;
     };
   };
+
+  globals.loki-secrets = lib.mkAfter [ config.age.secrets.grafana-loki-basic-auth-password ];
 }

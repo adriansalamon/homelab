@@ -12,7 +12,7 @@
               inherit (inputs.self.pkgs.x86_64-linux) lib;
               inherit inputs;
               inherit (config) nodes;
-              nomadCfg = config.homeConfigurations.nomad;
+              nomadCfg = config.nomadConfigurations.homelab;
             };
             modules = [
               ../modules/global.nix
@@ -29,7 +29,7 @@
                         builtins.addErrorContext "while aggregating globals from nixosConfigurations.${name} into flake-level globals:" cfg.config._globalsDefs
                       )
                       ++ [
-                        (builtins.addErrorContext "while aggregating globals from nomad into flake-level globals:" config.homeConfigurations.nomad.config._globalsDefs)
+                        (builtins.addErrorContext "while aggregating globals from nomad into flake-level globals:" config.nomadConfigurations.homelab.config._globalsDefs)
                       ]
                     )
                   );

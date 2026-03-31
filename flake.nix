@@ -15,7 +15,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix-rekey = {
-      url = "github:oddlama/agenix-rekey";
+      url = "github:sini/agenix-rekey";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -67,6 +67,10 @@
       url = "github:terranix/terranix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    agenix-rekey-to-sops.url = "github:adriansalamon/agenix-rekey-to-sops";
+    agenix-rekey-to-sops.inputs.agenix-rekey.follows = "agenix-rekey";
+
   };
 
   outputs =

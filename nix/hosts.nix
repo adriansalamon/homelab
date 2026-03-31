@@ -1,6 +1,11 @@
 { inputs, ... }:
 
 {
+
+  imports = [
+    inputs.home-manager.flakeModules.home-manager
+  ];
+
   flake =
     { config, lib, ... }:
     let
@@ -26,7 +31,7 @@
               inherit (pkgs) lib;
               inherit (config) nodes globals;
               inherit profiles;
-              nomadCfg = config.homeConfigurations.nomad;
+              nomadCfg = config.nomadConfigurations.homelab;
             };
             modules = [
               inputs.microvm.nixosModules.host

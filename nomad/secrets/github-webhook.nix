@@ -3,14 +3,13 @@ let
   localSecretsDir = ./files;
 
   mkSecret = path: {
-    rekeyFile = "${localSecretsDir}/github-${path}";
-    nomadPath = "nomad/jobs/github-webhook";
+    rekeyFile = localSecretsDir + "/github-${path}";
   };
 in
 {
-  age.secrets = {
-    github-webhook-secret = mkSecret "webhook-secret.age";
-    github-pat = mkSecret "pat.age";
-    github-nomad-token = mkSecret "nomad-token.age";
+  nomadJobs.github-webhook.secrets = {
+    webhook-secret = mkSecret "webhook-secret.age";
+    pat = mkSecret "pat.age";
+    nomad-token = mkSecret "nomad-token.age";
   };
 }

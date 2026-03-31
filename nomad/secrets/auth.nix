@@ -7,15 +7,13 @@ let
   localSecretsDir = ./files;
 
   mkSecret = job: path: {
-    rekeyFile = "${localSecretsDir}/${job}-${path}";
-    nomadPath = "nomad/jobs/${job}";
+    rekeyFile = localSecretsDir + "/${job}-${path}";
   };
 
   mkOidcSecret = name: {
-    name = "authelia-${name}-oidc-client-secret";
+    name = "${name}-oidc-client-secret";
     value = {
       rekeyFile = localSecretsDir + "/oidc/${name}-oidc-client-secret.txt.age";
-      nomadPath = "nomad/jobs/authelia";
       # this server is not supposed to have this file, upload the hash instead
       intermediary = true;
       hashFile = "${localSecretsDir}/oidc/${name}-oidc-client-hash.txt";
@@ -47,34 +45,32 @@ let
 
 in
 {
-  age.secrets = {
-    lldap-jwt-secret = mkSecret "lldap" "jwt-secret.txt.age";
-    lldap-key-seed = mkSecret "lldap" "key-seed.txt.age";
-    lldap-user-password = mkSecret "lldap" "user-password.txt.age";
-    lldap-postgres-password = {
+  nomadJobs.lldap.secrets = {
+    jwt-secret = mkSecret "lldap" "jwt-secret.txt.age";
+    key-seed = mkSecret "lldap" "key-seed.txt.age";
+    user-password = mkSecret "lldap" "user-password.txt.age";
+    postgres-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/lldap-postgres-password.age";
-      nomadPath = "nomad/jobs/lldap";
     };
+  };
 
-    authelia-jwt-secret = mkSecret "authelia" "jwt-secret.txt.age";
-    authelia-storage-encryption-key = mkSecret "authelia" "storage-encryption-key.txt.age";
-    authelia-session-secret = mkSecret "authelia" "session-secret.txt.age";
-    authelia-postgres-password = {
+  nomadJobs.authelia.secrets = {
+    jwt-secret = mkSecret "authelia" "jwt-secret.txt.age";
+    storage-encryption-key = mkSecret "authelia" "storage-encryption-key.txt.age";
+    session-secret = mkSecret "authelia" "session-secret.txt.age";
+    postgres-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/authelia-postgres-password.age";
-      nomadPath = "nomad/jobs/authelia";
     };
-    authelia-redis-password = {
+    redis-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/valkey-server-password.age";
-      nomadPath = "nomad/jobs/authelia";
     };
-    authelia-redis-sentinel-password = {
+    redis-sentinel-password = {
       rekeyFile = inputs.self.outPath + "/secrets/generated/valkey-sentinel-password.age";
-      nomadPath = "nomad/jobs/authelia";
     };
-    authelia-smtp-password = mkSecret "authelia" "smtp-password.txt.age";
-    authelia-ldap-password = mkSecret "authelia" "ldap-password.txt.age";
-    authelia-hmac-secret = mkSecret "authelia" "hmac-secret.txt.age";
-    authelia-jwks-key = mkSecret "authelia" "jwks-key.key.age";
+    smtp-password = mkSecret "authelia" "smtp-password.txt.age";
+    ldap-password = mkSecret "authelia" "ldap-password.txt.age";
+    hmac-secret = mkSecret "authelia" "hmac-secret.txt.age";
+    jwks-key = mkSecret "authelia" "jwks-key.key.age";
   }
   // lib.genAttrs' [
     "immich"
