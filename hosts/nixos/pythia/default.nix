@@ -19,6 +19,7 @@
     services.traefik
     services.valkey-server
     services.seaweedfs.master
+    services.vault-server
     auto-update
   ];
 

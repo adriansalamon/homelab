@@ -26,6 +26,10 @@ terraform {
       source  = "hashicorp/nomad"
       version = "~> 2.0"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = "~> 5.0"
+    }
   }
 }
 

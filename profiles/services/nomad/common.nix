@@ -31,6 +31,10 @@ in
         address = "127.0.0.1:8500";
       };
 
+      vault = {
+        enabled = true;
+      };
+
       # Enable TLS for mutual authentication between nodes
       tls = {
         http = true;

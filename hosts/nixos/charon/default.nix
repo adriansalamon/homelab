@@ -14,6 +14,7 @@
     services.nomad.server
     services.traefik
     services.valkey-server
+    services.vault-server
     services.seaweedfs.master
     router.monitoring
     router.dyndns

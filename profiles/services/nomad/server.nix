@@ -39,6 +39,15 @@ in
         task_identity = {
           aud = [ "consul.io" ];
           ttl = "1h";
+          file = true;
+        };
+      };
+
+      vault = {
+        default_identity = {
+          aud = [ "vault.io" ];
+          ttl = "1h";
+          file = true;
         };
       };
 

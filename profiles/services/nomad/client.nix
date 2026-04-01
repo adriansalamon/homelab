@@ -115,6 +115,10 @@ in
         key_file = config.age.secrets."nomad-client-key.pem".path;
       };
 
+      vault = {
+        address = "https://vault.local.${globals.domains.main}";
+      };
+
       telemetry = {
         publish_allocation_metrics = true;
         publish_node_metrics = true;

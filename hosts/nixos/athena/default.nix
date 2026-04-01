@@ -24,6 +24,7 @@ in
     services.consul-server
     services.nomad.server
     services.traefik
+    services.vault-server
     services.valkey-server
     services.seaweedfs.master
     auto-update

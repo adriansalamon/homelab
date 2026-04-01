@@ -88,5 +88,6 @@ in
     "stalwart"
     "affine"
     "opengist"
+    "vault"
   ] mkOidcSecret;
 }

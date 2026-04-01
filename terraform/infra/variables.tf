@@ -29,6 +29,17 @@ variable "nomad_bootstrap_token" {
   description = "Nomad bootstrap token"
 }
 
+variable "nomad_oidc_client_secret" {
+  type      = string
+  sensitive = true
+}
+
 variable "nomad_url" {
   type = string
+}
+
+variable "authelia_oidc_client_secret" {
+  description = "The OIDC client secret configured in Authelia"
+  type        = string
+  sensitive   = true
 }

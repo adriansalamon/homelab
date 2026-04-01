@@ -53,3 +53,5 @@ deploy.json
 .claude
 
 *.tf.backup
+
+id_*

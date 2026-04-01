@@ -378,6 +378,20 @@ identity_providers:
         grant_types:
           - 'authorization_code'
         token_endpoint_auth_method: 'client_secret_post'
+      - client_id: 'vault'
+        client_name: 'HashiCorp Vault'
+        client_secret: {{ .vault_oidc_client_secret }}
+        pre_configured_consent_duration: "3 months"
+        public: false
+        redirect_uris:
+          - https://vault.local.{{ $domain }}/ui/vault/auth/oidc/oidc/callback
+          - http://localhost:8250/oidc/callback
+        scopes:
+          - openid
+          - profile
+          - groups
+          - email
+        userinfo_signed_response_alg: none
 {{ end }}
 EOF
 
