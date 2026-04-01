@@ -6,7 +6,6 @@ on:
       - "main"
     paths:
       - "packages/**"
-      - "nomad/github-runner/**"
       - ".github/workflows/build-packages.yaml"
       - ".github/workflows/services.json"
   workflow_dispatch:
