@@ -64,8 +64,8 @@ job "github-runner" {
       }
 
       resources {
-        cpu    = 2000
-        memory = 3072 # Needs a lot of memory for nix builds
+        cpu        = 2000
+        memory     = 3072 # Needs a lot of memory for nix builds
         memory_max = 6144
       }
 

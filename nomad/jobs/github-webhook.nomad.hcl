@@ -13,6 +13,10 @@ job "github-webhook" {
     task "webhook" {
       driver = "docker"
 
+      identity {
+        env = true # Get NOMAD_TOKEN from workload identity
+      }
+
       meta {
         nebula_config = yamlencode({
           firewall = {
@@ -46,6 +50,7 @@ job "github-webhook" {
         GITHUB_REPO        = "homelab"
         NOMAD_JOB_TEMPLATE = "github-runner"
         ADDR               = ":${NOMAD_PORT_http}"
+        NOMAD_ADDR         = "${NOMAD_UNIX_ADDR}"
       }
 
       # Get secrets from Nomad variables
@@ -55,9 +60,7 @@ job "github-webhook" {
 {{ with nomadVar "nomad/jobs/github-webhook" }}
 GITHUB_WEBHOOK_SECRET={{ .webhook_secret }}
 GITHUB_PAT={{ .pat }}
-NOMAD_TOKEN={{ .nomad_token }}
 {{ end }}
-NOMAD_ADDR=https://nomad.local.{{ $domain }}
 DOMAIN={{ $domain }}
 EOF
         env         = true
