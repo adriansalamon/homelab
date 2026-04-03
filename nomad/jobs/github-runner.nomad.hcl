@@ -31,6 +31,19 @@ job "github-runner" {
     task "runner" {
       driver = "docker"
 
+      # Enable workload identity for Vault, Consul, and Nomad
+      identity {
+        env  = true  # Expose NOMAD_TOKEN as env var
+      }
+
+      vault {
+        env = true # Expose VAULT_TOKEN as env var
+      }
+
+      consul {
+        # Exposes CONSUL_HTTP_TOKEN as env var
+      }
+
       config {
         image = "ghcr.io/adriansalamon/github-runner:self-hosted-runner-e2089d1"
       }
@@ -57,6 +70,8 @@ job "github-runner" {
         GITHUB_URL    = "${NOMAD_META_github_url}"
         RUNNER_TOKEN  = "${NOMAD_META_runner_token}"
         RUNNER_LABELS = "${NOMAD_META_runner_labels}"
+
+        NOMAD_ADDR         = "${NOMAD_UNIX_ADDR}"
 
         NIX_REMOTE = "daemon"
         PATH       = "/nix-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"

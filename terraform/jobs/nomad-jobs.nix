@@ -19,19 +19,6 @@ let
   readClean = file: builtins.replaceStrings [ "\${" ] [ "$\${" ] (lib.readFile file);
 in
 {
-  # Terraform backend - using Consul KV for state
-  terraform.backend.consul = {
-    address = "consul.local.salamon.xyz";
-    scheme = "https";
-    path = "terraform/jobs";
-  };
-
-  # Nomad provider configuration
-  provider.nomad = {
-    address = "https://nomad.local.salamon.xyz";
-    region = "global";
-  };
-
   # Resources for both nix-nomad generated JSON jobs and legacy HCL jobs
   resource.nomad_job =
     let

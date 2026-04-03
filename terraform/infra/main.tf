@@ -46,6 +46,8 @@ provider "cloudflare" {
   email   = var.cloudflare_email
 }
 
+### AWS SMTP user (maybe broken?)
+
 resource "aws_iam_user" "smtp_user" {
   name = "smtp_user"
 }
@@ -72,12 +74,13 @@ resource "aws_iam_user_policy_attachment" "ses_attachment" {
   policy_arn = aws_iam_policy.ses_sender.arn
 }
 
+### Cloudflare DNS challenge token
+
 data "cloudflare_accounts" "main" {}
 
 data "cloudflare_account_api_token_permission_groups_list" "all" {
   account_id = data.cloudflare_accounts.main.result[0].id
 }
-
 
 locals {
   dns_permissions = {
@@ -86,7 +89,6 @@ locals {
     if contains(["DNS Write"], x.name)
   }
 }
-
 
 resource "cloudflare_api_token" "acme_dns_challenge" {
   name = "acme token"
@@ -110,6 +112,9 @@ resource "cloudflare_api_token" "acme_dns_challenge" {
     }]
   }]
 }
+
+
+### Hetzner VPS
 
 resource "hcloud_network" "main" {
   name     = "main"
@@ -147,4 +152,59 @@ resource "hcloud_server" "icarus" {
   }
 
   depends_on = [hcloud_network_subnet.main_subnet]
+}
+
+
+### AWS KMS key for Vault auto-unseal
+
+resource "aws_kms_key" "vault_unseal" {
+  description             = "KMS key for Vault auto-unseal"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+  multi_region            = false
+
+  tags = {
+    Name    = "vault-unseal"
+    Purpose = "vault-auto-unseal"
+  }
+}
+
+resource "aws_kms_alias" "vault_unseal" {
+  name          = "alias/vault-unseal"
+  target_key_id = aws_kms_key.vault_unseal.key_id
+}
+
+
+resource "aws_iam_user" "vault_unseal" {
+  name = "vault-unseal"
+  path = "/system/"
+
+  tags = {
+    Purpose = "vault-auto-unseal"
+  }
+}
+
+resource "aws_iam_access_key" "vault_unseal" {
+  user = aws_iam_user.vault_unseal.name
+}
+
+resource "aws_iam_user_policy" "vault_unseal" {
+  name = "vault-unseal-kms"
+  user = aws_iam_user.vault_unseal.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "VaultUnsealKMS"
+        Effect = "Allow"
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+        ]
+        Resource = aws_kms_key.vault_unseal.arn
+      }
+    ]
+  })
 }

@@ -12,6 +12,7 @@
 
         extraArgs = {
           inherit inputs system;
+          inherit (inputs.self) globals;
         };
 
         modules = [ ] ++ lib.collect builtins.isPath (lib.rakeLeaves ../terraform/jobs);
