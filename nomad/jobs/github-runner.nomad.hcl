@@ -45,7 +45,7 @@ job "github-runner" {
       }
 
       config {
-        image = "ghcr.io/adriansalamon/github-runner:self-hosted-runner-e2089d1"
+        image = "ghcr.io/adriansalamon/github-runner:main-d6187d2"
       }
 
       volume_mount {
