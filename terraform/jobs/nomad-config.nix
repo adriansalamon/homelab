@@ -10,6 +10,12 @@
       rules_hcl = ''
         namespace "*" {
           policy = "write"
+
+          variables {
+            path "*" {
+              capabilities = ["write", "read", "destroy", "list"]
+            }
+          }
         }
 
         node {
@@ -78,40 +84,7 @@
     github_runner_terraform = {
       name = "github-runner-terraform";
       description = "Policy for GitHub Actions runner to manage Nomad ACL configuration via Terraform";
-      rules_hcl = ''
-        # Allow managing ACL policies
-        namespace "*" {
-          policy = "write"
-          capabilities = [
-            "submit-job",
-            "dispatch-job",
-            "read-logs",
-            "read-fs",
-            "read-job",
-            "list-jobs",
-          ]
-        }
-
-        # Allow managing auth methods and binding rules
-        operator {
-          policy = "write"
-        }
-
-        # Allow reading nodes (for Terraform data sources)
-        node {
-          policy = "read"
-        }
-
-        # Allow managing host volumes
-        host_volume "*" {
-          policy = "write"
-        }
-
-        # Allow reading plugin information
-        plugin {
-          policy = "read"
-        }
-      '';
+      rules_hcl = "\${nomad_acl_policy.admin.rules_hcl}";
 
       job_acl = {
         namespace = "default";
@@ -137,6 +110,11 @@
       name = "atlantis";
       type = "client";
       policies = [ "\${nomad_acl_policy.operator.name}" ];
+    };
+
+    vault = {
+      name = "vault";
+      type = "management";
     };
   };
 

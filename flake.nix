@@ -69,7 +69,10 @@
     };
 
     agenix-rekey-to-sops.url = "github:adriansalamon/agenix-rekey-to-sops";
-    agenix-rekey-to-sops.inputs.agenix-rekey.follows = "agenix-rekey";
+    agenix-rekey-to-sops.inputs = {
+      agenix-rekey.follows = "agenix-rekey";
+      nixpkgs.follows = "nixpkgs";
+    };
 
   };
 

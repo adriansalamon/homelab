@@ -56,10 +56,14 @@
             age = {
               sops = {
                 outputDir = inputs.self.outPath + "/secrets/rekeyed/nomad";
-                recipients = [
-                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOg0phKMml4tg+kH2qZOUVi9NT6roXfiDRTLJ4Si3xtP" # CI key
-                ]
-                ++ (map (cfg: cfg.pubkey) inputs.self.secretsConfig.masterIdentities);
+                creation_rules = [
+                  {
+                    # Encrypt everything with age + vault
+                    path_regex = ".*";
+                    age = (map (cfg: cfg.pubkey) inputs.self.secretsConfig.masterIdentities);
+                    hc_vault_transit_uri = "https://vault.local.${config.globals.domains.main}/v1/transit/keys/sops-key";
+                  }
+                ];
               };
 
               rekey = {
