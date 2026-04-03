@@ -19,38 +19,23 @@ jobs:
   apply:
     name: Apply Nomad Jobs
     runs-on: [self-hosted, nomad]
-
-    env:
-      NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
-      NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
-      CONSUL_HTTP_ADDR: ${{ secrets.CONSUL_HTTP_ADDR }}
-      CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
-
     steps:
+      - name: Install sops
+        run: |
+          curl -Lo sops https://github.com/getsops/sops/releases/download/v3.12.2/sops-v3.12.2.linux.amd64
+          chmod +x sops && sudo mv sops /usr/local/bin
+
+      - name: Configure SOPS git filter
+        run: |
+          cat >> ~/.gitconfig <<EOF
+          [filter "sops"]
+              smudge = sops --decrypt --input-type binary /dev/stdin
+              clean = sops --encrypt --input-type binary --output-type binary /dev/stdin
+              required = true
+          EOF
+
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup SOPS key
-        run: |
-          KEYFILE=$(mktemp)
-          echo "${{ secrets.TERRAFORM_SOPS_KEY }}" > "$KEYFILE"
-          chmod 600 "$KEYFILE"
-          echo "SOPS_AGE_SSH_PRIVATE_KEY_FILE=$KEYFILE" >> "$GITHUB_ENV"
-
-      - name: Decrypt repo secrets
-        run: |
-          echo ${{ secrets.AGECRYPT_KEY }} | base64 -d > key.txt
-          nix run --inputs-from . nixpkgs#git-agecrypt init
-          nix run --inputs-from . nixpkgs#git-agecrypt config -- add -i key.txt
-          rm .git/index
-          git checkout HEAD -- "$(git rev-parse --show-toplevel)"
-          rm key.txt
-          if head -n1 global.nix | grep -q "age-encryption.org"; then
-            echo "❌ Decryption failed"
-            exit 1
-          else
-            echo "✅ Secrets decrypted successfully"
-          fi
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Initialize Terraform
         run: nix run path:.#terraform-jobs.init
@@ -66,4 +51,4 @@ jobs:
 
       - name: Cleanup plan file
         if: always()
-        run: rm -f plan.tfplan key.txt "$SOPS_AGE_SSH_PRIVATE_KEY_FILE"
+        run: rm -f plan.tfplan

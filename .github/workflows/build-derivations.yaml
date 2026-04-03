@@ -31,8 +31,6 @@ jobs:
           - host: zeus
 
     steps:
-      #- uses: wimpysworld/nothing-but-nix@main
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: "Setup Nix cache"
         run: |
           sudo mkdir -p /etc/nix
@@ -46,14 +44,26 @@ jobs:
             always-allow-substitutes = true
             allow-import-from-derivation = false
 
-      - name: "Decrypt repo secrets"
+      - name: Install sops
         run: |
-          echo ${{ secrets.AGECRYPT_KEY }} | base64 -d > key.txt
-          nix run nixpkgs#git-agecrypt init
-          nix run nixpkgs#git-agecrypt config -- add -i key.txt
-          rm .git/index
-          git checkout HEAD -- "$(git rev-parse --show-toplevel)"
-          rm key.txt
+          curl -Lo sops https://github.com/getsops/sops/releases/download/v3.12.2/sops-v3.12.2.linux.amd64
+          chmod +x sops && sudo mv sops /usr/local/bin
+
+      - name: Configure SOPS git filter
+        run: |
+          cat >> ~/.gitconfig <<EOF
+          [filter "sops"]
+              smudge = sops --decrypt --input-type binary /dev/stdin
+              clean = sops --encrypt --input-type binary --output-type binary /dev/stdin
+              required = true
+          EOF
+
+      - name: Store SSH private key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       # TODO: this does not work reliably
       - name: Check if build needed
