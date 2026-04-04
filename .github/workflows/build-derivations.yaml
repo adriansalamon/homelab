@@ -21,14 +21,25 @@ jobs:
       matrix:
         machine:
           - host: athena
+            system: x86_64-linux
+          - host: callisto
+            system: aarch64-linux
           - host: charon
+            system: x86_64-linux
           - host: demeter
+            system: x86_64-linux
           - host: hermes
+            system: x86_64-linux
           - host: icarus
+            system: x86_64-linux
           - host: orpheus
+            system: x86_64-linux
           - host: penelope
+            system: x86_64-linux
           - host: pythia
+            system: x86_64-linux
           - host: zeus
+            system: x86_64-linux
 
     env:
       SOPS_AGE_SSH_PRIVATE_KEY_FILE: /tmp/git_id_ed25519
@@ -46,6 +57,7 @@ jobs:
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= homelab:leKffLkOCSfX8pPGaQltduLxJNNVmG5oGPt6w3fH4t0=
             always-allow-substitutes = true
             allow-import-from-derivation = false
+            extra-platforms = aarch64-linux
 
       - name: Install sops
         run: |
@@ -67,6 +79,9 @@ jobs:
           chmod 600 $SOPS_AGE_SSH_PRIVATE_KEY_FILE
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - if: matrix.machine.platform == 'aarch64-linux'
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4
 
       # TODO: this does not work reliably
       - name: Check if build needed
