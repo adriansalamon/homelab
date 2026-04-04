@@ -30,6 +30,9 @@ jobs:
           - host: pythia
           - host: zeus
 
+    env:
+      SOPS_AGE_SSH_PRIVATE_KEY_FILE: /tmp/git_id_ed25519
+
     steps:
       - name: "Setup Nix cache"
         run: |
@@ -60,9 +63,8 @@ jobs:
 
       - name: Store SSH private key
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > $SOPS_AGE_SSH_PRIVATE_KEY_FILE
+          chmod 600 $SOPS_AGE_SSH_PRIVATE_KEY_FILE
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 

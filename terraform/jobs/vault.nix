@@ -65,30 +65,61 @@
     };
   };
 
-  # Module to setup Vault with Nomad Workload Identities
-  module.vault_setup = {
-    source = "./vault-nomad-setup";
+  resource.vault_jwt_auth_backend.nomad = {
+    path = "jwt-nomad";
+    description = "JWT auth backend for Nomad";
+    jwks_url = "\${var.nomad_url}/.well-known/jwks.json";
+    jwt_supported_algs = [
+      "RS256"
+      "EdDSA"
+    ];
 
-    nomad_jwks_url = "\${var.nomad_url}/.well-known/jwks.json";
+    default_role = "nomad-workloads";
+  };
 
-    policy_names = [
+  resource.vault_jwt_auth_backend_role.nomad_workload = {
+    backend = "\${vault_jwt_auth_backend.nomad.path}";
+    role_name = "\${vault_jwt_auth_backend.nomad.default_role}";
+    role_type = "jwt";
+
+    bound_audiences = [ "vault.io" ];
+
+    # user_claim is used to uniquely identity a user in Vault by mapping tokens
+    # to an entity alias.
+    user_claim = "/nomad_job_id";
+    user_claim_json_pointer = true;
+
+    claim_mappings = {
+      nomad_namespace = "nomad_namespace";
+      nomad_job_id = "nomad_job_id";
+      nomad_group = "nomad_group";
+      nomad_task = "nomad_task";
+    };
+
+    # token_type should be "service" so Nomad can renew them throughout the
+    # task's lifecycle.
+    token_type = "service";
+    token_policies = [
       "\${vault_policy.nomad_workloads.name}"
     ];
+
+    token_period = 3600;
+    token_explicit_max_ttl = 0;
   };
 
   # Policy for regular Nomad workloads (namespace/job-scoped secrets)
   resource.vault_policy.nomad_workloads = {
     name = "nomad-workloads";
     policy = ''
-      path "secret/data/{{identity.entity.aliases.''${module.vault_setup.auth_backend_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.''${module.vault_setup.auth_backend_accessor}.metadata.nomad_job_id}}/*" {
+      path "secret/data/{{identity.entity.aliases.''${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.''${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}/*" {
         capabilities = ["read"]
       }
 
-      path "secret/data/{{identity.entity.aliases.''${module.vault_setup.auth_backend_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.''${module.vault_setup.auth_backend_accessor}.metadata.nomad_job_id}}" {
+      path "secret/data/{{identity.entity.aliases.''${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.''${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}" {
         capabilities = ["read"]
       }
 
-      path "secret/metadata/{{identity.entity.aliases.''${module.vault_setup.auth_backend_accessor}.metadata.nomad_namespace}}/*" {
+      path "secret/metadata/{{identity.entity.aliases.''${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/*" {
         capabilities = ["list"]
       }
 
@@ -108,7 +139,7 @@
     # Match the nomad_job_id claim
     name = "github-runner";
 
-    mount_accessor = "\${module.vault_setup.auth_backend_accessor}";
+    mount_accessor = "\${vault_jwt_auth_backend.nomad.accessor}";
     canonical_id = "\${vault_identity_entity.github_runner.id}";
   };
 
