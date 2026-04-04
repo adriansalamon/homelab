@@ -158,40 +158,6 @@
         }
       '';
     };
-
-    github_runner_terraform = {
-      name = "github-runner-terraform";
-      description = "Policy for GitHub Actions runner to manage Consul ACL configuration via Terraform";
-      rules = ''
-        # Allow managing ACL policies
-        acl = "write"
-
-        # Allow reading intentions (for managing service mesh config)
-        operator = "read"
-
-        # Allow managing config entries (for service mesh, ingress gateways, etc.)
-        mesh = "write"
-
-        # Read common keys for configuration
-        key_prefix "config/" {
-          policy = "read"
-        }
-
-        # Read build info
-        key_prefix "builds/" {
-          policy = "read"
-        }
-
-        # Allow reading services and nodes (needed for Terraform data sources)
-        service_prefix "" {
-          policy = "read"
-        }
-
-        node_prefix "" {
-          policy = "read"
-        }
-      '';
-    };
   };
 
   # ACL Tokens
@@ -311,10 +277,6 @@
     name = "nomad-job-default-github-runner";
     description = "Role for GitHub Actions runner doing Terraform applies";
 
-    policies = [
-      "\${consul_acl_policy.read_common.id}"
-      "\${consul_acl_policy.read_services.id}"
-      "\${consul_acl_policy.github_runner_terraform.id}"
-    ];
+    policies = [ "global-management" ];
   };
 }

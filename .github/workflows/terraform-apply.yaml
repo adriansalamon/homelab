@@ -34,6 +34,13 @@ jobs:
               required = true
           EOF
 
+      - name: Get nomad management token
+        run: |
+          NOMAD_TOKEN=$(curl -sSf \
+                 --header "X-Vault-Token: $VAULT_TOKEN" \
+                 "$VAULT_ADDR/v1/nomad/creds/admin" | jq -r .data.secret_id)
+          echo "NOMAD_TOKEN=$NOMAD_TOKEN" >> $GITHUB_ENV
+
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
