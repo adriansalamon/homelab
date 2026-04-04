@@ -63,7 +63,7 @@ jobs:
 
       - name: Store SSH private key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > $SOPS_AGE_SSH_PRIVATE_KEY_FILE
+          echo "${{ secrets.AGECRYPT_KEY }}" | base64 -d > $SOPS_AGE_SSH_PRIVATE_KEY_FILE
           chmod 600 $SOPS_AGE_SSH_PRIVATE_KEY_FILE
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6

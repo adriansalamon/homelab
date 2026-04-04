@@ -16,23 +16,5 @@
       description = "Nomad URL";
       default = "https://nomad.local.${globals.domains.main}";
     };
-
-    authelia_oidc_client_secret = {
-      type = "string";
-      description = "OIDC client secret for Vault Authelia integration";
-      sensitive = true;
-    };
-
-    nomad_oidc_client_secret = {
-      type = "string";
-      description = "OIDC client secret for Nomad Authelia integration";
-      sensitive = true;
-    };
-
-    consul_bootstrap_token = {
-      type = "string";
-      description = "Consul bootstrap token for Vault Consul secrets engine";
-      sensitive = true;
-    };
   };
 }

@@ -129,7 +129,7 @@
     config = {
       oidc_discovery_url = "https://auth.\${var.domain}";
       oidc_client_id = "nomad";
-      oidc_client_secret = "\${var.nomad_oidc_client_secret}";
+      oidc_client_secret = "\${data.vault_kv_secret_v2.oidc_client_secrets.data.nomad}";
       bound_audiences = [ "nomad" ];
       allowed_redirect_uris = [
         "\${var.nomad_url}/ui/settings/tokens"

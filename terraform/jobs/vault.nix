@@ -12,6 +12,17 @@
     '';
   };
 
+  ephemeral.vault_kv_secret_v2.oidc_client_secrets = {
+    mount = "\${vault_mount.kvv2.path}";
+    mount_id = "\${vault_mount.kvv2.id}";
+    name = "oidc_client_secrets";
+  };
+
+  data.vault_kv_secret_v2.oidc_client_secrets = {
+    mount = "\${vault_mount.kvv2.path}";
+    name = "oidc_client_secrets";
+  };
+
   # OIDC authentication via Authelia
   resource.vault_jwt_auth_backend.authelia = {
     description = "Authelia OIDC";
@@ -19,7 +30,7 @@
     type = "oidc";
     oidc_discovery_url = "https://auth.\${var.domain}";
     oidc_client_id = "vault";
-    oidc_client_secret_wo = "\${var.authelia_oidc_client_secret}";
+    oidc_client_secret_wo = "\${ephemeral.vault_kv_secret_v2.oidc_client_secrets.data.vault}";
     oidc_client_secret_wo_version = 1;
     default_role = "admin";
 
