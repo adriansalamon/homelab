@@ -16,6 +16,9 @@ in
     packages = with pkgs; [
       rustup
       tex
+      consul
+      vault-bin
+      sops
     ];
   };
 }

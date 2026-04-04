@@ -251,9 +251,11 @@ in
                   res = res // {
                     ${elem.hostMountpoint} = {
                       fsType = "zfs";
-                      options =
-                        [ "zfsutil" ]
-                        ++ optional (prev != null)
+                      options = [
+                        "zfsutil"
+                      ]
+                      ++
+                        optional (prev != null)
                           "x-systemd.requires-mounts-for=${
                             warnIf (hasInfix " " prev.hostMountpoint)
                               "HostMountpoint ${prev.hostMountpoint} cannot contain a space"

@@ -56,7 +56,7 @@ job "alertmanager" {
         args = [
           "--config.file=${NOMAD_SECRETS_DIR}/alertmanager.yaml",
           "--web.listen-address=${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}",
-          "--web.external-url=https://alertmanager.local.salamon.xyz",
+          "--web.external-url=https://alertmanager.local.${DOMAIN}",
           "--storage.path=${NOMAD_ALLOC_DIR}/alertmanager",
         ]
       }

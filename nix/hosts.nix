@@ -16,6 +16,39 @@
         nameValuePair
         ;
 
+      mkRpi =
+        name: hostConfig:
+        let
+          system = "aarch64-linux";
+          pkgs = config.pkgs.${system};
+          profiles = pkgs.lib.rakeLeaves ../profiles;
+        in
+        {
+          nixosConfigurations.${name} = inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = {
+              inherit (inputs) agenix;
+              inherit inputs;
+              inherit (pkgs) lib;
+              inherit (config) nodes globals;
+              inherit profiles;
+              nomadCfg = config.nomadConfigurations.homelab;
+            };
+            modules = [
+              ../hosts/nixos/${name}
+              {
+                nixpkgs.config.allowUnfree = true;
+                node = {
+                  name = name;
+                  secretsDir = ../hosts/nixos/${name}/secrets;
+                };
+                networking.hostName = name;
+                nixpkgs.overlays = (import ../pkgs/default.nix inputs) ++ [ (import ../lib inputs) ];
+              }
+            ];
+          };
+        };
+
       mkHost =
         name: hostConfig:
         let
@@ -68,12 +101,12 @@
             modules = [
               inputs.agenix.darwinModules.default
               inputs.agenix-rekey.darwinModules.default
-              #{ nix.linux-builder.enable = true; }
-              inputs.nix-rosetta-builder.darwinModules.default
-              {
-                nix-rosetta-builder.onDemand = true;
-                nix-rosetta-builder.enable = false;
-              }
+              { nix.linux-builder.enable = true; }
+              #inputs.nix-rosetta-builder.darwinModules.default
+              #{
+              #  nix-rosetta-builder.onDemand = true;
+              #  nix-rosetta-builder.enable = false;
+              #}
               ../hosts/darwin
               ../hosts/darwin/atlas
               inputs.home-manager.darwinModules.home-manager
@@ -103,6 +136,7 @@
         (mkHost "penelope" { })
         (mkHost "pan" { })
         (mkDarwin "atlas" inputs.nixpkgs [ ])
+        (mkRpi "callisto" { })
       ];
     in
     hosts
@@ -122,7 +156,7 @@
           (
             name: cfg:
             let
-              system = "x86_64-linux";
+              system = cfg.config.nixpkgs.hostPlatform.system;
               deployCfg = config.globals.deploy.${name};
             in
             {

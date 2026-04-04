@@ -31,11 +31,15 @@
   nixpkgs.config.allowUnfree = true;
 
   nix = {
+
+    linux-builder.enable = true;
+
     settings = {
       max-jobs = "auto";
       trusted-users = [
         "root"
         "asalamon"
+        "@admin"
       ];
       experimental-features = "nix-command flakes";
 

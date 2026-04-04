@@ -54,7 +54,6 @@ let
 
 in
 {
-  # Mosquitto for MQTT
 
   age.secrets = {
     "home-assistant-secrets.yaml" = {
@@ -86,6 +85,15 @@ in
       };
     }
   );
+
+  # Mosquitto for MQTT
+
+  environment.persistence."/state".directories = lib.singleton {
+    directory = config.services.mosquitto.dataDir;
+    user = "mosquitto";
+    group = "mosquitto";
+    mode = "0700";
+  };
 
   services.mosquitto = {
     enable = true;

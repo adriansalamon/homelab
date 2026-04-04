@@ -44,29 +44,29 @@ in
         enabled = true;
         inherit port;
         host = globals.nebula.mesh.hosts.${host}.ipv4;
-        url = "https://zigbee2mqtt.local.${globals.domains.main}";
+        url = "https://zigbee2mqtt-${config.node.site}.local.${globals.domains.main}";
       };
 
       mqtt = {
-        base_topic = "zigbee2mqtt";
+        base_topic = "zigbee2mqtt/${config.node.site}";
         server = "mqtt://mqtt.local.${globals.domains.main}:1883";
         user = "zigbee2mqtt";
         password = "!${config.age.secrets."mqtt-secrets.yaml".path} password";
       };
 
       serial = {
-        port = "/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c0429d73cf8aef119de222ccef8776e9-if00-port0";
-        adapter = "zstack";
+        port = "/dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_14657d6e7ef3ef118072c21b6d9880ab-if00-port0";
+        adapter = "ember";
       };
     };
   };
 
-  consul.services.zigbee2mqtt = {
+  consul.services."zigbee2mqtt-${config.node.site}" = {
     inherit port;
     tags = [
       "traefik.enable=true"
-      "traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.local.${globals.domains.main}`)"
-      "traefik.http.routers.zigbee2mqtt.entrypoints=websecure"
+      "traefik.http.routers.zigbee2mqtt-${config.node.site}.rule=Host(`zigbee2mqtt-${config.node.site}.local.${globals.domains.main}`)"
+      "traefik.http.routers.zigbee2mqtt-${config.node.site}.entrypoints=websecure"
     ];
   };
 
