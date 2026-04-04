@@ -46,7 +46,7 @@ job "vmalert" {
       }
 
       config {
-        image = "victoriametrics/vmalert:v1.138.0"
+        image = "victoriametrics/vmalert:v1.139.0"
         ports = ["http"]
         args = [
           "-datasource.url=http://srv+lb-metrics.service.consul",
