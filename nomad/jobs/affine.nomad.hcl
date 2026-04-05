@@ -15,7 +15,7 @@ job "affine" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/toeverything/affine:0.26.4"
+        image = "ghcr.io/toeverything/affine:0.26.6"
         ports = ["http"]
         volumes = [
           "local/config:/root/.affine/config"
@@ -157,7 +157,7 @@ EOF
       driver = "docker"
 
       config {
-        image   = "ghcr.io/toeverything/affine:0.26.4"
+        image   = "ghcr.io/toeverything/affine:0.26.6"
         ports   = ["http"]
         command = "node"
         args    = ["./scripts/self-host-predeploy.js"]
