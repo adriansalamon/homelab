@@ -80,7 +80,7 @@ jobs:
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - if: matrix.machine.platform == 'aarch64-linux'
+      - if: matrix.machine.system == 'aarch64-linux'
         uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4
 
       # TODO: this does not work reliably
