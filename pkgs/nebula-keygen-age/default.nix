@@ -5,7 +5,7 @@ buildGoModule {
 
   src = ./src;
 
-  vendorHash = "sha256-RGWXSHwUc/epjkrWUmTTfE4u/zeCuIAi2gch4RC/M44=";
+  vendorHash = "sha256-jgXlROzWOb9zbjpOrpIHIh9NGJQAXN0ofeQY3CEx+Hk=";
 
   meta = with lib; {
     description = "Nebula keygen with stdin/stdout instead of files to make it usable with agenix.";

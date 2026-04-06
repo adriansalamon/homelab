@@ -7,7 +7,7 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    (modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
+    #(modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
   ];
 
   # Raspberry Pi 3B+ specific configuration
@@ -80,5 +80,5 @@
   powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 
   # Increase boot partition size for SD card image
-  sdImage.firmwareSize = 300; # MB
+  # sdImage.firmwareSize = 300; # MB
 }

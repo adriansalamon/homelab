@@ -149,6 +149,18 @@ name = "Zigbee2MQTT"
 description = "Zigbee device bridge"
 category = "smart home"
 
+[zigbee2mqtt-erebus]
+name = "Zigbee2MQTT Erebus"
+description = "Zigbee device bridge"
+category = "smart home"
+icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/zigbee2mqtt.svg"
+
+[zigbee2mqtt-arcadia]
+name = "Zigbee2MQTT Arcadia"
+description = "Zigbee device bridge"
+category = "smart home"
+icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/zigbee2mqtt.svg"
+
 # Infrastructure & Monitoring
 [authelia]
 name = "Authelia"
@@ -231,6 +243,12 @@ description = "Reverse proxy at Ithaca"
 category = "network"
 icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/traefik.svg"
 
+[traefik-arcadia]
+name = "Traefik Arcadia"
+description = "Reverse proxy at Arcadia"
+category = "network"
+icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/traefik.svg"
+
 [traefik-external]
 name = "Traefik External"
 description = "External reverse proxy dashboard"
@@ -257,7 +275,7 @@ EOH
     {
       "id": "consul",
       "url": "https://consul.local.{{ $domain }}"
-    }{{- range sprig_list "erebus" "olympus" "delphi" "ithaca" -}},
+    }{{- range sprig_list "erebus" "olympus" "delphi" "ithaca" "arcadia" -}},
     {
       "id": "traefik-{{ . }}",
       "url": "https://traefik-{{ . }}.local.{{ $domain }}"

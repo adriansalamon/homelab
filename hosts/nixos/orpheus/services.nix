@@ -61,12 +61,12 @@ in
     };
   };
 
-  consul.services.zigbee2mqtt = {
+  consul.services.zigbee2mqtt-erebus = {
     inherit port;
     tags = [
       "traefik.enable=true"
-      "traefik.http.routers.zigbee2mqtt.rule=Host(`zigbee2mqtt.local.${globals.domains.main}`)"
-      "traefik.http.routers.zigbee2mqtt.entrypoints=websecure"
+      "traefik.http.routers.zigbee2mqtt-erebus.rule=Host(`zigbee2mqtt-erebus.local.${globals.domains.main}`)"
+      "traefik.http.routers.zigbee2mqtt-erebus.entrypoints=websecure"
     ];
   };
 

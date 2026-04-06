@@ -1,33 +1,30 @@
-{
-  profiles,
-  ...
-}:
+{ profiles, ... }:
+let
+  site = "arcadia";
+in
 {
   # Raspberry Pi 3B+ at Arcadia
   imports = [
     ./hardware-configuration.nix
     ./net.nix
     ./zigbee.nix
+    ./dns.nix
   ]
   ++ (with profiles; [
     common
     impermanence
     services.consul-client
     auto-update
+    services.traefik
   ]);
 
-  node.site = "arcadia";
+  node = { inherit site; };
 
   networking.hostId = "c4736ae3";
-
-  services.openssh.enable = true;
 
   # Basic monitoring
   meta.vector.enable = true;
   meta.telegraf.enable = true;
-
-  # Don't mark as dummy so it can be deployed
-  node.dummy = false;
 
   system.stateVersion = "25.05";
 }
