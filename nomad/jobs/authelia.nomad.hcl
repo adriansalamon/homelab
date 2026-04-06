@@ -284,27 +284,6 @@ identity_providers:
           - groups
         token_endpoint_auth_method: client_secret_basic
 
-      - client_id: 'linkwarden'
-        client_name: 'Linkwarden'
-        client_secret: {{ .linkwarden_oidc_client_secret }}
-        pre_configured_consent_duration: "3 months"
-        public: false
-        require_pkce: false
-        redirect_uris:
-          - 'https://linkwarden.{{ $domain }}/api/v1/auth/callback/authelia'
-        scopes:
-          - 'openid'
-          - 'groups'
-          - 'email'
-          - 'profile'
-        response_types:
-          - 'code'
-        grant_types:
-          - 'authorization_code'
-        access_token_signed_response_alg: 'none'
-        userinfo_signed_response_alg: 'none'
-        token_endpoint_auth_method: 'client_secret_basic'
-
       - client_id: 'memos'
         client_name: 'Memos'
         client_secret: {{ .memos_oidc_client_secret }}

@@ -83,7 +83,6 @@ in
     "forgejo"
     "hass"
     "nomad"
-    "linkwarden"
     "memos"
     "stalwart"
     "affine"

@@ -60,12 +60,6 @@ name = "Memos"
 description = "Note-taking and journaling"
 category = "productivity"
 
-[linkwarden]
-name = "Linkwarden"
-description = "Bookmark and link manager"
-category = "productivity"
-icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/linkwarden.png"
-
 [paperless]
 name = "Paperless"
 description = "Document management system"

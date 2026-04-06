@@ -50,7 +50,7 @@ in the event of any one site going down.
 | 🛡️ Reverse Proxy      | Traefik                | Reverse proxy to secure access to services, uses Consul for dynamic service discovery.                             |
 | 🗂️ Network Management | UniFi Controller       | Central network controller for all UniFi devices across all sites.                                                 |
 | 📔 Notes              | Memos                  | Self-hosted note-taking app.                                                                                       |
-| 🎞️ Link management    | Linkwarden             | Link manager and collector for links.                                                                              |
+| 🎞️ Link management    | Linkding               | Link manager and collector for links.                                                                              |
 | 🔊 Music              | Snapserver             | Acts as a streaming device from Spotify or AirPlay, and syncs multiroom audio. I run Raspberry Pis as snapclients. |
 | 📂 File Server        | Samba                  | NAS file storage for clients on local network.                                                                     |
 | 📦 Git Forge          | Forgejo                | Self-hosted Git forge, alternative to GitHub. I host and back up private stuff here.                               |

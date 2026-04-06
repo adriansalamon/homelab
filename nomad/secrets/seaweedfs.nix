@@ -17,7 +17,6 @@ let
 
   secrets = map mkWeedSecret [
     "admin"
-    "linkwarden"
     "memos"
     "stalwart"
     "loki"

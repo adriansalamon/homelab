@@ -221,11 +221,6 @@ EOF
               "actions": ["Admin", "Read", "Write", "List", "Tagging"]
             },
             {
-              "name": "linkwarden",
-              "credentials": [{ "accessKey": "linkwarden", "secretKey": "{{ .linkwarden_secret_key }}" }],
-              "actions": ["Read:linkwarden", "Write:linkwarden", "List:linkwarden", "Tagging:linkwarden"]
-            },
-            {
               "name": "memos",
               "credentials": [{ "accessKey": "memos", "secretKey": "{{ .memos_secret_key }}" }],
               "actions": ["Read:memos", "Write:memos", "List:memos", "Tagging:memos"]
