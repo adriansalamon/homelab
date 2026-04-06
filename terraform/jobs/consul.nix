@@ -279,4 +279,18 @@
 
     policies = [ "global-management" ];
   };
+
+  resource.consul_acl_role.nomad_job_default_vmalert = {
+    name = "nomad-job-default-vmalert";
+    description = "Role for vmalert for consul service discovery";
+
+    policies = [ "base-agent-policy" ];
+  };
+
+  resource.consul_acl_role.nomad_job_default_prometheus = {
+    name = "nomad-job-default-prometheus";
+    description = "Role for Prometheus for consul service discovery";
+
+    policies = [ "base-agent-policy" ];
+  };
 }

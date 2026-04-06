@@ -9,7 +9,6 @@
     ./hardware-configuration.nix
     ./net.nix
     ./samba
-    ./snapserver
     ./ai.nix
     ./guests.nix
     ./services.nix

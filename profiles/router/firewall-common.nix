@@ -89,7 +89,6 @@ in
             8080 # unifi inform
             1883 # mqtt
             2222 # forgejo ssh
-
           ];
         };
 

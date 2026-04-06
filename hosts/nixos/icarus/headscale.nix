@@ -156,7 +156,7 @@ in
 
   globals.nebula.mesh.hosts.icarus.firewall.inbound = [
     {
-      "port" = builtins.toString config.services.headscale.port;
+      "port" = toString config.services.headscale.port;
       "proto" = "tcp";
       "group" = "reverse-proxy";
     }

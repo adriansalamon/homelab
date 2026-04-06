@@ -8,6 +8,7 @@
 let
   host = config.node.name;
   port = 8234;
+  serviceName = "zigbee2mqtt-${config.node.site}";
 in
 {
 
@@ -65,8 +66,8 @@ in
     inherit port;
     tags = [
       "traefik.enable=true"
-      "traefik.http.routers.zigbee2mqtt-${config.node.site}.rule=Host(`zigbee2mqtt-${config.node.site}.local.${globals.domains.main}`)"
-      "traefik.http.routers.zigbee2mqtt-${config.node.site}.entrypoints=websecure"
+      "traefik.http.routers.${serviceName}.rule=Host(`${serviceName}.local.${globals.domains.main}`)"
+      "traefik.http.routers.${serviceName}.entrypoints=websecure"
     ];
   };
 
@@ -82,4 +83,10 @@ in
       host = "zeus-home-assistant";
     }
   ];
+
+  globals.monitoring.http."${serviceName}" = {
+    url = "https://${serviceName}.local.${globals.domains.main}/";
+    network = "internal";
+    expectedBodyRegex = "Zigbee2MQTT";
+  };
 }
