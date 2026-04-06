@@ -119,8 +119,8 @@ job "vector" {
           [[ with nomadVar "nomad/jobs/vector" ]]
           [sinks.loki.auth]
             strategy = "basic"
-            user = "[[ .username ]]"
-            password = "[[ .password ]]"
+            user = "extra/homelab+vector-loki-basic-auth-password"
+            password = "[[ .loki_basic_auth_password ]]"
           [[ end ]]
         EOH
       }
