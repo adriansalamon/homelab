@@ -125,7 +125,7 @@ datasources:
     access: proxy
     url: http://loki.service.consul:19832
     basicAuth: true
-    basicAuthUser: "nomad+grafana-loki-basic-auth-password"
+    basicAuthUser: "extra/homelab+grafana-loki-basic-auth-password"
     secureJsonData:
       basicAuthPassword: {{ with nomadVar "nomad/jobs/grafana" }}{{ .loki_basic_auth_password }}{{ end }}
 EOF
