@@ -1,10 +1,14 @@
 job "alertmanager" {
   group "alertmanager" {
-    count = 1
+    count = 2
 
     network {
       port "http" {
         static = 24837
+      }
+
+      port "cluster" {
+        static = 24838
       }
 
       mode = "cni/nebula"
@@ -20,6 +24,8 @@ job "alertmanager" {
       driver = "docker"
 
       meta {
+        nebula_roles = jsonencode(["alertmanager"])
+
         nebula_config = yamlencode({
           firewall = {
             outbound = [
@@ -44,6 +50,17 @@ job "alertmanager" {
                 port  = "24837"
                 proto = "tcp"
                 group = "metrics-ruler"
+              },
+              {
+                port  = "24838"
+                proto = "tcp"
+                group = "nomad-client"
+              },
+              # cluster comms
+              {
+                port  = "24838"
+                proto = "tcp"
+                group = "alertmanager"
               }
             ]
           }
@@ -52,12 +69,15 @@ job "alertmanager" {
 
       config {
         image = "prom/alertmanager:v0.31.1"
-        ports = ["http"]
+        ports = ["http", "cluster"]
         args = [
           "--config.file=${NOMAD_SECRETS_DIR}/alertmanager.yaml",
           "--web.listen-address=${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}",
           "--web.external-url=https://alertmanager.local.${DOMAIN}",
           "--storage.path=${NOMAD_ALLOC_DIR}/alertmanager",
+          "--cluster.listen-address=${NOMAD_ALLOC_IP_cluster}:${NOMAD_PORT_cluster}",
+          "--cluster.advertise-address=${NOMAD_ALLOC_IP_cluster}:${NOMAD_PORT_cluster}",
+          "--cluster.peer=alertmanager-cluster.service.consul:${NOMAD_PORT_cluster}",
         ]
       }
 
@@ -115,7 +135,6 @@ receivers:
         url: '{{ if gt (len .Alerts) 0 }}{{ (index .Alerts 0).GeneratorURL }}{{ else }}{{ .ExternalURL }}{{ end }}'
         url_title: '{{ if eq .Status "resolved" }}View history{{ else }}View alert{{ end }}'
 
-
 inhibit_rules:
   - source_matchers:
       - severity="critical"
@@ -153,6 +172,18 @@ EOF
         check {
           type     = "http"
           path     = "/-/healthy"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+      service {
+        name    = "alertmanager-cluster"
+        port    = "cluster"
+        address = "${NOMAD_ALLOC_IP_cluster}"
+
+        check {
+          type     = "tcp"
           interval = "10s"
           timeout  = "2s"
         }

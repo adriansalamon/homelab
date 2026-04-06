@@ -13,6 +13,8 @@ job "vmalert" {
     task "vmalert" {
       driver = "docker"
 
+      consul {}
+
       meta {
         nebula_roles = jsonencode(["metrics-ruler"])
         nebula_config = yamlencode({
@@ -52,11 +54,23 @@ job "vmalert" {
           "-datasource.url=http://srv+lb-metrics.service.consul",
           "-remoteWrite.url=http://srv+prometheus.service.consul",
           "-remoteRead.url=http://srv+lb-metrics.service.consul",
-          "-notifier.url=http://srv+alertmanager.service.consul",
+          "-notifier.config=${NOMAD_ALLOC_DIR}/notifier.yaml",
           "-rule=${NOMAD_ALLOC_DIR}/rules/*.yaml",
           "-httpListenAddr=${NOMAD_ALLOC_IP_http}:${NOMAD_PORT_http}",
           "-external.url=https://vmalert.local.${DOMAIN}"
         ]
+      }
+
+      template {
+        data = <<EOF
+consul_sd_configs:
+  - server: consul.local.{{ key "config/domains/main" }}
+    scheme: "https"
+    token: {{ env "CONSUL_TOKEN" }}
+    services:
+      - alertmanager
+EOF
+        destination = "${NOMAD_ALLOC_DIR}/notifier.yaml"
       }
 
       template {
