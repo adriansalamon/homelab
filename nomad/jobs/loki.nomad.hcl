@@ -126,7 +126,7 @@ EOF
       vault {}
 
       config {
-        image = "nginx:1.29.7-alpine"
+        image = "nginx:1.29.8-alpine"
         ports = ["http"]
         volumes = [
           "local/nginx.conf:/etc/nginx/nginx.conf",
