@@ -14,6 +14,8 @@ job "affine" {
     task "affine" {
       driver = "docker"
 
+      vault {}
+
       config {
         image = "ghcr.io/toeverything/affine:0.26.4"
         ports = ["http"]
@@ -55,9 +57,9 @@ EOF
 
       template {
         data        = <<EOF
-{{ with nomadVar "nomad/jobs/affine" }}
-DATABASE_URL=postgresql://affine:{{ .postgres_password }}@master.homelab-cluster.service.consul:5432/affine
-REDIS_SERVER_PASSWORD={{ .redis_password }}
+{{ with secret "secret/data/default/affine" }}
+DATABASE_URL=postgresql://affine:{{ .Data.data.postgres_password }}@master.homelab-cluster.service.consul:5432/affine
+REDIS_SERVER_PASSWORD={{ .Data.data.redis_password }}
 {{ end }}
 EOF
         destination = "${NOMAD_SECRETS_DIR}/secrets.env"
@@ -69,7 +71,7 @@ EOF
       template {
         destination = "/root/.affine/config/private.key"
         data        = <<EOT
-{{ with nomadVar "nomad/jobs/affine" }}{{ .private_key }}{{ end }}
+{{ with secret "secret/data/default/affine" }}{{ .Data.data.private_key }}{{ end }}
 EOT
       }
 
@@ -78,7 +80,7 @@ EOT
       template {
         data        = <<EOF
 {{ $domain := key "config/domains/main" }}
-{{ with nomadVar "nomad/jobs/affine" }}
+{{ with secret "secret/data/default/affine" }}
 {
   "server": {
     "host": "affine.{{ $domain }}",
@@ -94,7 +96,7 @@ EOT
   "oauth": {
     "providers.oidc": {
       "clientId": "affine",
-      "clientSecret": "{{ .oidc_client_secret }}",
+      "clientSecret": "{{ .Data.data.oidc_client_secret }}",
       "issuer": "https://auth.{{ $domain }}",
       "args": {
         "scope": "openid profile email",
@@ -115,7 +117,7 @@ EOT
           "forcePathStyle": true,
           "credentials": {
             "accessKeyId": "affine",
-            "secretAccessKey": "{{ .s3_secret_key }}"
+            "secretAccessKey": "{{ .Data.data.s3_secret_key }}"
           }
         }
       }
@@ -156,6 +158,8 @@ EOF
 
       driver = "docker"
 
+      vault {}
+
       config {
         image   = "ghcr.io/toeverything/affine:0.26.4"
         ports   = ["http"]
@@ -166,7 +170,7 @@ EOF
       template {
         destination = "/root/.affine/config/private.key"
         data        = <<EOT
-{{ with nomadVar "nomad/jobs/affine" }}{{ .private_key }}{{ end }}
+{{ with secret "secret/data/default/affine" }}{{ .Data.data.private_key }}{{ end }}
 EOT
       }
 
@@ -175,9 +179,9 @@ EOT
 REDIS_SERVER_HOST=master.redis.service.consul
 REDIS_SERVER_PORT=6379
 AFFINE_INDEXER_ENABLED=false
-{{ with nomadVar "nomad/jobs/affine" }}
-DATABASE_URL=postgresql://affine:{{ .postgres_password }}@master.homelab-cluster.service.consul:5432/affine
-REDIS_SERVER_PASSWORD={{ .redis_password }}
+{{ with secret "secret/data/default/affine" }}
+DATABASE_URL=postgresql://affine:{{ .Data.data.postgres_password }}@master.homelab-cluster.service.consul:5432/affine
+REDIS_SERVER_PASSWORD={{ .Data.data.redis_password }}
 {{ end }}
 EOF
         destination = "${NOMAD_SECRETS_DIR}/secrets.env"

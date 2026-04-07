@@ -19,6 +19,8 @@ job "loki" {
     task "loki" {
       driver = "docker"
 
+      vault {}
+
       meta {
         nebula_config = yamlencode({
           firewall = {
@@ -49,7 +51,9 @@ job "loki" {
 
       template {
         data        = <<EOF
-S3_SECRET_KEY={{ with nomadVar "nomad/jobs/loki" }}{{ .s3_secret_key }}{{ end }}
+{{ with secret "secret/data/default/loki" }}
+S3_SECRET_KEY={{ .Data.data.s3_secret_key }}
+{{ end }}
 EOF
         env         = true
         destination = "${NOMAD_SECRETS_DIR}/secret.env"
@@ -119,6 +123,8 @@ EOF
     task "nginx" {
       driver = "docker"
 
+      vault {}
+
       config {
         image = "nginx:1.29.7-alpine"
         ports = ["http"]
@@ -158,7 +164,7 @@ EOF
 
       template {
         data        = <<EOF
-{{ with nomadVar "nomad/jobs/loki" }}{{ .basic_auth_hashes }}{{ end }}
+{{ with secret "secret/data/default/loki" }}{{ .Data.data.basic_auth_hashes }}{{ end }}
 EOF
         destination = "${NOMAD_SECRETS_DIR}/basic-auth-hashes"
       }

@@ -33,6 +33,8 @@ job "seaweedfs-filer" {
     task "filer" {
       driver = "docker"
 
+      vault {}
+
       meta {
         nebula_roles = jsonencode(["postgres-client", "weed-filer"])
 
@@ -197,8 +199,8 @@ hostname = "primary.homelab-cluster.service.consul"
 port = 5432
 username = "seaweedfs"
 database = "seaweedfs"
-{{ with nomadVar "nomad/jobs/seaweedfs-filer" }}
-password = "{{ .postgres_password }}"
+{{ with secret "secret/data/default/seaweedfs-filer" }}
+password = "{{ .Data.data.postgres_password }}"
 {{ end }}
 schema = ""
 sslmode = "disable"
@@ -212,32 +214,32 @@ EOF
 
       template {
         data        = <<EOF
-        {{ with nomadVar "nomad/jobs/seaweedfs-filer" }}
+        {{ with secret "secret/data/default/seaweedfs-filer" }}
         {
           "identities": [
             {
               "name": "admin",
-              "credentials": [{ "accessKey": "admin", "secretKey": "{{ .admin_secret_key }}" }],
+              "credentials": [{ "accessKey": "admin", "secretKey": "{{ .Data.data.admin_secret_key }}" }],
               "actions": ["Admin", "Read", "Write", "List", "Tagging"]
             },
             {
               "name": "memos",
-              "credentials": [{ "accessKey": "memos", "secretKey": "{{ .memos_secret_key }}" }],
+              "credentials": [{ "accessKey": "memos", "secretKey": "{{ .Data.data.memos_secret_key }}" }],
               "actions": ["Read:memos", "Write:memos", "List:memos", "Tagging:memos"]
             },
             {
               "name": "stalwart-mail",
-              "credentials": [{ "accessKey": "stalwart-mail", "secretKey": "{{ .stalwart_secret_key }}" }],
+              "credentials": [{ "accessKey": "stalwart-mail", "secretKey": "{{ .Data.data.stalwart_secret_key }}" }],
               "actions": ["Read:stalwart-mail", "Write:stalwart-mail", "List:stalwart-mail", "Tagging:stalwart-mail"]
             },
             {
               "name": "loki",
-              "credentials": [{ "accessKey": "loki", "secretKey": "{{ .loki_secret_key }}" }],
+              "credentials": [{ "accessKey": "loki", "secretKey": "{{ .Data.data.loki_secret_key }}" }],
               "actions": ["Read:loki", "Write:loki", "List:loki", "Tagging:loki"]
             },
             {
               "name": "affine",
-              "credentials": [{ "accessKey": "affine", "secretKey": "{{ .affine_secret_key }}" }],
+              "credentials": [{ "accessKey": "affine", "secretKey": "{{ .Data.data.affine_secret_key }}" }],
               "actions": ["Read:affine-blobs", "Write:affine-blobs", "List:affine-blobs", "Tagging:affine-blobs"]
             }
           ]

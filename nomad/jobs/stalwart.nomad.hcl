@@ -17,6 +17,8 @@ job "stalwart" {
     task "stalwart" {
       driver = "docker"
 
+      vault {}
+
       meta {
         nebula_roles = jsonencode(["postgres-client"])
 
@@ -130,7 +132,7 @@ bucket = "stalwart-mail"
 region = "us-east-1"
 endpoint = "https://s3.local.{{ $domain }}"
 access-key = "stalwart-mail"
-secret-key = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .s3_secret_key }}{{ end }}"
+secret-key = "{{ with secret "secret/data/default/stalwart" }}{{ .Data.data.s3_secret_key }}{{ end }}"
 
 
 # ===================
@@ -144,7 +146,7 @@ port = "{{ .Port }}"
 {{ end }}
 database = "stalwart"
 user = "stalwart"
-password = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .postgres_password }}{{ end }}"
+password = "{{ with secret "secret/data/default/stalwart" }}{{ .Data.data.postgres_password }}{{ end }}"
 
 # ===================
 # Assign stores
@@ -166,7 +168,7 @@ domains = ["mail.{{ $domain }}"]
 challenge = "dns-01"
 renew-before = "30d"
 provider = "cloudflare"
-secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .cloudflare_dns_api_token }}{{ end }}"
+secret = "{{ with secret "secret/data/default/stalwart" }}{{ .Data.data.cloudflare_dns_api_token }}{{ end }}"
 
 [certificate."default"]
 acme = "letsencrypt"
@@ -190,7 +192,7 @@ fields.full-name = "name"
 # ===================
 [authentication.fallback-admin]
 user = "admin"
-secret = "{{ with nomadVar "nomad/jobs/stalwart" }}{{ .admin_password }}{{ end }}"
+secret = "{{ with secret "secret/data/default/stalwart" }}{{ .Data.data.admin_password }}{{ end }}"
           EOF
       }
 

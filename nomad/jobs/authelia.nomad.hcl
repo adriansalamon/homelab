@@ -15,6 +15,8 @@ job "authelia" {
     task "authelia" {
       driver = "docker"
 
+      vault {}
+
       config {
         image = "authelia/authelia:4.39"
         ports = ["http"]
@@ -111,11 +113,11 @@ identity_providers:
         rules:
           - policy: deny
             subject: "group:lldap_strict_readonly"
-{{ with nomadVar "nomad/jobs/authelia" }}
+{{ with secret "secret/data/default/authelia" }}
     clients:
       - client_id: "xcz7Bm8a5EC-fDtgd2WPFhX7raI0H2ZcQZww7PmmyRsa8cfvUuNQUz2HRtkNXflqooHwmHAe"
         client_name: "Immich"
-        client_secret: {{ .immich_oidc_client_secret }}
+        client_secret: {{ .Data.data.immich_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         redirect_uris:
@@ -131,7 +133,7 @@ identity_providers:
 
       - client_id: "3GATim_TL9yrNLsWhrC9mv0L-44zmv44qDu1EH8ZoXZVdGDrLaQYjjRO49Y66AKGDfzmS6yt"
         client_name: "Jellyfin"
-        client_secret: {{ .jellyfin_oidc_client_secret }}
+        client_secret: {{ .Data.data.jellyfin_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         require_pkce: true
@@ -148,7 +150,7 @@ identity_providers:
 
       - client_id: "M47wLZwSUPGuGEqeU172pz8eJ6zSPb1aDuZ-h0Y1z9JCEsb-eC27K6UzBuGLSCPF8Am-XpUF"
         client_name: "Tailscale"
-        client_secret: {{ .tailscale_oidc_client_secret }}
+        client_secret: {{ .Data.data.tailscale_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         redirect_uris:
@@ -162,7 +164,7 @@ identity_providers:
 
       - client_id: "headscale"
         client_name: "Headscale"
-        client_secret: {{ .headscale_oidc_client_secret }}
+        client_secret: {{ .Data.data.headscale_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         redirect_uris:
@@ -177,7 +179,7 @@ identity_providers:
 
       - client_id: "paperless"
         client_name: "Paperless"
-        client_secret: {{ .paperless_oidc_client_secret }}
+        client_secret: {{ .Data.data.paperless_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         redirect_uris:
@@ -197,7 +199,7 @@ identity_providers:
 
       - client_id: "grafana"
         client_name: "Grafana"
-        client_secret: {{ .grafana_oidc_client_secret }}
+        client_secret: {{ .Data.data.grafana_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         redirect_uris:
@@ -211,7 +213,7 @@ identity_providers:
 
       - client_id: "open-webui"
         client_name: "Open WebUI"
-        client_secret: {{ .open_webui_oidc_client_secret }}
+        client_secret: {{ .Data.data.open_webui_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         require_pkce: false
@@ -232,7 +234,7 @@ identity_providers:
 
       - client_id: "forgejo"
         client_name: "Forgejo"
-        client_secret: {{ .forgejo_oidc_client_secret }}
+        client_secret: {{ .Data.data.forgejo_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         require_pkce: true
@@ -253,7 +255,7 @@ identity_providers:
 
       - client_id: "hass"
         client_name: "Home Assistant"
-        client_secret: {{ .hass_oidc_client_secret }}
+        client_secret: {{ .Data.data.hass_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         require_pkce: true
@@ -270,7 +272,7 @@ identity_providers:
 
       - client_id: "nomad"
         client_name: "Nomad"
-        client_secret: {{ .nomad_oidc_client_secret }}
+        client_secret: {{ .Data.data.nomad_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         require_pkce: false
@@ -286,7 +288,7 @@ identity_providers:
 
       - client_id: 'memos'
         client_name: 'Memos'
-        client_secret: {{ .memos_oidc_client_secret }}
+        client_secret: {{ .Data.data.memos_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         require_pkce: false
@@ -306,7 +308,7 @@ identity_providers:
 
       - client_id: 'stalwart'
         client_name: 'Stalwart'
-        client_secret: {{ .stalwart_oidc_client_secret }}
+        client_secret: {{ .Data.data.stalwart_oidc_client_secret }}
         public: false
         authorization_policy: 'two_factor'
         require_pkce: true
@@ -327,7 +329,7 @@ identity_providers:
 
       - client_id: 'affine'
         client_name: 'Affine'
-        client_secret: {{ .affine_oidc_client_secret }}
+        client_secret: {{ .Data.data.affine_oidc_client_secret }}
         public: false
         pre_configured_consent_duration: "3 months"
         redirect_uris:
@@ -344,7 +346,7 @@ identity_providers:
 
       - client_id: 'opengist'
         client_name: 'Opengist'
-        client_secret: {{ .opengist_oidc_client_secret }}
+        client_secret: {{ .Data.data.opengist_oidc_client_secret }}
         public: false
         pre_configured_consent_duration: "3 months"
         redirect_uris:
@@ -359,7 +361,7 @@ identity_providers:
         token_endpoint_auth_method: 'client_secret_post'
       - client_id: 'vault'
         client_name: 'HashiCorp Vault'
-        client_secret: {{ .vault_oidc_client_secret }}
+        client_secret: {{ .Data.data.vault_oidc_client_secret }}
         pre_configured_consent_duration: "3 months"
         public: false
         redirect_uris:
@@ -379,8 +381,8 @@ EOF
 
       template {
         data        = <<EOF
-{{ with nomadVar "nomad/jobs/authelia" }}
-{{ .jwks_key }}{{ end }}
+{{ with secret "secret/data/default/authelia" }}
+{{ .Data.data.jwks_key }}{{ end }}
 EOF
         destination = "${NOMAD_SECRETS_DIR}/jwks.pem"
       }
@@ -391,35 +393,35 @@ EOF
 
       template {
         data = <<EOF
-{{ with nomadVar "nomad/jobs/authelia" }}
+{{ with secret "secret/data/default/authelia" }}
 session:
-  secret: {{ .session_secret }}
+  secret: {{ .Data.data.session_secret }}
   redis:
-    password: {{ .redis_password }}
+    password: {{ .Data.data.redis_password }}
     high_availability:
-      sentinel_password: {{ .redis_sentinel_password }}
+      sentinel_password: {{ .Data.data.redis_sentinel_password }}
 
 storage:
-  encryption_key: {{ .storage_encryption_key }}
+  encryption_key: {{ .Data.data.storage_encryption_key }}
   postgres:
-    password: {{ .postgres_password }}
+    password: {{ .Data.data.postgres_password }}
 
 authentication_backend:
   ldap:
-    password: {{ .ldap_password }}
+    password: {{ .Data.data.ldap_password }}
 
 notifier:
   smtp:
-    username: {{ .smtp_username }}
-    password: {{ .smtp_password }}
+    username: {{ .Data.data.smtp_username }}
+    password: {{ .Data.data.smtp_password }}
 
 identity_validation:
   reset_password:
-    jwt_secret: {{ .jwt_secret }}
+    jwt_secret: {{ .Data.data.jwt_secret }}
 
 identity_providers:
   oidc:
-    hmac_secret: {{ .hmac_secret }}
+    hmac_secret: {{ .Data.data.hmac_secret }}
     jwks:
       - key: {{ "{{" }} secret "{{ env "NOMAD_SECRETS_DIR" }}/jwks.pem" | mindent 10 "|" | msquote {{ "}}" }}
 {{ end }}

@@ -26,6 +26,8 @@ job "linkding" {
     task "linkding" {
       driver = "docker"
 
+      vault {}
+
       volume_mount {
         volume      = "linkding-data"
         destination = "/etc/linkding/data"
@@ -81,8 +83,8 @@ EOF
 
       template {
         data        = <<EOF
-{{ with nomadVar "nomad/jobs/linkding" }}
-LD_DB_PASSWORD={{ .postgres_password }}
+{{ with secret "secret/data/default/linkding" }}
+LD_DB_PASSWORD={{ .Data.data.postgres_password }}
 {{ end }}
 EOF
         destination = "${NOMAD_SECRETS_DIR}/secrets.env"

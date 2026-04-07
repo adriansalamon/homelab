@@ -230,15 +230,6 @@
       policies = [ "\${consul_acl_policy.nebula_cni.name}" ];
     };
 
-    atlantis = {
-      description = "Token for Atlantis";
-      policies = [
-        "\${consul_acl_policy.terraform.name}"
-        "\${consul_acl_policy.base_agent.name}"
-        "\${consul_acl_policy.write_session.name}"
-      ];
-    };
-
     vault = {
       description = "Token for Vault";
       policies = [ "global-management" ];

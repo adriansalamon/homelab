@@ -46,8 +46,8 @@
     }:
     {
       data = ''
-        {{ with nomadVar "nomad/jobs/${dbName}" }}
-        ${envVar}="postgresql://${dbUser}:{{ .postgres_password }}@${dbHost}:${toString dbPort}/${dbName}?sslmode=disable"
+        {{ with secret "secret/data/default/${dbName}" }}
+        ${envVar}="postgresql://${dbUser}:{{ .Data.data.postgres_password }}@${dbHost}:${toString dbPort}/${dbName}?sslmode=disable"
         {{ end }}
       '';
       destination = "\${NOMAD_SECRETS_DIR}/postgres.env";

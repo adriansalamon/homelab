@@ -18,6 +18,8 @@ in
       task.memos = {
         driver = "docker";
 
+        vault = { };
+
         config = {
           image = "neosmemo/memos:0.26.2";
         };

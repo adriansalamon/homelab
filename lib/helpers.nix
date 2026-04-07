@@ -127,6 +127,6 @@ in
     };
 
     inherit rakeLeaves time mkNomadConfiguration;
-
+    inherit (import ./time.nix) iso8601ToUnix;
   };
 }

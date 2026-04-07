@@ -13,6 +13,8 @@ job "grafana" {
     task "grafana" {
       driver = "docker"
 
+      vault {}
+
       meta {
         nebula_roles = jsonencode(["grafana"])
 
@@ -127,7 +129,7 @@ datasources:
     basicAuth: true
     basicAuthUser: "extra/homelab+grafana-loki-basic-auth-password"
     secureJsonData:
-      basicAuthPassword: {{ with nomadVar "nomad/jobs/grafana" }}{{ .loki_basic_auth_password }}{{ end }}
+      basicAuthPassword: {{ with secret "secret/data/default/grafana" }}{{ .Data.data.loki_basic_auth_password }}{{ end }}
 EOF
         destination = "${NOMAD_ALLOC_DIR}/provisioning/datasources/sources.yaml"
       }
@@ -135,10 +137,10 @@ EOF
       template {
         data        = <<EOF
 GF_PATHS_CONFIG="{{ env "NOMAD_ALLOC_DIR" }}/grafana.ini"
-{{ with nomadVar "nomad/jobs/grafana" }}
-GF_SECURITY_SECRET_KEY={{ .secret_key }}
-GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET={{ .oidc_client_secret }}
-GF_DATABASE_PASSWORD={{ .postgres_password }}
+{{ with secret "secret/data/default/grafana" }}
+GF_SECURITY_SECRET_KEY={{ .Data.data.secret_key }}
+GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET={{ .Data.data.oidc_client_secret }}
+GF_DATABASE_PASSWORD={{ .Data.data.postgres_password }}
 {{ end }}
 DOMAIN="{{ key "config/domains/main" }}"
 GF_PATHS_PROVISIONING="{{ env "NOMAD_ALLOC_DIR" }}/provisioning"

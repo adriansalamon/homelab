@@ -42,6 +42,9 @@ job "vector" {
 
     task "vector" {
       driver = "docker"
+
+      vault {}
+
       config {
         image = "timberio/vector:0.54.0-alpine"
       }
@@ -116,11 +119,11 @@ job "vector" {
             group = "{{label.\"com.hashicorp.nomad.task_group_name\" }}"
             namespace = "{{label.\"com.hashicorp.nomad.namespace\" }}"
             node = "{{label.\"com.hashicorp.nomad.node_name\" }}"
-          [[ with nomadVar "nomad/jobs/vector" ]]
+          [[ with secret "secret/data/default/vector" ]]
           [sinks.loki.auth]
             strategy = "basic"
             user = "extra/homelab+vector-loki-basic-auth-password"
-            password = "[[ .loki_basic_auth_password ]]"
+            password = "[[ .Data.data.loki_basic_auth_password ]]"
           [[ end ]]
         EOH
       }

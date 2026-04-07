@@ -19,6 +19,8 @@ job "lldap" {
     task "lldap" {
       driver = "docker"
 
+      vault {}
+
       config {
         image = "lldap/lldap:2026-03-04-alpine" # todo: pin to a specific version?
         ports = ["http", "ldap"]
@@ -73,11 +75,11 @@ job "lldap" {
 
       template {
         data = <<EOF
-{{ with nomadVar "nomad/jobs/lldap" }}
-LLDAP_JWT_SECRET = "{{ .jwt_secret }}"
-LLDAP_KEY_SEED = "{{ .key_seed }}"
-LLDAP_LDAP_USER_PASS = "{{ .user_password }}"
-LLDAP_DATABASE_URL = "postgres://lldap:{{ .postgres_password }}@{{ range service "primary.homelab-cluster" }}{{ .Address }}:{{ .Port }}{{ end }}/lldap"
+{{ with secret "secret/data/default/lldap" }}
+LLDAP_JWT_SECRET = "{{ .Data.data.jwt_secret }}"
+LLDAP_KEY_SEED = "{{ .Data.data.key_seed }}"
+LLDAP_LDAP_USER_PASS = "{{ .Data.data.user_password }}"
+LLDAP_DATABASE_URL = "postgres://lldap:{{ .Data.data.postgres_password }}@{{ range service "primary.homelab-cluster" }}{{ .Address }}:{{ .Port }}{{ end }}/lldap"
 {{ end }}
 EOF
 

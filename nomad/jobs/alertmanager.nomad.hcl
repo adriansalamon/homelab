@@ -23,6 +23,8 @@ job "alertmanager" {
     task "alertmanager" {
       driver = "docker"
 
+      vault {}
+
       meta {
         nebula_roles = jsonencode(["alertmanager"])
 
@@ -98,9 +100,9 @@ route:
 
 receivers:
   - name: pushover
-    pushover_configs:[[ with nomadVar "nomad/jobs/alertmanager" ]]
-      - user_key: [[ .pushover_user_key ]]
-        token: [[ .pushover_app_key ]][[ end ]]
+    pushover_configs:[[ with secret "secret/data/default/alertmanager" ]]
+      - user_key: [[ .Data.data.pushover_user_key ]]
+        token: [[ .Data.data.pushover_app_key ]][[ end ]]
         send_resolved: true
         title: '{{ if eq .Status "resolved" }}✅ RESOLVED: {{ or .GroupLabels.alertname .CommonLabels.alertname "Alert" }}{{ else }}🚨 {{ or .GroupLabels.alertname .CommonLabels.alertname "Alert" }} ({{ .Alerts.Firing | len }}){{ end }}'
         message: |

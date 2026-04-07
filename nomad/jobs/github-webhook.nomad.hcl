@@ -13,6 +13,8 @@ job "github-webhook" {
     task "webhook" {
       driver = "docker"
 
+      vault {}
+
       identity {
         env = true # Get NOMAD_TOKEN from workload identity
       }
@@ -57,9 +59,9 @@ job "github-webhook" {
       template {
         data        = <<EOF
 {{ $domain := key "config/domains/main" }}
-{{ with nomadVar "nomad/jobs/github-webhook" }}
-GITHUB_WEBHOOK_SECRET={{ .webhook_secret }}
-GITHUB_PAT={{ .pat }}
+{{ with secret "secret/data/default/github-webhook" }}
+GITHUB_WEBHOOK_SECRET={{ .Data.data.webhook_secret }}
+GITHUB_PAT={{ .Data.data.pat }}
 {{ end }}
 DOMAIN={{ $domain }}
 EOF

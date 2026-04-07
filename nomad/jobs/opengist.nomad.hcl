@@ -23,6 +23,8 @@ job "opengist" {
     task "opengist" {
       driver = "docker"
 
+      vault {}
+
       volume_mount {
         volume      = "opengist-data"
         destination = "/opengist"
@@ -70,11 +72,11 @@ EOF
 
       template {
         data        = <<EOF
-{{ with nomadVar "nomad/jobs/opengist" }}
-OG_DB_URI=postgres://opengist:{{ .postgres_password }}@master.homelab-cluster.service.consul:5432/opengist
+{{ with secret "secret/data/default/opengist" }}
+OG_DB_URI=postgres://opengist:{{ .Data.data.postgres_password }}@master.homelab-cluster.service.consul:5432/opengist
 OG_OIDC_PROVIDER_NAME=authelia
 OG_OIDC_CLIENT_KEY=opengist
-OG_OIDC_SECRET={{ .oidc_client_secret }}
+OG_OIDC_SECRET={{ .Data.data.oidc_client_secret }}
 OG_OIDC_DISCOVERY_URL=https://auth.{{ key "config/domains/main" }}/.well-known/openid-configuration
 {{ end }}
 EOF
