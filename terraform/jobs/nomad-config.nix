@@ -1,6 +1,9 @@
-# Nomad platform configuration
-# Migrated from terraform/infra/nomad.tf
-{ ... }:
+{
+  config,
+  lib,
+  globals,
+  ...
+}:
 {
   # ACL Policies
   resource.nomad_acl_policy = {
@@ -84,7 +87,7 @@
     github_runner_terraform = {
       name = "github-runner-terraform";
       description = "Policy for GitHub Actions runner to manage Nomad ACL configuration via Terraform";
-      rules_hcl = "\${nomad_acl_policy.admin.rules_hcl}";
+      inherit (config.resource.nomad_acl_policy.admin) rules_hcl;
 
       job_acl = {
         namespace = "default";
@@ -97,19 +100,19 @@
   resource.nomad_acl_token = {
     operator_token = {
       type = "client";
-      policies = [ "\${nomad_acl_policy.operator.name}" ];
+      policies = [ config.resource.nomad_acl_policy.operator.name ];
     };
 
     nebula_cni = {
       name = "nebula-cni";
       type = "client";
-      policies = [ "\${nomad_acl_policy.nebula_cni.name}" ];
+      policies = [ config.resource.nomad_acl_policy.nebula_cni.name ];
     };
 
     atlantis = {
       name = "atlantis";
       type = "client";
-      policies = [ "\${nomad_acl_policy.operator.name}" ];
+      policies = [ config.resource.nomad_acl_policy.operator.name ];
     };
 
     vault = {
@@ -127,12 +130,12 @@
     token_name_format = "authelia-\$\${value.username}";
 
     config = {
-      oidc_discovery_url = "https://auth.\${var.domain}";
+      oidc_discovery_url = "https://auth.${globals.domains.main}";
       oidc_client_id = "nomad";
-      oidc_client_secret = "\${data.vault_kv_secret_v2.oidc_client_secrets.data.nomad}";
+      oidc_client_secret = lib.tf.ref "data.vault_kv_secret_v2.oidc_client_secrets.data.nomad";
       bound_audiences = [ "nomad" ];
       allowed_redirect_uris = [
-        "\${var.nomad_url}/ui/settings/tokens"
+        "https://nomad.local.${globals.domains.main}/ui/settings/tokens"
         "http://localhost:4649/oidc/callback"
       ];
       oidc_scopes = [
@@ -150,10 +153,10 @@
   };
 
   resource.nomad_acl_binding_rule.authelia_admin = {
-    auth_method = "\${nomad_acl_auth_method.authelia.name}";
+    auth_method = config.resource.nomad_acl_auth_method.authelia.name;
     selector = "admin in list.groups";
     bind_type = "policy";
-    bind_name = "\${nomad_acl_policy.admin.name}";
+    bind_name = config.resource.nomad_acl_policy.admin.name;
   };
 
   # Scheduler configuration

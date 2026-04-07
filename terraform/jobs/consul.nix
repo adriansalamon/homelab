@@ -1,6 +1,31 @@
-# Consul platform configuration
-# Migrated from terraform/infra/consul.tf
-{ ... }:
+{
+  config,
+  lib,
+  globals,
+  ...
+}:
+let
+  inherit (config.resource) consul_acl_policy;
+
+  # Standard policies for any Consul agent node
+  common_agent_policies = [
+    consul_acl_policy.read_common.name
+    consul_acl_policy.base_agent.name
+  ];
+
+  # Helper for agent tokens
+  mkAgentToken = desc: extraPolicies: {
+    description = desc;
+    policies = common_agent_policies ++ extraPolicies;
+  };
+
+  # Helper for Nomad job roles
+  mkNomadRole = jobName: desc: policies: {
+    name = "nomad-job-default-${jobName}";
+    description = "Role for ${jobName} ${desc}";
+    inherit policies;
+  };
+in
 {
   # ACL Policies
   resource.consul_acl_policy = {
@@ -162,72 +187,45 @@
 
   # ACL Tokens
   resource.consul_acl_token = {
-    server_token = {
-      description = "Token for Consul server agents";
-      policies = [
-        "\${consul_acl_policy.read_common.name}"
-        "\${consul_acl_policy.base_agent.name}"
-        "\${consul_acl_policy.server_policy.name}"
-      ];
-    };
-
-    agent_token = {
-      description = "Token for Consul client agents";
-      policies = [
-        "\${consul_acl_policy.read_common.name}"
-        "\${consul_acl_policy.base_agent.name}"
-      ];
-    };
+    server_token = mkAgentToken "Token for Consul server agents" [
+      consul_acl_policy.server_policy.name
+    ];
+    agent_token = mkAgentToken "Token for Consul client agents" [ ];
+    nomad_server = mkAgentToken "Token for Nomad servers" [ consul_acl_policy.nomad_server.name ];
+    nomad_client = mkAgentToken "Token for Nomad clients" [ ];
 
     kea_ddns_token = {
       description = "Kea DDNS Token";
-      policies = [ "\${consul_acl_policy.write_services.name}" ];
+      policies = [ consul_acl_policy.write_services.name ];
     };
 
     traefik = {
       description = "Traefik Token";
-      policies = [ "\${consul_acl_policy.read_services.name}" ];
+      policies = [ consul_acl_policy.read_services.name ];
     };
 
     patroni = {
       description = "Token for patroni";
       policies = [
-        "\${consul_acl_policy.patroni.name}"
-        "\${consul_acl_policy.read_services.name}"
-        "\${consul_acl_policy.read_nodes.name}"
-        "\${consul_acl_policy.write_session.name}"
-      ];
-    };
-
-    nomad_server = {
-      description = "Token for Nomad servers";
-      policies = [
-        "\${consul_acl_policy.read_common.name}"
-        "\${consul_acl_policy.nomad_server.name}"
-        "\${consul_acl_policy.base_agent.name}"
-      ];
-    };
-
-    nomad_client = {
-      description = "Token for Nomad clients";
-      policies = [
-        "\${consul_acl_policy.read_common.name}"
-        "\${consul_acl_policy.base_agent.name}"
+        consul_acl_policy.patroni.name
+        consul_acl_policy.read_services.name
+        consul_acl_policy.read_nodes.name
+        consul_acl_policy.write_session.name
       ];
     };
 
     build_token = {
       description = "Token for build servers";
-      policies = [ "\${consul_acl_policy.builds_push.name}" ];
+      policies = [ consul_acl_policy.builds_push.name ];
     };
 
     apply_builds = {
       description = "Token for apply builds";
-      policies = [ "\${consul_acl_policy.apply_builds.name}" ];
+      policies = [ consul_acl_policy.apply_builds.name ];
     };
 
     nebula_cni = {
-      policies = [ "\${consul_acl_policy.nebula_cni.name}" ];
+      policies = [ consul_acl_policy.nebula_cni.name ];
     };
 
     vault = {
@@ -240,11 +238,11 @@
   module.consul_setup = {
     source = "hashicorp-modules/nomad-setup/consul";
 
-    nomad_jwks_url = "\${var.nomad_url}/.well-known/jwks.json";
+    nomad_jwks_url = "https://nomad.local.${globals.domains.main}/.well-known/jwks.json";
 
     tasks_policy_ids = [
-      "\${consul_acl_policy.read_common.name}"
-      "\${consul_acl_policy.read_services.name}"
+      consul_acl_policy.read_common.name
+      consul_acl_policy.read_services.name
     ];
   };
 
@@ -264,24 +262,19 @@
 
   # Role for github-runner job with Terraform management permissions
   # Gets bound via the dynamic binding rule above
-  resource.consul_acl_role.nomad_job_default_github_runner = {
-    name = "nomad-job-default-github-runner";
-    description = "Role for GitHub Actions runner doing Terraform applies";
+  resource.consul_acl_role = {
+    nomad_job_default_github_runner = {
+      name = "nomad-job-default-github-runner";
+      description = "Role for GitHub Actions runner doing Terraform applies";
 
-    policies = [ "global-management" ];
-  };
+      policies = [ "global-management" ];
+    };
 
-  resource.consul_acl_role.nomad_job_default_vmalert = {
-    name = "nomad-job-default-vmalert";
-    description = "Role for vmalert for consul service discovery";
-
-    policies = [ "base-agent-policy" ];
-  };
-
-  resource.consul_acl_role.nomad_job_default_prometheus = {
-    name = "nomad-job-default-prometheus";
-    description = "Role for Prometheus for consul service discovery";
-
-    policies = [ "base-agent-policy" ];
+    nomad_job_default_vmalert = mkNomadRole "vmalert" "for consul service discovery" [
+      consul_acl_policy.base_agent.name
+    ];
+    nomad_job_default_prometheus = mkNomadRole "prometheus" "for consul service discovery" [
+      consul_acl_policy.base_agent.name
+    ];
   };
 }

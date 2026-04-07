@@ -1,6 +1,9 @@
-# Vault platform configuration
-# Migrated from terraform/infra/vault.tf
-{ ... }:
+{
+  config,
+  lib,
+  globals,
+  ...
+}:
 {
   # Admin policy for OIDC users
   resource.vault_policy.admin = {
@@ -13,13 +16,13 @@
   };
 
   ephemeral.vault_kv_secret_v2.oidc_client_secrets = {
-    mount = "\${vault_mount.kvv2.path}";
-    mount_id = "\${vault_mount.kvv2.id}";
+    mount = config.resource.vault_mount.kvv2.path;
+    mount_id = lib.tf.ref "vault_mount.kvv2.id";
     name = "oidc_client_secrets";
   };
 
   data.vault_kv_secret_v2.oidc_client_secrets = {
-    mount = "\${vault_mount.kvv2.path}";
+    mount = config.resource.vault_mount.kvv2.path;
     name = "oidc_client_secrets";
   };
 
@@ -28,7 +31,7 @@
     description = "Authelia OIDC";
     path = "oidc";
     type = "oidc";
-    oidc_discovery_url = "https://auth.\${var.domain}";
+    oidc_discovery_url = "https://auth.${globals.domains.main}";
     oidc_client_id = "vault";
     oidc_client_secret_wo = "\${ephemeral.vault_kv_secret_v2.oidc_client_secrets.data.vault}";
     oidc_client_secret_wo_version = 1;
@@ -37,9 +40,9 @@
   };
 
   resource.vault_jwt_auth_backend_role.admin = {
-    backend = "\${vault_jwt_auth_backend.authelia.path}";
+    backend = config.resource.vault_jwt_auth_backend.authelia.path;
     role_name = "admin";
-    token_policies = [ "\${vault_policy.admin.name}" ];
+    token_policies = [ config.resource.vault_policy.admin.name ];
 
     user_claim = "preferred_username";
     groups_claim = "groups";
@@ -52,7 +55,7 @@
     ];
 
     allowed_redirect_uris = [
-      "https://vault.local.\${var.domain}/ui/vault/auth/oidc/oidc/callback"
+      "https://vault.local.${globals.domains.main}/ui/vault/auth/oidc/oidc/callback"
       "http://localhost:8250/oidc/callback"
     ];
 
@@ -79,7 +82,7 @@
   resource.vault_jwt_auth_backend.nomad = {
     path = "jwt-nomad";
     description = "JWT auth backend for Nomad";
-    jwks_url = "\${var.nomad_url}/.well-known/jwks.json";
+    jwks_url = "https://nomad.local.${globals.domains.main}/.well-known/jwks.json";
     jwt_supported_algs = [
       "RS256"
       "EdDSA"
@@ -89,8 +92,8 @@
   };
 
   resource.vault_jwt_auth_backend_role.nomad_workload = {
-    backend = "\${vault_jwt_auth_backend.nomad.path}";
-    role_name = "\${vault_jwt_auth_backend.nomad.default_role}";
+    backend = config.resource.vault_jwt_auth_backend.nomad.path;
+    role_name = config.resource.vault_jwt_auth_backend.nomad.default_role;
     role_type = "jwt";
 
     bound_audiences = [ "vault.io" ];
@@ -111,7 +114,7 @@
     # task's lifecycle.
     token_type = "service";
     token_policies = [
-      "\${vault_policy.nomad_workloads.name}"
+      config.resource.vault_policy.nomad_workloads.name
     ];
 
     token_period = 3600;
@@ -143,30 +146,30 @@
   resource.vault_identity_entity.github_runner = {
     name = "github-runner";
     # the ci runner provisions vault itself, so needs very broad access
-    policies = [ "\${vault_policy.admin.name}" ];
+    policies = [ config.resource.vault_policy.admin.name ];
   };
 
   resource.vault_identity_entity_alias.github_runner = {
     # Match the nomad_job_id claim
     name = "github-runner";
 
-    mount_accessor = "\${vault_jwt_auth_backend.nomad.accessor}";
-    canonical_id = "\${vault_identity_entity.github_runner.id}";
+    mount_accessor = lib.tf.ref "vault_jwt_auth_backend.nomad.accessor";
+    canonical_id = lib.tf.ref "vault_identity_entity.github_runner.id";
   };
 
   # We need a nomad vault backend to be able to request nomad management tokens
   resource.vault_nomad_secret_backend.config = {
     backend = "nomad";
 
-    address = "\${var.nomad_url}";
-    token = "\${nomad_acl_token.vault.secret_id}";
+    address = "https://nomad.local.${globals.domains.main}";
+    token = lib.tf.ref "nomad_acl_token.vault.secret_id";
 
     default_lease_ttl_seconds = "3600";
     max_lease_ttl_seconds = "7200";
   };
 
   resource.vault_nomad_secret_role.admin = {
-    backend = "\${vault_nomad_secret_backend.config.backend}";
+    backend = lib.tf.ref "vault_nomad_secret_backend.config.backend";
     role = "admin";
     type = "management"; # specific token to be able to configure nomad
   };
@@ -178,17 +181,20 @@
     description = "Transit Secrets Engine";
   };
 
-  # SOPS key for for decrypting nomad secrets (secrets/rekeyed/nomad/*)
-  resource.vault_transit_secret_backend_key.sops_key = {
-    backend = "\${vault_mount.transit.path}";
-    name = "sops-key";
-    deletion_allowed = false;
-  };
-
-  # SOPS key for decrypting nix files in repo, eg. globals.nix
-  resource.vault_transit_secret_backend_key.git_homelab = {
-    backend = "\${vault_mount.transit.path}";
-    name = "git-homelab";
-    deletion_allowed = false;
-  };
+  # Transit keys (SOPS keys for decrypting secrets)
+  resource.vault_transit_secret_backend_key = lib.listToAttrs (
+    map
+      (name: {
+        name = lib.replaceStrings [ "-" ] [ "_" ] name;
+        value = {
+          backend = config.resource.vault_mount.transit.path;
+          inherit name;
+          deletion_allowed = false;
+        };
+      })
+      [
+        "sops-key"
+        "git-homelab"
+      ]
+  );
 }
