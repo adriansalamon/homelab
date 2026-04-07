@@ -38,6 +38,7 @@
         driver = "docker";
 
         vault = {
+          role = "github-runner";
           env = true; # Expose VAULT_TOKEN as env var
         };
 

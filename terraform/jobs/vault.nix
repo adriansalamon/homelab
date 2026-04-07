@@ -143,18 +143,31 @@
     '';
   };
 
-  resource.vault_identity_entity.github_runner = {
-    name = "github-runner";
-    # the ci runner provisions vault itself, so needs very broad access
-    policies = [ config.resource.vault_policy.admin.name ];
-  };
+  resource.vault_jwt_auth_backend_role.github_runner = {
+    backend = config.resource.vault_jwt_auth_backend.nomad.path;
+    role_name = "github-runner";
+    role_type = "jwt";
 
-  resource.vault_identity_entity_alias.github_runner = {
-    # Match the nomad_job_id claim
-    name = "github-runner";
+    bound_audiences = [ "vault.io" ];
 
-    mount_accessor = lib.tf.ref "vault_jwt_auth_backend.nomad.accessor";
-    canonical_id = lib.tf.ref "vault_identity_entity.github_runner.id";
+    # user_claim is used to uniquely identity a user in Vault by mapping tokens
+    # to an entity alias.
+    user_claim = "/nomad_job_id";
+    user_claim_json_pointer = true;
+
+    bound_claims = {
+      nomad_job_id = "github-runner";
+    };
+
+    # token_type should be "service" so Nomad can renew them throughout the
+    # task's lifecycle.
+    token_type = "service";
+    token_policies = [
+      config.resource.vault_policy.admin.name
+    ];
+
+    token_period = 3600;
+    token_explicit_max_ttl = 0;
   };
 
   # We need a nomad vault backend to be able to request nomad management tokens
