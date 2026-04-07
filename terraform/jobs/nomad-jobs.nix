@@ -28,7 +28,7 @@ in
         let
           jobName = lib.removeSuffix ".json" name;
         in
-        lib.nameValuePair "nix_${jobName}" {
+        lib.nameValuePair jobName {
           jobspec = readClean "${nomadJobsOutput}/${name}";
           json = true;
         }
@@ -37,7 +37,7 @@ in
       # Legacy HCL jobs
       hclJobResources = lib.listToAttrs (
         map (hclFile: {
-          name = "hcl_${lib.removeSuffix ".nomad.hcl" hclFile}";
+          name = "${lib.removeSuffix ".nomad.hcl" hclFile}";
           value = {
             jobspec = readClean "${jobsFolderPath}/${hclFile}";
             json = false;
