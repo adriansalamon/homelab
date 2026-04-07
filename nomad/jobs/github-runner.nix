@@ -41,9 +41,7 @@
           env = true; # Expose VAULT_TOKEN as env var
         };
 
-        consul = {
-          # Exposes CONSUL_HTTP_TOKEN as env var
-        };
+        consul = { }; # Exposes CONSUL_HTTP_TOKEN as env var
 
         config = {
           image = "ghcr.io/adriansalamon/github-runner:main-d6187d2";
