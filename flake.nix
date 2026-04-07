@@ -55,6 +55,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nebula-vault-plugin = {
+      url = "github:adriansalamon/nebula-vault-plugin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-nomad = {
       url = "github:tristanpemble/nix-nomad";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -70,7 +75,6 @@
       agenix-rekey.follows = "agenix-rekey";
       nixpkgs.follows = "nixpkgs";
     };
-
   };
 
   outputs =

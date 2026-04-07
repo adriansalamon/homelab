@@ -31,14 +31,24 @@ in
   };
 
   age.secrets = {
-    "nebula-ca.key" = {
-      rekeyFile = inputs.self.outPath + "/secrets/nebula/mesh/ca.key.age";
-    };
-
     # CONSUL_HTTP_TOKEN=xxxxxxx
     # NOMAD_TOKEN=xxxxxx
     "nebula-nomad-agent.env" = {
       rekeyFile = inputs.self.outPath + "/secrets/consul/nebula-nomad-cni.env.age";
+    };
+
+    "nebula-nomad-cni-agent-vault-secret-id" = {
+      generator = {
+        tags = [ "vault-approle" ];
+        script =
+          { pkgs, ... }:
+          ''
+            # Requires VAULT_ADDR and VAULT_TOKEN to be set in environment
+            ${pkgs.vault-bin}/bin/vault write -f -format=json \
+              auth/approle/role/nebula-cni/secret-id \
+              | ${pkgs.jq}/bin/jq -r '.data.secret_id'
+          '';
+      };
     };
   };
 
@@ -169,11 +179,6 @@ in
     {
       enable = true;
       defaultNebulaConfig = {
-        pki = {
-          # Use both old v1 and v2 CA for compatibility
-          ca = inputs.self.outPath + "/secrets/nebula/mesh/ca_combined.crt";
-        };
-
         # Default firewall rules
         firewall = {
           outbound = [
@@ -219,9 +224,6 @@ in
         };
       };
 
-      caKeyPath = config.age.secrets."nebula-ca.key".path;
-      caCertPath = inputs.self.outPath + "/secrets/nebula/mesh/ca.crt";
-
       environmentFile = config.age.secrets."nebula-nomad-agent.env".path;
       nomadAddr = "https://nomad.local.${globals.domains.main}";
 
@@ -230,6 +232,16 @@ in
         networkCIDR = globals.nebula.mesh.cidrv4;
         rangeStart = lib.net.cidr.host 2000 globals.nebula.mesh.cidrv4;
         rangeEnd = lib.net.cidr.host 3000 globals.nebula.mesh.cidrv4;
+      };
+
+      extraConfig = {
+        signer_type = "vault";
+        vault = {
+          addr = "https://vault.local.${globals.domains.main}";
+          mount = "nebula";
+          role_id = "de64137f-2203-13c3-987c-4186fa105a4f";
+          secret_id_path = config.age.secrets."nebula-nomad-cni-agent-vault-secret-id".path;
+        };
       };
     };
 

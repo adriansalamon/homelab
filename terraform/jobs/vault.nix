@@ -210,4 +210,49 @@
         "git-homelab"
       ]
   );
+
+  # Nebula Vault Plugin registration
+  resource.vault_plugin.nebula = {
+    name = "nebula-vault-plugin";
+    type = "secret";
+    command = "vault-plugin-nebula";
+    sha256 = "eeca86cbe0638ff8cabb33d6a116fe1577014866db74f3e94bed3ea46a7e53cb";
+  };
+
+  # Enable the Nebula secrets engine
+  resource.vault_mount.nebula = {
+    path = "nebula";
+    type = config.resource.vault_plugin.nebula.name;
+    description = "Nebula secrets engine for certificate management";
+  };
+
+  # Policy for nebula-nomad-cni to issue certificates
+  resource.vault_policy.nebula_cni = {
+    name = "nebula-cni";
+    policy = ''
+      # Allow signing certificates
+      path "nebula/sign" {
+        capabilities = ["create", "update"]
+      }
+
+      # Allow reading CA certificate
+      path "nebula/ca" {
+        capabilities = ["read"]
+      }
+    '';
+  };
+
+  # AppRole for nebula-nomad-cni agents
+  resource.vault_auth_backend.approle = {
+    type = "approle";
+    path = "approle";
+  };
+
+  resource.vault_approle_auth_backend_role.nebula_cni = {
+    backend = config.resource.vault_auth_backend.approle.path;
+    role_name = "nebula-cni";
+    token_policies = [ config.resource.vault_policy.nebula_cni.name ];
+    token_ttl = 3600;
+    token_max_ttl = 7200;
+  };
 }

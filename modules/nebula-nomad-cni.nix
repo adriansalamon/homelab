@@ -47,12 +47,14 @@ in
     };
 
     caCertPath = mkOption {
-      type = types.path;
+      type = types.nullOr types.path;
+      default = null;
       description = "Path to the Nebula CA certificate.";
     };
 
     caKeyPath = mkOption {
-      type = types.path;
+      type = types.nullOr types.path;
+      default = null;
       description = "Path to the Nebula CA private key.";
     };
 
@@ -120,13 +122,11 @@ in
 
         serviceConfig =
           let
-            configFile =
-              tomlFormat.generate "agent.toml" {
+            configFile = tomlFormat.generate "agent.toml" (
+              {
                 socket_path = cfg.socketPath;
                 consul_addr = cfg.consulAddr;
                 nomad_addr = cfg.nomadAddr;
-                ca_cert_path = cfg.caCertPath;
-                ca_key_path = cfg.caKeyPath;
                 nebula_config_path = yamlFormat.generate "nebula-config.yaml" (cfg.defaultNebulaConfig);
                 worker_binary_path = "${cfg.package}/bin/nebula-nomad-worker";
                 cert_ttl = cfg.certTTL;
@@ -136,7 +136,8 @@ in
                   range_end = cfg.ipPool.rangeEnd;
                 };
               }
-              // cfg.extraConfig;
+              // cfg.extraConfig
+            );
           in
           {
             Type = "simple";

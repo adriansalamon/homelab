@@ -117,6 +117,8 @@ in
 
     storageBackend = "raft";
 
+    pluginDirectory = pkgs.vault-plugins;
+
     environmentFiles = [
       config.age.secrets."aws-kms.env".path
     ];

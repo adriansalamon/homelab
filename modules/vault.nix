@@ -128,6 +128,19 @@ in
           }
         '';
       };
+
+      pluginDirectory = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        description = ''
+          Directory containing Vault plugins. This will be set as the
+          plugin_directory configuration option. The directory cannot be
+          a symbolic link, but the files within it can be.
+        '';
+        example = literalExpression ''
+          pkgs.vault-plugins
+        '';
+      };
     };
   };
 
@@ -138,6 +151,7 @@ in
     };
     services.vault-server.settings = {
       storage.${cfg.storageBackend} = mkDefault { };
+      plugin_directory = mkIf (cfg.pluginDirectory != null) (toString cfg.pluginDirectory);
     };
 
     # Use dynamically allocated system user instead of hardcoded ids
