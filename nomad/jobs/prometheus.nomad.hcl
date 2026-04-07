@@ -54,7 +54,7 @@ job "prometheus" {
       }
 
       config {
-        image = "prom/prometheus:v3.11.0-distroless"
+        image = "prom/prometheus:v3.11.1-distroless"
         ports = ["http"]
         args = [
           "--config.file=${NOMAD_ALLOC_DIR}/prometheus.yaml",
