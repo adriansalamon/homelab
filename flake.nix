@@ -41,10 +41,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixos-nftables-firewall = {
-      url = "github:thelegy/nixos-nftables-firewall";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixos-nftables-firewall.url = "github:thelegy/nixos-nftables-firewall";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 

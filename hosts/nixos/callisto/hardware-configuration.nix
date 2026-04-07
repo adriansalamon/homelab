@@ -15,7 +15,10 @@
     # Use the extlinux boot loader (works well with Raspberry Pi)
     loader = {
       grub.enable = false;
-      generic-extlinux-compatible.enable = true;
+      generic-extlinux-compatible = {
+        configurationLimit = 1; # I made the boot partition too small
+        enable = true;
+      };
     };
 
     initrd.availableKernelModules = [
