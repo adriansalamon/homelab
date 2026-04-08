@@ -4,7 +4,9 @@
       "inputs": {
         "darwin": "darwin",
         "home-manager": "home-manager",
-        "nixpkgs": ["nixpkgs"],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "systems": "systems"
       },
       "locked": {
@@ -25,7 +27,9 @@
       "inputs": {
         "devshell": "devshell",
         "flake-parts": "flake-parts",
-        "nixpkgs": ["nixpkgs"],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "pre-commit-hooks": "pre-commit-hooks",
         "treefmt-nix": "treefmt-nix"
       },
@@ -45,10 +49,14 @@
     },
     "agenix-rekey-to-sops": {
       "inputs": {
-        "agenix-rekey": ["agenix-rekey"],
+        "agenix-rekey": [
+          "agenix-rekey"
+        ],
         "devshell": "devshell_2",
         "flake-parts": "flake-parts_2",
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1775221657,
@@ -66,7 +74,10 @@
     },
     "darwin": {
       "inputs": {
-        "nixpkgs": ["agenix", "nixpkgs"]
+        "nixpkgs": [
+          "agenix",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1744478979,
@@ -105,7 +116,10 @@
     },
     "devshell": {
       "inputs": {
-        "nixpkgs": ["agenix-rekey", "nixpkgs"]
+        "nixpkgs": [
+          "agenix-rekey",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1728330715,
@@ -123,7 +137,10 @@
     },
     "devshell_2": {
       "inputs": {
-        "nixpkgs": ["agenix-rekey-to-sops", "nixpkgs"]
+        "nixpkgs": [
+          "agenix-rekey-to-sops",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1768818222,
@@ -141,7 +158,9 @@
     },
     "disko": {
       "inputs": {
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1773889306,
@@ -207,7 +226,10 @@
     },
     "flake-parts": {
       "inputs": {
-        "nixpkgs-lib": ["agenix-rekey", "nixpkgs"]
+        "nixpkgs-lib": [
+          "agenix-rekey",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1733312601,
@@ -225,7 +247,10 @@
     },
     "flake-parts_2": {
       "inputs": {
-        "nixpkgs-lib": ["agenix-rekey-to-sops", "nixpkgs"]
+        "nixpkgs-lib": [
+          "agenix-rekey-to-sops",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1775087534,
@@ -297,7 +322,10 @@
     },
     "flake-parts_6": {
       "inputs": {
-        "nixpkgs-lib": ["terranix", "nixpkgs"]
+        "nixpkgs-lib": [
+          "terranix",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1736143030,
@@ -333,7 +361,11 @@
     },
     "gitignore": {
       "inputs": {
-        "nixpkgs": ["agenix-rekey", "pre-commit-hooks", "nixpkgs"]
+        "nixpkgs": [
+          "agenix-rekey",
+          "pre-commit-hooks",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1709087332,
@@ -351,7 +383,10 @@
     },
     "gomod2nix": {
       "inputs": {
-        "flake-utils": ["nix-nomad", "flake-utils"],
+        "flake-utils": [
+          "nix-nomad",
+          "flake-utils"
+        ],
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
@@ -370,7 +405,10 @@
     },
     "home-manager": {
       "inputs": {
-        "nixpkgs": ["agenix", "nixpkgs"]
+        "nixpkgs": [
+          "agenix",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1745494811,
@@ -388,7 +426,9 @@
     },
     "home-manager_2": {
       "inputs": {
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1775247674,
@@ -406,7 +446,10 @@
     },
     "home-manager_3": {
       "inputs": {
-        "nixpkgs": ["impermanence", "nixpkgs"]
+        "nixpkgs": [
+          "impermanence",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1768598210,
@@ -443,7 +486,9 @@
     },
     "microvm": {
       "inputs": {
-        "nixpkgs": ["nixpkgs"],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "spectrum": "spectrum"
       },
       "locked": {
@@ -463,14 +508,16 @@
     "nebula-nomad-cni": {
       "inputs": {
         "flake-parts": "flake-parts_4",
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1775597122,
-        "narHash": "sha256-W/TGTKvVWRc5k7gK9ajrkQy9G5kBhjU+32tcKrvuTi4=",
+        "lastModified": 1775633503,
+        "narHash": "sha256-gkRuDryJJroGCOm1SNlzZOnUfZwDD5URO976iDPC+Xg=",
         "owner": "adriansalamon",
         "repo": "nebula-nomad-cni",
-        "rev": "39abb3b8052bbc72adca64c8dc0c9c01363b9523",
+        "rev": "0721ac73ca09bfd940e639da2a112537d6d5aa64",
         "type": "github"
       },
       "original": {
@@ -482,7 +529,9 @@
     "nebula-vault-plugin": {
       "inputs": {
         "flake-parts": "flake-parts_5",
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1775588503,
@@ -500,7 +549,9 @@
     },
     "nix-darwin": {
       "inputs": {
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1775037210,
@@ -522,7 +573,9 @@
         "flake-compat": "flake-compat_3",
         "flake-utils": "flake-utils",
         "gomod2nix": "gomod2nix",
-        "nixpkgs": ["nixpkgs"],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "nixpkgs-lib": "nixpkgs-lib_4",
         "nmd": "nmd"
       },
@@ -542,7 +595,9 @@
     },
     "nix-rosetta-builder": {
       "inputs": {
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1770491098,
@@ -576,7 +631,9 @@
     "nixos-generators": {
       "inputs": {
         "nixlib": "nixlib",
-        "nixpkgs": ["nixpkgs"]
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1769813415,
@@ -750,7 +807,10 @@
       "inputs": {
         "flake-compat": "flake-compat",
         "gitignore": "gitignore",
-        "nixpkgs": ["agenix-rekey", "nixpkgs"]
+        "nixpkgs": [
+          "agenix-rekey",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1735882644,
@@ -867,7 +927,9 @@
     "terranix": {
       "inputs": {
         "flake-parts": "flake-parts_6",
-        "nixpkgs": ["nixpkgs"],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "systems": "systems_4"
       },
       "locked": {
@@ -886,7 +948,10 @@
     },
     "treefmt-nix": {
       "inputs": {
-        "nixpkgs": ["agenix-rekey", "nixpkgs"]
+        "nixpkgs": [
+          "agenix-rekey",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1735135567,
