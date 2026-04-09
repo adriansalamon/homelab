@@ -37,6 +37,7 @@
             modules = [
               ../hosts/nixos/${name}
               {
+                nixpkgs.config.allowUnfree = true;
                 node = {
                   name = name;
                   secretsDir = ../hosts/nixos/${name}/secrets;
@@ -70,7 +71,7 @@
               ../modules/guests
               ../hosts/nixos/${name}
               {
-
+                nixpkgs.config.allowUnfree = true;
                 node = {
                   name = name;
                   secretsDir = ../hosts/nixos/${name}/secrets;
@@ -107,7 +108,7 @@
               #  nix-rosetta-builder.enable = false;
               #}
               ../hosts/darwin
-              ../hosts/darwin/atlas
+              ../hosts/darwin/${name}
               inputs.home-manager.darwinModules.home-manager
               {
                 home-manager.users.asalamon.imports = [
