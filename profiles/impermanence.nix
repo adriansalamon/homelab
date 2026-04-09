@@ -30,6 +30,9 @@ in
     directories = [
       "/var/lib/nixos"
     ]
+    ++ optionals config.hardware.bluetooth.enable [
+      "/var/lib/bluetooth"
+    ]
     ++ optionals (config.services.postgresql.enable || config.services.patroni.enable) [
       {
         directory = "/var/lib/postgresql";

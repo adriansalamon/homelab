@@ -37,7 +37,6 @@
             modules = [
               ../hosts/nixos/${name}
               {
-                nixpkgs.config.allowUnfree = true;
                 node = {
                   name = name;
                   secretsDir = ../hosts/nixos/${name}/secrets;
@@ -71,7 +70,7 @@
               ../modules/guests
               ../hosts/nixos/${name}
               {
-                nixpkgs.config.allowUnfree = true;
+
                 node = {
                   name = name;
                   secretsDir = ../hosts/nixos/${name}/secrets;
@@ -135,6 +134,7 @@
         (mkHost "hermes" { })
         (mkHost "penelope" { })
         (mkHost "pan" { })
+        (mkHost "theia" { })
         (mkDarwin "atlas" inputs.nixpkgs [ ])
         (mkRpi "callisto" { })
       ];
