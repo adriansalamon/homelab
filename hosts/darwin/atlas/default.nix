@@ -6,7 +6,7 @@
 {
 
   imports = [
-    ./yabai.nix
+    ./paneru.nix
   ];
 
   environment.systemPackages = with pkgs; [
@@ -40,6 +40,7 @@
     vim
     yubikey-personalization
     uv
+    rift-bin
   ];
 
   launchd.user.agents.backrest = {

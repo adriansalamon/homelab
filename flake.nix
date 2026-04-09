@@ -75,6 +75,11 @@
       agenix-rekey.follows = "agenix-rekey";
       nixpkgs.follows = "nixpkgs";
     };
+
+    paneru = {
+      url = "github:karinushka/paneru";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

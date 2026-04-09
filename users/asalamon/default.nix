@@ -3,9 +3,10 @@ let
   tex = pkgs.texlive.combined.scheme-full;
 in
 {
+  # Import shared configs
   imports = [
-    ./zsh.nix
-    ./nvim.nix
+    ./common/shell.nix
+    ./common/nvim.nix
   ];
 
   home = {

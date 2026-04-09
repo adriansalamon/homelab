@@ -1,5 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
+  # Shared shell configuration for both macOS and Linux
   programs = {
     fzf = {
       enable = true;
@@ -9,7 +10,6 @@
     starship = {
       enable = true;
       settings = {
-
         gcloud = {
           detect_env_vars = [ "GOOGLE_CLOUD" ];
         };
@@ -40,6 +40,7 @@
 
     zsh = {
       enable = true;
+      dotDir = "${config.xdg.configHome}/zsh";  # Use XDG config directory
 
       zplug = {
         enable = true;

@@ -1,5 +1,7 @@
-{...}: {
-   programs.neovim = {
+{ ... }:
+{
+  # Shared neovim configuration
+  programs.neovim = {
     enable = true;
 
     defaultEditor = true;
@@ -10,6 +12,5 @@
 
     withPython3 = true;
     withNodeJs = true;
-};
-
+  };
 }

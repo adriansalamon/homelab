@@ -4,7 +4,6 @@
   ...
 }:
 {
-
   system = {
     stateVersion = 5;
     primaryUser = "asalamon";
