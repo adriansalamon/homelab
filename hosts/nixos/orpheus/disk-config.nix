@@ -66,6 +66,7 @@
     target = "hermes";
     filesystems = {
       "tank03/adrian" = true;
+      "zroot/safe<" = true;
     };
   };
 
