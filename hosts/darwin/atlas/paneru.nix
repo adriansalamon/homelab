@@ -98,7 +98,9 @@ in
       windows.all = {
         title = ".*";
         horizontal_padding = 5;
+        vertical_padding = 5;
       };
+
       bindings = {
         # Focus windows - HYPER + h/j/k/l (vim keys)
         window_focus_west = "rcmd + rctrl + ralt - h";

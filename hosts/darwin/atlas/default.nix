@@ -40,7 +40,6 @@
     vim
     yubikey-personalization
     uv
-    rift-bin
   ];
 
   launchd.user.agents.backrest = {

@@ -113,7 +113,7 @@
               {
                 home-manager.users.asalamon.imports = [
                   inputs.agenix.homeManagerModules.default
-                  ../users/asalamon
+                  ../users/asalamon/darwin
                 ];
 
                 nixpkgs.overlays = (import ../pkgs/default.nix inputs) ++ [ (import ../lib inputs) ];

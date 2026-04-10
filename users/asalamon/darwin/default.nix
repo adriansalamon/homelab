@@ -5,8 +5,8 @@ in
 {
   # Import shared configs
   imports = [
-    ./common/shell.nix
-    ./common/nvim.nix
+    ../common/shell.nix
+    ../common/nvim.nix
   ];
 
   home = {
@@ -20,6 +20,11 @@ in
       consul
       vault-bin
       sops
+    ];
+
+    # Add Homebrew to PATH for Darwin
+    sessionPath = [
+      "/opt/homebrew/bin"
     ];
   };
 }
