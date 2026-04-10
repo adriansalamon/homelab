@@ -8,7 +8,9 @@
     {
       apps.setupHetznerStorageBoxes = import ../apps/setup-hetzner-storage-boxes.nix {
         inherit pkgs;
+        inherit (inputs.self) globals;
         nixosConfigurations = inputs.self.nodes;
+        nomadConfigurations = inputs.self.nomadConfigurations;
         decryptIdentity = (builtins.head inputs.self.secretsConfig.masterIdentities).identity;
       };
 

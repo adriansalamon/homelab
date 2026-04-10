@@ -1,7 +1,9 @@
 # Based on https://github.com/oddlama/nixos-extra-modules/blob/2dfcc1f/apps/setup-hetzner-storage-boxes.nix adapted to work with MacOS
 {
   pkgs,
+  globals,
   nixosConfigurations,
+  nomadConfigurations,
   decryptIdentity,
 }:
 let
@@ -25,7 +27,8 @@ let
     unique
     ;
 
-  allBoxDefinitions = flatten (
+  # Collect NixOS host backup configurations
+  nixosBoxDefinitions = flatten (
     forEach (attrValues nixosConfigurations) (
       hostCfg:
       forEach (attrValues hostCfg.config.services.restic.backups) (
@@ -40,6 +43,29 @@ let
       )
     )
   );
+
+  # Collect Nomad backup job configurations
+  nomadBoxDefinitions = flatten (
+    forEach (attrValues nomadConfigurations) (
+      nomadCfg:
+      forEach (attrValues nomadCfg.config.backups) (
+        backupCfg:
+        let
+          box = globals.hetzner.storageboxes.${backupCfg.storageBox};
+          subuser = box.users.${backupCfg.subuser};
+        in
+        {
+          inherit (box) mainUser;
+          inherit (subuser) subUid path;
+          sshPrivateKeyFile =
+            nomadCfg.config.age.secrets."backup-${backupCfg.name}-ssh-private-key".rekeyFile;
+        }
+      )
+    )
+  );
+
+  # Combine both NixOS and Nomad backup definitions
+  allBoxDefinitions = nixosBoxDefinitions ++ nomadBoxDefinitions;
 
   subUserFor = box: "${box.mainUser}-sub${toString box.subUid}";
   boxesBySubuser = groupBy subUserFor allBoxDefinitions;

@@ -20,6 +20,7 @@
           };
 
           inherit (inputs.self) globals;
+          nomadConfig = inputs.self.nomadConfigurations."homelab";
         };
       };
     in

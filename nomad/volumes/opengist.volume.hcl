@@ -7,3 +7,8 @@ capability {
   access_mode     = "single-node-single-writer"
   attachment_mode = "file-system"
 }
+
+capability {
+  access_mode     = "single-node-reader-only"
+  attachment_mode = "file-system"
+}

@@ -1,11 +1,5 @@
 job "httpd" {
   group "httpd" {
-    constraint {
-      attribute = "${attr.plugins.cni.version.nebula-nomad-cni}"
-      operator  = "="
-      value     = "v0.1.0-ed2fe81"
-    }
-
     network {
       port "http" {
         static = 8080
