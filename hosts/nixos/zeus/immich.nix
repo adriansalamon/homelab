@@ -48,6 +48,16 @@ in
     ];
   };
 
+  fileSystems."/mnt/freenas02/delade_bilder" = {
+    device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/shared/delat/Foton";
+    fsType = "nfs";
+    options = [
+      "nfsvers=4"
+      "x-systemd.automount"
+      "noauto"
+    ];
+  };
+
   services.immich = {
     inherit port;
     enable = true;
