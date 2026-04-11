@@ -1,17 +1,10 @@
 {
   lib,
-  globals,
-  nomadConfig,
+  helpers,
   ...
 }:
 let
-  # Get the backup configuration
-  backupCfg = nomadConfig.config.backups.nomad-volumes;
-  box = globals.hetzner.storageboxes.${backupCfg.storageBox};
-  subuser = box.users.${backupCfg.subuser};
-  subuserName = "${box.mainUser}-sub${toString subuser.subUid}";
-
-  resticOpts = ''-o rclone.program="ssh -p23 ${subuserName}@${box.mainUser}.your-storagebox.de -i ''${NOMAD_SECRETS_DIR}/restic-ssh-privkey"'';
+  resticOpts = helpers.resticOpts "nomad-volumes";
 in
 {
   job.backup-nomad-volumes = {

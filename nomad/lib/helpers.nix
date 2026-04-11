@@ -1,4 +1,9 @@
-{ lib, globals, ... }:
+{
+  lib,
+  globals,
+  secretsConfig,
+  ...
+}:
 {
   mkNebula =
     cfg:
@@ -128,5 +133,15 @@
       }"
       "traefik.http.routers.${name}.entrypoints=${entrypoint}"
     ];
+
+  resticOpts =
+    repo:
+    let
+      backupCfg = secretsConfig.config.backups.${repo};
+      box = globals.hetzner.storageboxes.${backupCfg.storageBox};
+      subuser = box.users.${backupCfg.subuser};
+      subuserName = "${box.mainUser}-sub${toString subuser.subUid}";
+    in
+    ''-o rclone.program="ssh -p23 ${subuserName}@${box.mainUser}.your-storagebox.de -i ''${NOMAD_SECRETS_DIR}/restic-ssh-privkey"'';
 
 }

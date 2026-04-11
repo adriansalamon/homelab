@@ -7,20 +7,21 @@
       ...
     }:
     let
+      lib = pkgs.lib;
       jobsConfig = inputs.nix-nomad.lib.mkNomadJobs {
         inherit pkgs;
 
-        config = builtins.attrValues (pkgs.lib.rakeLeaves ../nomad/jobs);
+        config = lib.collect builtins.isPath (lib.rakeLeaves ../nomad/jobs);
 
         extraArgs = {
           # helper functions for job files
           helpers = import ../nomad/lib/helpers.nix {
-            lib = pkgs.lib;
+            inherit lib;
             inherit (inputs.self) globals;
+            secretsConfig = inputs.self.nomadConfigurations."homelab";
           };
 
           inherit (inputs.self) globals;
-          nomadConfig = inputs.self.nomadConfigurations."homelab";
         };
       };
     in

@@ -5,21 +5,10 @@
   ];
 
   backups = {
-    vault = {
-      subuser = "vault-snapshots";
-    };
-
-    postgres = {
-      subuser = "postgres-dumps";
-    };
-
-    seaweedfs = {
-      subuser = "seaweedfs-s3";
-    };
-
-    nomad-volumes = {
-      subuser = "nomad-volumes";
-    };
+    vault.subuser = "vault-snapshots";
+    postgres.subuser = "postgres-dumps";
+    seaweedfs.subuser = "seaweedfs-s3";
+    nomad-volumes.subuser = "nomad-volumes";
   };
 
   nomadJobs.backup-seaweedfs.secrets.s3-secret-key = {

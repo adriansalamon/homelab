@@ -1,18 +1,11 @@
 {
   lib,
-  globals,
   helpers,
-  nomadConfig,
   ...
 }:
 let
-  # Get the backup configuration
-  backupCfg = nomadConfig.config.backups.vault;
-  box = globals.hetzner.storageboxes.${backupCfg.storageBox};
-  subuser = box.users.${backupCfg.subuser};
-  subuserName = "${box.mainUser}-sub${toString subuser.subUid}";
+  resticOpts = helpers.resticOpts "vault";
 
-  resticOpts = ''-o rclone.program="ssh -p23 ${subuserName}@${box.mainUser}.your-storagebox.de -i ''${NOMAD_SECRETS_DIR}/restic-ssh-privkey"'';
   script = ''
     set -e
 
@@ -114,16 +107,6 @@ in
         };
 
         templates = [
-          # Get Vault token from workload identity
-          {
-            data = ''
-              VAULT_TOKEN={{ env "VAULT_TOKEN" }}
-            '';
-            destination = "\${NOMAD_SECRETS_DIR}/vault.env";
-            env = true;
-            perms = "0600";
-          }
-          # Restic password
           {
             data = ''
               {{ with secret "secret/data/default/backup-vault" }}
@@ -134,7 +117,6 @@ in
             env = true;
             perms = "0600";
           }
-          # SSH private key for Hetzner
           {
             data = ''
               {{ with secret "secret/data/default/backup-vault" }}{{ .Data.data.ssh_private_key }}{{ end }}
