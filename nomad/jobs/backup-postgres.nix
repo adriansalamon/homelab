@@ -13,6 +13,55 @@ let
   subuserName = "${box.mainUser}-sub${toString subuser.subUid}";
 
   resticOpts = ''-o rclone.program="ssh -p23 ${subuserName}@${box.mainUser}.your-storagebox.de -i ''${NOMAD_SECRETS_DIR}/restic-ssh-privkey"'';
+
+  script = ''
+    set -e
+
+    # Install restic and openssh for backup
+    echo "Installing restic and openssh..."
+    apk add --no-cache restic openssh-client curl
+
+    # Set up SSH directory and known_hosts
+    mkdir -p /root/.ssh
+    cp /local/known_hosts /root/.ssh/known_hosts
+    chmod 700 /root/.ssh
+    chmod 600 /root/.ssh/known_hosts
+
+    # Wait for PostgreSQL to be available
+    echo "Waiting for PostgreSQL to be available..."
+    until pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER"; do
+      echo "PostgreSQL is unavailable - sleeping"
+      sleep 2
+    done
+    echo "PostgreSQL is available"
+
+    # Create backup directory
+    mkdir -p /backup
+    DUMP_FILE="/backup/patroni-$(date +%Y%m%d-%H%M%S).sql.gz"
+
+    # Dump all databases using credentials from Vault
+    echo "Dumping all databases to $DUMP_FILE..."
+    pg_dumpall --clean --if-exists | gzip > "$DUMP_FILE"
+
+    echo "Database dump completed. Size: $(du -h "$DUMP_FILE" | cut -f1)"
+
+    # Initialize the repository if it doesn't exist
+    echo "Initializing restic repository if needed..."
+    restic ${resticOpts} cat config > /dev/null || restic ${resticOpts} init
+
+    # Backup the dump to Hetzner
+    echo "Uploading backup to Hetzner Storage Box..."
+    restic ${resticOpts} backup "$DUMP_FILE" --tag postgres --tag patroni
+
+    # Unlock the repository
+    restic ${resticOpts} unlock
+
+    # Prune old snapshots
+    echo "Pruning old backups..."
+    restic ${resticOpts} forget --prune --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --tag postgres
+
+    echo "Backup completed successfully!"
+  '';
 in
 {
   job.backup-postgres = {
@@ -58,54 +107,7 @@ in
           entrypoint = [ "/bin/sh" ];
           args = [
             "-c"
-            ''
-              set -e
-
-              # Install restic and openssh for backup
-              echo "Installing restic and openssh..."
-              apk add --no-cache restic openssh-client curl
-
-              # Set up SSH directory and known_hosts
-              mkdir -p /root/.ssh
-              cp /local/known_hosts /root/.ssh/known_hosts
-              chmod 700 /root/.ssh
-              chmod 600 /root/.ssh/known_hosts
-
-              # Wait for PostgreSQL to be available
-              echo "Waiting for PostgreSQL to be available..."
-              until pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER"; do
-                echo "PostgreSQL is unavailable - sleeping"
-                sleep 2
-              done
-              echo "PostgreSQL is available"
-
-              # Create backup directory
-              mkdir -p /backup
-              DUMP_FILE="/backup/patroni-$(date +%Y%m%d-%H%M%S).sql.gz"
-
-              # Dump all databases using credentials from Vault
-              echo "Dumping all databases to $DUMP_FILE..."
-              pg_dumpall --clean --if-exists | gzip > "$DUMP_FILE"
-
-              echo "Database dump completed. Size: $(du -h "$DUMP_FILE" | cut -f1)"
-
-              # Initialize the repository if it doesn't exist
-              echo "Initializing restic repository if needed..."
-              restic ${resticOpts} cat config > /dev/null || restic ${resticOpts} init
-
-              # Backup the dump to Hetzner
-              echo "Uploading backup to Hetzner Storage Box..."
-              restic ${resticOpts} backup "$DUMP_FILE" --tag postgres --tag patroni
-
-              # Unlock the repository
-              restic ${resticOpts} unlock
-
-              # Prune old snapshots
-              echo "Pruning old backups..."
-              restic ${resticOpts} forget --prune --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --tag postgres
-
-              echo "Backup completed successfully!"
-            ''
+            script
           ];
         };
 
