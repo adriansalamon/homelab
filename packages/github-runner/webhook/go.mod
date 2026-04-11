@@ -4,7 +4,7 @@ go 1.25.8
 
 require (
 	github.com/caarlos0/env/v11 v11.4.0
-	github.com/hashicorp/nomad/api v0.0.0-20260325144059-0c3fa0187887
+	github.com/hashicorp/nomad/api v0.0.0-20260410071528-9e6d492b59a8
 )
 
 require (
