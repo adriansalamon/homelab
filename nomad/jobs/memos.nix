@@ -12,6 +12,7 @@ in
       networks = [
         {
           mode = "cni/nebula";
+          port.dummy = { };
         }
       ];
 
@@ -39,6 +40,7 @@ in
           {
             data = ''
               MEMOS_MODE=prod
+              MEMOS_ADDR={{ env "NOMAD_ALLOC_IP_dummy" }}
               MEMOS_PORT=${port}
               MEMOS_DRIVER=postgres
               MEMOS_INSTANCE_URL=https://memos.${globals.domains.main}

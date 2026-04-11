@@ -39,6 +39,21 @@ let
                 default = null;
               };
 
+              rekeyFile = lib.mkOption {
+                type = types.nullOr types.path;
+                default =
+                  if secretSubmod.config.generator != null then
+                    if config.age.rekey.generatedSecretsDir != null then
+                      config.age.rekey.generatedSecretsDir
+                      + "/${submod.config._module.args.name}-${secretSubmod.config._module.args.name}.age"
+                    else
+                      null
+                  else if config.age.rekey.secretsDir != null then
+                    config.age.rekey.secretsDir + "/${secretSubmod.config.id}.age"
+                  else
+                    null;
+              };
+
               sopsFormat = lib.mkOption {
                 type = lib.types.str;
                 description = "Format of the secret";

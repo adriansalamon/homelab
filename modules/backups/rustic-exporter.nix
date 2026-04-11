@@ -47,6 +47,7 @@ in
 
     systemd.services."prometheus-rustic-exporter" = {
       description = "Prometheus exporter for restic/rustic repos";
+      wantedBy = [ "multi-user.target" ];
       wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
 

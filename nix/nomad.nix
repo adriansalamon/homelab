@@ -21,7 +21,8 @@
             secretsConfig = inputs.self.nomadConfigurations."homelab";
           };
 
-          inherit (inputs.self) globals;
+          inherit (inputs.self) globals nodes;
+          secretsConfig = inputs.self.nomadConfigurations."homelab";
         };
       };
     in
