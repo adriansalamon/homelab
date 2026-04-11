@@ -344,4 +344,47 @@
     token_period = 3600;
     token_explicit_max_ttl = 0;
   };
+
+  # Policy for Vault backup workload
+  resource.vault_policy.vault_backup = {
+    name = "vault-backup";
+    policy = ''
+      # Allow creating Vault raft snapshots
+      path "sys/storage/raft/snapshot" {
+        capabilities = ["read"]
+      }
+    '';
+  };
+
+  # Dedicated role for Vault backup job
+  resource.vault_jwt_auth_backend_role.vault_backup = {
+    backend = config.resource.vault_jwt_auth_backend.nomad.path;
+    role_name = "vault-backup";
+    role_type = "jwt";
+
+    bound_audiences = [ "vault.io" ];
+
+    user_claim = "/nomad_job_id";
+    user_claim_json_pointer = true;
+
+    claim_mappings = {
+      nomad_namespace = "nomad_namespace";
+      nomad_job_id = "nomad_job_id";
+      nomad_group = "nomad_group";
+      nomad_task = "nomad_task";
+    };
+
+    bound_claims = {
+      nomad_job_id = "backup-vault";
+    };
+
+    token_type = "service";
+    token_policies = [
+      config.resource.vault_policy.nomad_workloads.name
+      config.resource.vault_policy.vault_backup.name
+    ];
+
+    token_period = 3600;
+    token_explicit_max_ttl = 0;
+  };
 }
