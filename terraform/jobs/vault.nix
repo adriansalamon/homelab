@@ -4,6 +4,45 @@
   globals,
   ...
 }:
+let
+
+  mkNomadRoleMapping =
+    {
+      name,
+      job_id ? null,
+      policies,
+    }:
+    {
+      backend = config.resource.vault_jwt_auth_backend.nomad.path;
+      role_name = name;
+      role_type = "jwt";
+
+      bound_audiences = [ "vault.io" ];
+
+      user_claim = "/nomad_job_id";
+      user_claim_json_pointer = true;
+
+      claim_mappings = {
+        nomad_namespace = "nomad_namespace";
+        nomad_job_id = "nomad_job_id";
+        nomad_group = "nomad_group";
+        nomad_task = "nomad_task";
+      };
+
+      token_type = "service";
+      token_policies = policies;
+
+      token_period = 3600;
+      token_explicit_max_ttl = 0;
+    }
+    // lib.optionalAttrs (job_id != null) {
+      bound_claims = {
+        nomad_job_id = job_id;
+      };
+    };
+
+in
+
 {
   # Admin policy for OIDC users
   resource.vault_policy.admin = {
@@ -91,36 +130,6 @@
     default_role = "nomad-workloads";
   };
 
-  resource.vault_jwt_auth_backend_role.nomad_workload = {
-    backend = config.resource.vault_jwt_auth_backend.nomad.path;
-    role_name = config.resource.vault_jwt_auth_backend.nomad.default_role;
-    role_type = "jwt";
-
-    bound_audiences = [ "vault.io" ];
-
-    # user_claim is used to uniquely identity a user in Vault by mapping tokens
-    # to an entity alias.
-    user_claim = "/nomad_job_id";
-    user_claim_json_pointer = true;
-
-    claim_mappings = {
-      nomad_namespace = "nomad_namespace";
-      nomad_job_id = "nomad_job_id";
-      nomad_group = "nomad_group";
-      nomad_task = "nomad_task";
-    };
-
-    # token_type should be "service" so Nomad can renew them throughout the
-    # task's lifecycle.
-    token_type = "service";
-    token_policies = [
-      config.resource.vault_policy.nomad_workloads.name
-    ];
-
-    token_period = 3600;
-    token_explicit_max_ttl = 0;
-  };
-
   # Policy for regular Nomad workloads (namespace/job-scoped secrets)
   resource.vault_policy.nomad_workloads = {
     name = "nomad-workloads";
@@ -143,31 +152,58 @@
     '';
   };
 
-  resource.vault_jwt_auth_backend_role.github_runner = {
-    backend = config.resource.vault_jwt_auth_backend.nomad.path;
-    role_name = "github-runner";
-    role_type = "jwt";
+  # Default Nomad workload role
+  resource.vault_jwt_auth_backend_role.nomad_workload = mkNomadRoleMapping {
+    name = config.resource.vault_jwt_auth_backend.nomad.default_role;
 
-    bound_audiences = [ "vault.io" ];
+    policies = [ config.resource.vault_policy.nomad_workloads.name ];
+  };
 
-    # user_claim is used to uniquely identity a user in Vault by mapping tokens
-    # to an entity alias.
-    user_claim = "/nomad_job_id";
-    user_claim_json_pointer = true;
+  # Nomad workload role for the github-runner job
+  resource.vault_jwt_auth_backend_role.github_runner = mkNomadRoleMapping {
+    name = "github-runner";
+    job_id = "github-runner";
+    policies = [ config.resource.vault_policy.admin.name ];
+  };
 
-    bound_claims = {
-      nomad_job_id = "github-runner";
-    };
+  resource.vault_policy.postgres_backup = {
+    name = "postgres-backup";
+    policy = ''
+      # Allow getting dynamic PostgreSQL credentials
+      path "database/creds/backup" {
+        capabilities = ["read"]
+      }
+    '';
+  };
 
-    # token_type should be "service" so Nomad can renew them throughout the
-    # task's lifecycle.
-    token_type = "service";
-    token_policies = [
-      config.resource.vault_policy.admin.name
+  resource.vault_jwt_auth_backend_role.postgres_backup = mkNomadRoleMapping {
+    name = "postgres-backup";
+    job_id = "backup-postgres";
+
+    policies = [
+      config.resource.vault_policy.nomad_workloads.name
+      config.resource.vault_policy.postgres_backup.name
     ];
+  };
 
-    token_period = 3600;
-    token_explicit_max_ttl = 0;
+  resource.vault_policy.vault_backup = {
+    name = "vault-backup";
+    policy = ''
+      # Allow creating Vault raft snapshots
+      path "sys/storage/raft/snapshot" {
+        capabilities = ["read"]
+      }
+    '';
+  };
+
+  resource.vault_jwt_auth_backend_role.vault_backup = mkNomadRoleMapping {
+    name = "vault-backup";
+    job_id = "backup-vault";
+
+    policies = [
+      config.resource.vault_policy.nomad_workloads.name
+      config.resource.vault_policy.vault_backup.name
+    ];
   };
 
   # We need a nomad vault backend to be able to request nomad management tokens
@@ -299,92 +335,5 @@
 
     default_ttl = 3600;
     max_ttl = 7200;
-
-  };
-
-  # Policy for PostgreSQL backup workload
-  resource.vault_policy.postgres_backup = {
-    name = "postgres-backup";
-    policy = ''
-      # Allow getting dynamic PostgreSQL credentials
-      path "database/creds/backup" {
-        capabilities = ["read"]
-      }
-    '';
-  };
-
-  # Dedicated role for PostgreSQL backup job
-  resource.vault_jwt_auth_backend_role.postgres_backup = {
-    backend = config.resource.vault_jwt_auth_backend.nomad.path;
-    role_name = "postgres-backup";
-    role_type = "jwt";
-
-    bound_audiences = [ "vault.io" ];
-
-    user_claim = "/nomad_job_id";
-    user_claim_json_pointer = true;
-
-    bound_claims = {
-      nomad_job_id = "backup-postgres";
-    };
-
-    claim_mappings = {
-      nomad_namespace = "nomad_namespace";
-      nomad_job_id = "nomad_job_id";
-      nomad_group = "nomad_group";
-      nomad_task = "nomad_task";
-    };
-
-    token_type = "service";
-    token_policies = [
-      config.resource.vault_policy.nomad_workloads.name
-      config.resource.vault_policy.postgres_backup.name
-    ];
-
-    token_period = 3600;
-    token_explicit_max_ttl = 0;
-  };
-
-  # Policy for Vault backup workload
-  resource.vault_policy.vault_backup = {
-    name = "vault-backup";
-    policy = ''
-      # Allow creating Vault raft snapshots
-      path "sys/storage/raft/snapshot" {
-        capabilities = ["read"]
-      }
-    '';
-  };
-
-  # Dedicated role for Vault backup job
-  resource.vault_jwt_auth_backend_role.vault_backup = {
-    backend = config.resource.vault_jwt_auth_backend.nomad.path;
-    role_name = "vault-backup";
-    role_type = "jwt";
-
-    bound_audiences = [ "vault.io" ];
-
-    user_claim = "/nomad_job_id";
-    user_claim_json_pointer = true;
-
-    claim_mappings = {
-      nomad_namespace = "nomad_namespace";
-      nomad_job_id = "nomad_job_id";
-      nomad_group = "nomad_group";
-      nomad_task = "nomad_task";
-    };
-
-    bound_claims = {
-      nomad_job_id = "backup-vault";
-    };
-
-    token_type = "service";
-    token_policies = [
-      config.resource.vault_policy.nomad_workloads.name
-      config.resource.vault_policy.vault_backup.name
-    ];
-
-    token_period = 3600;
-    token_explicit_max_ttl = 0;
   };
 }
