@@ -70,7 +70,7 @@ job "alertmanager" {
       }
 
       config {
-        image = "prom/alertmanager:v0.31.1"
+        image = "prom/alertmanager:v0.32.0"
         ports = ["http", "cluster"]
         args = [
           "--config.file=${NOMAD_SECRETS_DIR}/alertmanager.yaml",

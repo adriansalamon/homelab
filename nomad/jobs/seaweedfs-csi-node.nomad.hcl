@@ -51,7 +51,7 @@ job "seaweedfs-csi-node" {
       }
 
       config {
-        image      = "chrislusf/seaweedfs-csi-driver:v1.4.6"
+        image      = "chrislusf/seaweedfs-csi-driver:v1.4.8"
         privileged = true
         args = [
           "--endpoint=unix:///csi-sock/csi.sock",
@@ -98,7 +98,7 @@ job "seaweedfs-csi-node" {
       }
 
       config {
-        image      = "chrislusf/seaweedfs-mount:v1.4.6"
+        image      = "chrislusf/seaweedfs-mount:v1.4.8"
         privileged = true
         args = [
           "--endpoint=unix:///var/lib/seaweedfs-mount/seaweedfs-mount.sock",
