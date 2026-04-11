@@ -1,17 +1,12 @@
 {
   config,
   lib,
-  pkgs,
   inputs,
   nodes,
   ...
 }:
 let
   localSecretsDir = ./files;
-
-  mkSecret = job: path: {
-    rekeyFile = localSecretsDir + "/${job}-${path}";
-  };
 
   # Helper for SeaweedFS S3 secret keys
   mkWeedSecret =

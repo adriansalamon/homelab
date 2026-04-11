@@ -249,10 +249,99 @@
   };
 
   resource.vault_approle_auth_backend_role.nebula_cni = {
-    backend = config.resource.vault_auth_backend.approle.path;
+    backend = lib.tf.ref "vault_auth_backend.approle.path";
     role_name = "nebula-cni";
     token_policies = [ config.resource.vault_policy.nebula_cni.name ];
     token_ttl = 3600;
     token_max_ttl = 7200;
+  };
+
+  # Fetch the Patroni superuser password from Vault KV
+  ephemeral.vault_kv_secret_v2.patroni_superuser_password = {
+    mount = config.resource.vault_mount.kvv2.path;
+    name = "patroni/superuser-password";
+  };
+
+  # PostgreSQL secrets engine for Patroni cluster
+  resource.vault_database_secrets_mount.patroni = {
+    path = "database";
+
+    postgresql = [
+      {
+        name = "patroni";
+        plugin_name = "postgresql-database-plugin";
+
+        # Connect to Patroni primary via Consul DNS
+        connection_url = "postgresql://{{username}}:{{password}}@primary.homelab-cluster.service.consul:5432/postgres";
+
+        # Use the superuser credentials for managing dynamic users
+        username = "postgres";
+        password_wo = "\${ephemeral.vault_kv_secret_v2.patroni_superuser_password.data.password}";
+        password_wo_version = 1;
+
+        allowed_roles = [ "*" ];
+
+        # Verify connection on creation
+        verify_connection = true;
+      }
+    ];
+  };
+
+  # Role for backup jobs - read-only access to all databases
+  resource.vault_database_secret_backend_role.backup = {
+    backend = lib.tf.ref "vault_database_secrets_mount.patroni.path";
+    name = "backup";
+    db_name = "patroni";
+
+    creation_statements = [
+      "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' IN ROLE pg_read_all_data;"
+    ];
+
+    default_ttl = 3600;
+    max_ttl = 7200;
+
+  };
+
+  # Policy for PostgreSQL backup workload
+  resource.vault_policy.postgres_backup = {
+    name = "postgres-backup";
+    policy = ''
+      # Allow getting dynamic PostgreSQL credentials
+      path "database/creds/backup" {
+        capabilities = ["read"]
+      }
+    '';
+  };
+
+  # Dedicated role for PostgreSQL backup job
+  resource.vault_jwt_auth_backend_role.postgres_backup = {
+    backend = config.resource.vault_jwt_auth_backend.nomad.path;
+    role_name = "postgres-backup";
+    role_type = "jwt";
+
+    bound_audiences = [ "vault.io" ];
+
+    user_claim = "/nomad_job_id";
+    user_claim_json_pointer = true;
+
+    bound_claims = {
+      nomad_job_id = "backup-postgres";
+    };
+
+    claim_mappings = {
+      nomad_namespace = "nomad_namespace";
+      nomad_job_id = "nomad_job_id";
+      nomad_group = "nomad_group";
+      nomad_task = "nomad_task";
+    };
+
+    token_type = "service";
+    token_policies = [
+      config.resource.vault_policy.nomad_workloads.name
+      config.resource.vault_policy.postgres_backup.name
+    ];
+
+    token_period = 3600;
+    token_explicit_max_ttl = 0;
   };
 }

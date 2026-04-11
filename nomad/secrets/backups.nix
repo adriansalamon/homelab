@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   imports = [
     ../../modules/backups/nomad-backups.nix
@@ -20,5 +20,9 @@
     nomad-volumes = {
       subuser = "nomad-volumes";
     };
+  };
+
+  nomadJobs.backup-seaweedfs.secrets.s3-secret-key = {
+    inherit (config.nomadJobs.seaweedfs-filer.secrets.admin-secret-key) rekeyFile;
   };
 }
