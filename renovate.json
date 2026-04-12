@@ -6,29 +6,53 @@
   "extends": [
     "config:recommended",
     "schedule:earlyMondays",
-    "helpers:pinGitHubActionDigests"
+    "helpers:pinGitHubActionDigests",
+    "group:allDigest"
   ],
   "lockFileMaintenance": {
     "enabled": true
   },
   "packageRules": [
     {
-      "matchManagers": [
-        "nix"
-      ],
-      "matchUpdateTypes": [
-        "!lockFileMaintenance"
-      ],
+      "matchManagers": ["nix"],
+      "matchUpdateTypes": ["!lockFileMaintenance"],
       "enabled": false
+    },
+    {
+      "description": "Group Go module updates in pkgs/ (requires manual vendorHash update in default.nix)",
+      "matchManagers": ["gomod"],
+      "matchPaths": ["pkgs/**"],
+      "groupName": "Go dependencies in pkgs/ (manual vendorHash update required)",
+      "groupSlug": "pkgs-go-deps",
+      "prBodyNotes": [
+        "⚠️ After merging, update `vendorHash` in the corresponding `default.nix` file"
+      ]
+    },
+    {
+      "description": "Group Docker image updates from Nomad jobs",
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["docker"],
+      "groupName": "Docker images",
+      "groupSlug": "docker-images"
+    },
+    {
+      "description": "Group Dockerfile base image updates separately",
+      "matchManagers": ["dockerfile"],
+      "groupName": "Dockerfile base images",
+      "groupSlug": "dockerfile-images"
+    },
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "groupSlug": "github-actions"
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
       "datasourceTemplate": "docker",
-      "managerFilePatterns": [
-        "/\\.nomad\\.hcl$/"
-      ],
+      "managerFilePatterns": ["\\.nomad\\.hcl$", "nomad/jobs/.*\\.nix$"],
       "matchStrings": [
         "\\s*image\\s*=\\s*\\\"(?<depName>.*?):(?<currentValue>.*?)\\\""
       ]

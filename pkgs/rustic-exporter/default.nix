@@ -5,16 +5,16 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "rustic-exporter";
-  version = "78a132887e820922660c726b1299272495eeb11e";
+  version = "0.1.0-rc.9";
 
   src = fetchFromGitHub {
-    owner = "adriansalamon";
+    owner = "timtorChen";
     repo = pname;
-    rev = version;
-    hash = "sha256-OYFcahH0RJ4epN6/9KuJsKeQnoi1A76zSaoAj9kL+ik=";
+    rev = "v${version}";
+    hash = "sha256-jUAHXZsirU1+9H1IN0y0ds12aShrDn12fuPQOHzE2+0=";
   };
 
-  cargoHash = "sha256-Fr7fhfMBt8ouKh8WcjHrrM1IAFBZ6fzaAs7Z0POAr8c=";
+  cargoHash = "sha256-L3TE2TS35ZcKcZZ/RD/PjKpoEk8uap8xQGe8HUOIf+U=";
 
   meta = with lib; {
     description = "Prometheus exporter for restic/rustic repo stats.";
