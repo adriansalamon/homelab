@@ -35,6 +35,12 @@ in
     id = 8;
   };
 
+  services.nomad-client = {
+    enable = true;
+    isMicrovm = false;
+    macvlanMaster = "server";
+  };
+
   meta.vector.enable = true;
   meta.telegraf.enable = true;
 

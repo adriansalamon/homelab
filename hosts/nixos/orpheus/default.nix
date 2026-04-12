@@ -10,7 +10,6 @@
     ./net.nix
     ./samba
     ./ai.nix
-    ./guests.nix
     ./services.nix
   ]
   ++ (with profiles; [
@@ -33,6 +32,12 @@
 
   globals.nebula.mesh.hosts.orpheus = {
     id = 2;
+  };
+
+  services.nomad-client = {
+    enable = true;
+    isMicrovm = false;
+    macvlanMaster = "serverBr";
   };
 
   system.stateVersion = "24.11";

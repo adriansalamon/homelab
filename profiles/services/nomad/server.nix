@@ -9,7 +9,7 @@ let
   nomadSecretDir = inputs.self.outPath + "/secrets/nomad/";
 in
 {
-  imports = [ ./common.nix ];
+  services.nomad-common.enable = true;
 
   age.secrets."server-nomad-key.pem" = {
     rekeyFile = "${nomadSecretDir}/global-server-nomad-key.pem.age";

@@ -12,7 +12,6 @@
     ./atticd.nix
     ./db.nix
     ./net.nix
-    ./guests.nix
     common
     zfs
     impermanence
@@ -27,6 +26,12 @@
 
   globals.nebula.mesh.hosts.demeter = {
     id = 3;
+  };
+
+  services.nomad-client = {
+    enable = true;
+    isMicrovm = false;
+    macvlanMaster = "serverBr";
   };
 
   meta.vector.enable = true;

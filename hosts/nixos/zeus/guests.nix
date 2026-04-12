@@ -73,7 +73,6 @@
         id = 2051;
         bridge = "lanBr";
       })
-      (mkMicrovm "nomad" { id = 2052; })
       (mkMicrovm "paperless" { id = 2053; })
       (mkMicrovm "forgejo" { id = 2057; })
     ];

@@ -1,7 +1,7 @@
 name      = "opengist-data"
 type      = "host"
 plugin_id = "mkdir"
-node_id   = "8b13b588-fae4-1d27-d2cf-9277212ccfa5"
+node_id   = "49512e1e-d203-0efe-41e2-165f03cc3af4"
 
 capability {
   access_mode     = "single-node-single-writer"

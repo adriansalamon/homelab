@@ -20,6 +20,8 @@ in
     group.backup = {
       count = 1;
 
+      networks = lib.singleton { mode = "cni/nebula"; };
+
       # Mount the opengist volume
       volume."opengist-data" = {
         type = "host";

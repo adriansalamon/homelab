@@ -188,6 +188,11 @@ EOF
         env         = true
         perms       = "0600"
       }
+
+      resources {
+        cpu    = 1000
+        memory = 1024
+      }
     }
   }
 }

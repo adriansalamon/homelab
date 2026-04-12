@@ -16,6 +16,8 @@
     # made for building nix derivations
     group.runner = {
 
+      networks = lib.singleton { mode = "cni/nebula"; };
+
       volume."nix-store" = {
         type = "host";
         source = "nix-store";
