@@ -27,7 +27,7 @@ in
   };
 
   age.secrets.forgejo-postgres-password = {
-    inherit (nodes.zeus.config.age.secrets.postgres-password) rekeyFile;
+    inherit (nodes.demeter.config.age.secrets.forgejo-postgres-password) rekeyFile;
     mode = "440";
     inherit (config.services.forgejo) group;
   };
@@ -114,7 +114,7 @@ in
     database = {
       createDatabase = false;
       type = "postgres";
-      host = globals.nebula.mesh.hosts.zeus.ipv4;
+      host = "primary.homelab-cluster.service.consul";
       port = 5432;
       name = "forgejo";
       user = "forgejo";

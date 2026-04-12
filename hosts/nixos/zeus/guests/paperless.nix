@@ -48,13 +48,16 @@ in
   };
 
   age.secrets.postgres-password = {
-    generator.dependencies = [ nodes.zeus.config.age.secrets.postgres-password ];
+    generator.dependencies = [ nodes.demeter.config.age.secrets.paperless-postgres-password ];
     generator.script = lib.helpers.generateWithEnv "PAPERLESS_DBPASS";
     mode = "440";
     group = "paperless";
   };
 
-  globals.nebula.mesh.hosts.zeus-paperless.groups = [ "nfs-client" ];
+  globals.nebula.mesh.hosts.zeus-paperless.groups = [
+    "nfs-client"
+    "postgres-client"
+  ];
 
   fileSystems."/paperless" = {
     device = "${globals.nebula.mesh.hosts.hermes.ipv4}:/data/tank02/shared/scanning/paperless";
@@ -108,7 +111,7 @@ in
 
       PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS = "salamon";
 
-      PAPERLESS_DBHOST = "zeus.node.consul";
+      PAPERLESS_DBHOST = "primary.homelab-cluster.service.consul";
       PAPERLESS_DBENGINE = "postgresql";
       PAPERLESS_DBPORT = 5432;
       PAPERLESS_DBNAME = "paperless";
@@ -151,6 +154,7 @@ in
   ];
 
   # we need posgres access
+  # TODO: remove
   globals.nebula.mesh.hosts.zeus.firewall.inbound = [
     {
       port = "5432";

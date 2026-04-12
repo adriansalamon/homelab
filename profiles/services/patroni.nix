@@ -103,7 +103,7 @@ in
     };
   };
 
-  # Todo: remove this once we have consul connect for all services
+  # Todo: remove this once all things have "postgres-client" group.
   globals.nebula.mesh.hosts.${config.node.name}.firewall.inbound = [
     {
       "port" = "5432";

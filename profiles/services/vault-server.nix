@@ -197,7 +197,11 @@ in
 
   # Nebula firewall rules
   globals.nebula.mesh.hosts.${host} = {
-    groups = [ "vault-server" ];
+    groups = [
+      "vault-server"
+      # for postgres secrets engine
+      "postgres-client"
+    ];
     firewall.inbound = [
       # Vault API (8200)
       {

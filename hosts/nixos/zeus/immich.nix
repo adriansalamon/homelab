@@ -92,5 +92,6 @@ in
   meta.backups.storageboxes."cloud-backups" = {
     subuser = "immich";
     paths = [ "/media/immich-data" ];
+    withPostgres = true;
   };
 }

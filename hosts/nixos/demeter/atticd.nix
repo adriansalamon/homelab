@@ -87,11 +87,14 @@ in
     ];
   };
 
-  globals.nebula.mesh.hosts.${config.node.name}.firewall.inbound = [
-    {
-      "port" = toString port;
-      "proto" = "tcp";
-      "group" = "reverse-proxy";
-    }
-  ];
+  globals.nebula.mesh.hosts.${config.node.name} = {
+    groups = [ "postgres-client" ];
+    firewall.inbound = [
+      {
+        "port" = toString port;
+        "proto" = "tcp";
+        "group" = "reverse-proxy";
+      }
+    ];
+  };
 }

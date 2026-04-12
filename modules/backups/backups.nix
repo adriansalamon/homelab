@@ -7,13 +7,17 @@
 }:
 let
   inherit (lib)
+    any
     attrValues
     flip
     mkIf
     mkMerge
     mkOption
+    optionals
     types
     ;
+
+  anyPostgres = any (boxCfg: boxCfg.withPostgres) (attrValues config.meta.backups.storageboxes);
 in
 {
 
@@ -37,6 +41,12 @@ in
           paths = mkOption {
             description = "The paths to backup.";
             type = types.listOf types.str;
+          };
+
+          withPostgres = mkOption {
+            description = "Whether to enable and configure services.postgresqlBackup to also backup all postgres databases.";
+            type = types.bool;
+            default = false;
           };
         };
       })
@@ -67,12 +77,35 @@ in
 
           user = "root";
 
-          inherit (boxCfg) paths;
+          backupPrepareCommand = mkIf anyPostgres (
+            lib.getExe (
+              pkgs.writeShellApplication {
+                name = "backup-postgres";
+                runtimeInputs = [
+                  config.services.postgresql.package
+                  pkgs.util-linux
+                ];
+                text = ''
+                  umask 0077
+                  mkdir -p /var/cache/postgresql_backups
+                  runuser -u postgres pg_dumpall > /var/cache/postgresql_backups/database.sql
+                '';
+              }
+            )
+          );
+
+          paths =
+            boxCfg.paths
+            ++ optionals boxCfg.withPostgres [
+              "/var/cache/postgresql_backups"
+            ];
+
           timerConfig = {
             OnCalendar = "02:15";
             RandomizedDelaySec = "3h";
             Persistent = true;
           };
+
           initialize = true;
           passwordFile = config.age.secrets.restic-encryption-password.path;
           pruneOpts = [
