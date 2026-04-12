@@ -1,148 +1,178 @@
 ## Homelab
 
-This is a place for all infra stuff at home. There are currently five geographic sites + a
-cloud environment.
+Infrastructure as code for a multi-site homelab setup. All servers run NixOS
+with configurations managed in this repo. Also contains configuration for
+workloads running as Nomad jobs, and other infra configuration.
 
-- Olympus (G29)
-- Erebus (B22)
-- Delphi (B216)
-- Ithaca (N170)
-- Arcadia (F110)
-- Aether (Hetzner)
+### Hosts
 
-With the main infra at Olympus.
+|     | type   | name     | hardware                                         | use                                                                           |
+| --- | ------ | -------- | ------------------------------------------------ | ----------------------------------------------------------------------------- |
+| 💻  | laptop | atlas    | M1 Macbook Air                                   | Personal machine, has served me well.                                         |
+| 🖥️  | server | athena   | Dell R210 II<br>E3-1230v2, 8gb RAM               | Firewall/router. DHCP and DNS server. Internal reverse proxy and VPN gateway. |
+| 🖥️  | server | demeter  | Supermicro 1U X9SCM<br>E3-1230, 16gb RAM         | Backup NAS/storage server. Nomad client.                                      |
+| 🖥️  | server | zeus     | Supermicro X10DRU-i+<br>2xE5-2620v4, 64gb RAM    | Main VM and services host. Runs most of my services.                          |
+| 🖥️  | server | hermes   | Supermicro 2U X11SSH-LN4F<br>E3-1240v6, 32gb RAM | Storage server/NAS. Has a 16TB ZFS storage pool.                              |
+| 🖥️  | server | orpheus  | ASUS PN51<br>Ryzen 5 5500U, 16gb RAM             | Edge server at Erebus. Local NAS, Nomad client.                               |
+| 🖥️  | server | charon   | Intel N150<br>12gb RAM                           | Firewall/router at Erebus.                                                    |
+| 🖥️  | server | pythia   | Intel N150<br>12gb RAM                           | Firewall/router at Delphi.                                                    |
+| 🖥️  | server | penelope | Intel N150<br>12gb RAM                           | Firewall/router at Ithaca.                                                    |
+| 🖥️  | server | pan      | UBNT Edgerouter Lite                             | Firewall/router at Arcadia. Runs OpenWrt.                                     |
+| 🖥️  | server | callisto | Raspberry Pi 3                                   | At Arcadia. Runs zigbee2mqtt.                                                 |
+| ☁️  | VPS    | icarus   | Hetzner Cloud server                             | Proxy for local services. Nebula lighthouse, Headscale server.                |
 
-### Infra
+### Infrastructure
 
-This repo uses OpenTofu and NixOS to manage the infrastructure. All servers (except Pan) are running NixOS and have
-their configurations in this repo. Many services are configured and deployed so that they can still be functional
-in the event of any one site going down.
+#### Nomad
 
-#### Hosts
+Container orchestration with Nomad. Jobs can be defined as either:
 
-|     | type   | name      | hardware                                         | use                                                                                    |
-| --- | ------ | --------- | ------------------------------------------------ | -------------------------------------------------------------------------------------- |
-| 💻  | laptop | atlas     | M1 Macbook Air                                   | Personal machine, has served me well.                                                  |
-| 🖥️  | server | athena    | Dell R210 II<br>E3-1230v2, 8gb RAM               | Firewall/router. DHCP and DNS server. Internal reverse proxy and VPN gateway.          |
-| 🖥️  | server | demeter   | Supermicro 1U X9SCM<br>E3-1230, 16gb RAM         | Backup NAS/storage server. Runs not much currently.                                    |
-| 🖥️  | server | zeus      | Supermicro X10DRU-i+<br>2xE5-2620v4, 64gb RAM    | Main VM and services host. Runs most of my services.                                   |
-| 🖥️  | server | hermes    | Supermicro 2U X11SSH-LN4F<br>E3-1240v6, 32gb RAM | Storage server/NAS. Has a 16TB ZFS storage pool.                                       |
-| 🖥️  | server | orpheus   | ASUS PN51<br>Ryzen 5 5500U, 16gb RAM             | Edge server at Erebus. Runs some services and VMs and acts as a local NAS at the site. |
-| 🖥️  | server | charon    | Intel N150<br>12gb RAM                           | Firewall/router at Erebus.                                                             |
-| 🖥️  | server | pythia    | Intel N150<br>12gb RAM                           | Firewall/router at Delphi.                                                             |
-| 🖥️  | server | penelope  | Intel N150<br>12gb RAM                           | Firewall/router at Ithaca.                                                             |
-| 🖥️  | server | pan       | UBNT Edgerouter Lite                             | Firewall/router at Arcadia. Runs OpenWrt.                                              |
-| 🖥️  | server | proxmox01 | Dell R610<br>2x5690, 96gb RAM                    | Decommissioned. Very good at heating a home.                                           |
-| ☁️  | VPS    | icarus    | Hetzner Cloud server                             | Proxy for local services. Nebula lighthouse, Headscale server.                         |
+- **HCL files** in `nomad/jobs/*.nomad.hcl` (legacy)
+- **Nix expressions** using
+  [nix-nomad](https://github.com/tristanpemble/nix-nomad) to generate JSON
+  jobspecs
 
-#### Services
+Jobs deployed across multiple Nomad clients for high availability. Services use
+Consul for service discovery and custom [Nebula CNI
+plugin](https://github.com/adriansalamon/nebula-nomad-cni) for networking with
+strict firewall rules per service.
 
-|                       | service                | description                                                                                                        |
-| --------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 🪪 SSO                | Authelia               | Single-Sign-On for hosted services. Uses lldap as an LDAP backend.                                                 |
-| 📷 Photos             | Immich                 | Self hosted Google Images alternative. My phone backs up here via the Immich app.                                  |
-| 📄 Documents          | Paperless              | Manager for physical and digital documents. Automatically ingests scans from my HP printer/scanner via Samba.      |
-| 🌐 VPN                | Headscale              | Use as classic VPN for remote access with SSO login. Used to remotely access internal services.                    |
-| 🏠 Home Automation    | Home Assistant         | Manages things (mostly IoT devices) in my home.                                                                    |
-| 🍿 Media Server       | Jellyfin               | Used to view movies and TV series.                                                                                 |
-| 🎞️ Media Management   | Radarr/Sonarr/Prowlarr | Used to automatically keep media in sync.                                                                          |
-| 🗃️ Download client    | Deluge                 | Download client to download and cache files.                                                                       |
-| 🛡️ Reverse Proxy      | Traefik                | Reverse proxy to secure access to services, uses Consul for dynamic service discovery.                             |
-| 🗂️ Network Management | UniFi Controller       | Central network controller for all UniFi devices across all sites.                                                 |
-| 📔 Notes              | Memos                  | Self-hosted note-taking app.                                                                                       |
-| 🎞️ Link management    | Linkding               | Link manager and collector for links.                                                                              |
-| 🔊 Music              | Snapserver             | Acts as a streaming device from Spotify or AirPlay, and syncs multiroom audio. I run Raspberry Pis as snapclients. |
-| 📂 File Server        | Samba                  | NAS file storage for clients on local network.                                                                     |
-| 📦 Git Forge          | Forgejo                | Self-hosted Git forge, alternative to GitHub. I host and back up private stuff here.                               |
+Job deployment managed via Terranix+OpenTofu (see below).
 
-#### System
+#### Networking
 
-|                      | system      | description                                                                                                                                                                                                                 |
-| -------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📁 Service Discovery | Consul      | Consul cluster to manage service registrations. I also put DHCP leases as consul services and use the built-in distributed Consul DNS.                                                                                      |
-| 📮 DNS               | CoreDNS     | Flexible DNS server, redirects queries to Consul DNS, and blocks malicious DNS servers using a blocklist.                                                                                                                   |
-| 🎻 Orchestration     | Nomad       | Orchestrates deployment of docker services for high availability, scaling, and failover.                                                                                                                                    |
-| 🌐 Networking        | Nebula      | Overlay encrypted mesh network. All services are connected and communicate over Nebula, and use groups and use strict Nebula firewall rules.                                                                                |
-| 🔐 Secrets           | Age         | All secrets are stored in this repo, but encrypted using Age. Two YubiKeys (one offline backup) used for decryption. `agenix-rekey` enables me to encrypt per-service secrets.                                              |
-| 📃 Logs              | Loki        | Journald logs are sent to Loki, using vector. They can be queried using Grafana.                                                                                                                                            |
-| ⏱️ Metrics           | Prometheus  | Metrics are collected using Prometheus and visualized using Grafana.                                                                                                                                                        |
-| ⛈️ Backups           | Restic      | Automatic backups off all my data to Hetzner Storage Boxes via restic.                                                                                                                                                      |
-| 💾 Nix Cache         | Attic       | Nix cache to speed up Nix builds.                                                                                                                                                                                           |
-| 🗃️ Storage           | SeaweedFS   | Distributed S3 compatible object storage. I keep some files here replicated across multiple sites.                                                                                                                          |
-| 🤖 Automation        | Home-rolled | Custom setup for automatic builds and deployments of NixOS configurations, based on GitHub Actions and Consul written in Go. Also running custom Go service for automatically deploying updates to nomad jobs (ie. GitOps). |
+**Nebula**: Encrypted mesh overlay network connecting all sites. Every service
+communicates over Nebula with firewall rules defined per task using groups
+(e.g., `postgres-client`, `redis-client`). Also used for traditional
+site-to-site subnet routing for client devices. Lighthouse runs on Hetzner VPS.
 
-### Secrets 🔐
+**Traefik**: Ingress/reverse proxy. Runs on all sites + on VPS for access to
+services.
 
-All secrets, e.g. passwords, API tokens, etc. are stored as age encrypted files.
-These are encrypted using two YubiKeys (one offline backup). Using
-[`agenix-rekey`](https://github.com/oddlama/agenix-rekey), secrets are
-rekeyed/encrypted per host/server. Please see the documentation for the library
-for more information. I also have scripts for automatically deploying secrets to
-Nomad as Nomad variables.
+**Consul**: Service discovery and distributed DNS. DHCP leases registered as
+Consul services. Traefik uses Consul catalog for dynamic routing.
 
-Semi-secret data, like domain names, email addresses, and IP addresses, which
-are not secrets in the traditional sense (I'm fine if they are in the Nix store)
-but I would still like to keep hidden publicly on GitHub, are encrypted using
-[`git-agecrypt`](https://github.com/vlaci/git-agecrypt). To set up after cloning
-repo, use:
+**CoreDNS**: Primary DNS server, forwards to Consul DNS and includes
+ad-blocking. Does split DNS to local Traefik instance for internal resources.
+
+**Headscale**: Tailscale-compatible VPN for remote access to internal services.
+OIDC authentication via Authelia.
+
+#### Secrets Management
+
+**Age**: Secrets encrypted using Age with YubiKey identities (one offline
+backup). [`agenix-rekey`](https://github.com/oddlama/agenix-rekey) handles
+per-host secret encryption. Also used to generate sops encrypted files for
+provisioning into Vault.
+
+Useful commands:
 
 ```bash
-git-agecrypt init
-git-agecrypt config -i secrets/yubikey-identity.pub
+# generate secrets
+agenix generate -a
+# rekey secrets for hosts
+agenix rekey -a
+# rekey secrets for provisioning into Vault
+nix run \#sops-rekey
 ```
 
-### Provisioning hosts
+**Vault**: Runtime secrets for Nomad jobs. Auto-unseal using AWS KMS. Nomad jobs
+use Vault integration to fetch secrets at runtime. Secrets are provisioned into
+Vault via sops terraform provider.
 
-Boot into a NixOS live ISO, for example one pre-generated with your ssh key. You can build a
-NixOS live ISO with preconfigured ssh keys:
+**sops**: Semi-sensitive data (domain names, IPs) encrypted in git but
+available in Nix store. Not traditional secrets but kept out of public repo.
+Uses git filter for transparent encryption/decryption:
+
+```gitconfig
+[filter "sops"]
+  smudge = sops --decrypt --input-type binary /dev/stdin
+  clean = sops --encrypt --input-type binary --output-type binary /dev/stdin
+  required = true
+```
+
+#### Observability
+
+**Prometheus**: Metrics collection from all hosts and services.
+
+**Loki**: Centralized logging. Journald logs forwarded via Vector.
+
+**Grafana**: Dashboards for metrics and logs. OIDC auth via Authelia.
+
+#### Storage & Backups
+
+**SeaweedFS**: Distributed S3-compatible object storage replicated across sites.
+Used for Nomad CSI volumes.
+
+**Restic**: Automated backups to Hetzner Storage Box.
+
+**ZFS**: Local storage pools on NAS hosts.
+
+#### Terraform/Terranix
+
+Two separate Terraform configurations:
+
+**External infrastructure** (`terraform/infra/`): Traditional HCL for cloud
+resources
+
+- Cloudflare DNS records
+- Hetzner VPS
+- AWS resources (SES SMTP, KMS for Vault auto-unseal)
+
+```bash
+tofu -chdir=terraform/infra <init|plan|apply>
+```
+
+**Internal cluster** (`terraform/jobs/`): [Terranix](https://terranix.org/)
+(Nix-based) for cluster provisioning
+
+- Nomad configuration
+- Nomad job deployments (automatically collects from `nomad/jobs/*`)
+- Consul configuration
+- Vault configuration
+- Vault secrets
+
+```bash
+nix run #terraform-jobs.<init|plan|apply>
+```
+
+### CI/CD
+
+Automated builds and deployments via GitHub Actions:
+
+**NixOS system builds** (`.github/workflows/build-derivations.yaml`):
+
+- Builds all NixOS system derivations on GitHub-hosted runners
+- Pushes to Attic binary cache
+- Updates deployment pointer in Consul KV store (via consul-kv-proxy)
+- Hosts poll Consul KV and pull new system closures when available
+
+**Cluster configuration** (`.github/workflows/terraform-apply.yaml`):
+
+- Runs on self-hosted runner with access to internal cluster
+- Applies Terranix-generated Terraform for Nomad/Consul/Vault
+- Automatically deploys all Nomad jobs
+
+### Provisioning
+
+New hosts provisioned using
+[nixos-anywhere](https://github.com/nix-community/nixos-anywhere) with
+[disko](https://github.com/nix-community/disko) for declarative disk
+partitioning.
+
+Build custom live ISO with SSH keys:
 
 ```bash
 nix build --print-out-paths --no-link github:adriansalamon/homelab#live-iso
 ```
 
-After booting into your system, you will want to gather:
-
-- Hard drive ids, to put in `disk-config.nix`
-- Network interface mac ids, to put in `net.nix`
-- Anything else hardware-related
-
-When you are happy with config, run:
+Deploy to new host:
 
 ```bash
-nix run github:nix-community/nixos-anywhere -- --flake .#name <user>@<host> --build-on-remote
+nix run github:nix-community/nixos-anywhere -- --flake .#hostname <user>@<host> --build-on-remote
 ```
 
-To install.
-
-If you want to do it manually (e.g. there might be some data already there, and
-you want to be careful). Read on.
-
-Get the repo on the host, e.g. `git ls-files | rsync -a --files-from=- . <user>@<host>/homelab`. Then on the host run:
-
-```bash
-nix shell nixpkgs#disko
-sudo disko -m <disko|format|mount> --flake .#<host>
-```
-
-To make sure your filesystem is formatted correctly. You are then ready to install like normally:
-
-```bash
-nix run github:nix-community/nixos-anywhere -- --flake .#name <user>@<host> --build-on-remote --disko-mode mount
-```
-
-After installing, grab the ssh public key and put in `<host>/secrets/host.pub`, rekey secrets,
-and deploy normally.
-
-### OpenTofu
-
-Some things are managed using OpenTofu, e.g. Cloudflare DNS, Hetzner Cloud, and Consul.
-To run, use:
-
-```bash
-nix run #tofu <command, e.g. plan|apply>
-```
-
-This also automatically sets up a tunnel to a Consul server.
+After install, add host SSH key to `<host>/secrets/host.pub` and rekey secrets.
 
 ## Credits
 
@@ -157,4 +187,5 @@ Other sources of inspiration:
   pushed me to finally move to a NixOS based setup.
 - [PopeRigby](https://codeberg.org/PopeRigby/config) - Authelia setup is based
   on his config.
-- [Diogo Correia](https://github.com/diogotcorreia/dotfiles) - My automatic build and deployment setup is heavily inspired by his.
+- [Diogo Correia](https://github.com/diogotcorreia/dotfiles) - My automatic
+  build and deployment setup is heavily inspired by his.
