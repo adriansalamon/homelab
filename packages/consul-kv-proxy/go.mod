@@ -2,7 +2,7 @@ module consul-kv-proxy
 
 go 1.25.8
 
-require github.com/hashicorp/consul/api v1.33.7
+require github.com/hashicorp/consul/api v1.34.0
 
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
