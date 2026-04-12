@@ -19,13 +19,13 @@
       "enabled": false
     },
     {
-      "description": "Group Go module updates in pkgs/ (requires manual vendorHash update in default.nix)",
+      "description": "Group Go module updates in pkgs/ (requires manual vendorHash updates)",
       "matchManagers": ["gomod"],
-      "matchPaths": ["pkgs/**"],
-      "groupName": "Go dependencies in pkgs/ (manual vendorHash update required)",
+      "matchFileNames": ["pkgs/**"],
+      "groupName": "Go dependencies in pkgs/",
       "groupSlug": "pkgs-go-deps",
       "prBodyNotes": [
-        "⚠️ After merging, update `vendorHash` in the corresponding `default.nix` file"
+        "⚠️ After merging, update `vendorHash` in the corresponding `nix` file"
       ]
     },
     {
