@@ -15,7 +15,7 @@ job "seaweedfs-csi-controller" {
       driver = "docker"
 
       meta {
-        nebula_roles = jsonencode(["weed-filer-client"])
+        nebula_roles = jsonencode(["weed-mount"])
 
         nebula_config = yamlencode({
           firewall = {

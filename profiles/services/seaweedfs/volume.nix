@@ -1,4 +1,9 @@
-{ config, globals, ... }:
+{
+  config,
+  globals,
+  lib,
+  ...
+}:
 let
   host = config.node.name;
   nebulaIp = globals.nebula.mesh.hosts.${host}.ipv4;
@@ -42,18 +47,31 @@ in
     };
   };
 
-  globals.nebula.mesh.hosts.${host}.firewall.inbound = [
-    {
-      port = config.services.seaweedfs.volume.port;
-      proto = "tcp";
-      host = "any";
-    }
-    {
-      port = config.services.seaweedfs.volume.port + 10000;
-      proto = "tcp";
-      host = "any";
-    }
-  ];
+  globals.nebula.mesh.hosts.${host} = {
+    groups = [ "weed-volume" ];
+
+    firewall.inbound = lib.flatten (
+      map
+        (group: [
+          {
+            port = config.services.seaweedfs.volume.port;
+            proto = "tcp";
+            inherit group;
+          }
+          # gRPC port (defaults to port + 10000)
+          {
+            port = config.services.seaweedfs.volume.port + 10000;
+            proto = "tcp";
+            inherit group;
+          }
+        ])
+        [
+          "weed-filer"
+          "weed-mount"
+          "weed-volume"
+        ]
+    );
+  };
 
   consul.services = {
     seaweedfs-http-volume = {

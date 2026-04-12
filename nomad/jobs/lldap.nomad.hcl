@@ -22,7 +22,7 @@ job "lldap" {
       vault {}
 
       config {
-        image = "lldap/lldap:2026-03-04-alpine" # todo: pin to a specific version?
+        image = "lldap/lldap:2026-03-04-alpine"
         ports = ["http", "ldap"]
       }
 

@@ -49,19 +49,7 @@ in
 
   nomadJobs.rustic-exporter.secrets = {
     "ssh-private-key" = {
-      generator.script =
-        {
-          lib,
-          name,
-          pkgs,
-          ...
-        }:
-        ''
-          TMPFILE=$(mktemp)
-          ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C ${lib.escapeShellArg "${name}"} -f "$TMPFILE" <<<y >/dev/null 2>&1
-          cat "$TMPFILE"
-          rm "$TMPFILE" "$TMPFILE.pub"
-        '';
+      generator.script = "ssh-ed25519";
     };
   }
   // flip concatMapAttrs manualBackups (

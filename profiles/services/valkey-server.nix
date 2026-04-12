@@ -226,12 +226,12 @@ in
     {
       inherit (config.services.redis.servers.server) port;
       proto = "tcp";
-      group = "any"; # TODO: restrict this
+      group = "redis-client";
     }
     {
       inherit (config.services.redis.servers.sentinel) port;
       proto = "tcp";
-      group = "any";
+      group = "redis-client";
     }
   ];
 }

@@ -48,13 +48,7 @@ job "seaweedfs-filer" {
               }
             ]
             inbound = [
-              # temp
-              {
-                port  = "any"
-                proto = "tcp"
-                host  = "any"
-              },
-              # CLIENT STUFF
+              # s3
               {
                 port  = 30091
                 proto = "tcp"
@@ -65,11 +59,7 @@ job "seaweedfs-filer" {
                 proto = "tcp"
                 group = "nomad-client"
               },
-              {
-                port  = 20090
-                proto = "tcp"
-                group = "reverse-proxy"
-              },
+              # http
               {
                 port  = 20090
                 proto = "tcp"
@@ -78,7 +68,7 @@ job "seaweedfs-filer" {
               {
                 port  = 20090
                 proto = "tcp"
-                group = "weed-filer-client"
+                group = "weed-mount"
               },
               # RPC
               {
@@ -89,7 +79,7 @@ job "seaweedfs-filer" {
               {
                 port  = 30090
                 proto = "tcp"
-                group = "weed-filer-client"
+                group = "weed-mount"
               }
             ]
           }
@@ -102,10 +92,7 @@ job "seaweedfs-filer" {
         address = "${NOMAD_ALLOC_IP_http}"
         tags = [
           "http",
-          "filer",
-          "traefik.enable=true",
-          "traefik.http.routers.seaweedfs-filer.rule=Host(`filer.local.${DOMAIN}`)",
-          "traefik.http.routers.seaweedfs-filer.entrypoints=websecure"
+          "filer"
         ]
 
         check {

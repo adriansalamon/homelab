@@ -31,11 +31,6 @@ in
       pkgs,
       ...
     }:
-    ''
-      TMPFILE=$(mktemp)
-      ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C ${lib.escapeShellArg "${target}:${name}"} -f "$TMPFILE" <<<y >/dev/null 2>&1
-      cat "$TMPFILE"
-      rm "$TMPFILE" "$TMPFILE.pub"
-    ''
+    ''(exec 3>&1; ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C ${lib.escapeShellArg "${target}:${name}"} -f /dev/fd/3 <<<y >/dev/null 2>&1; true)''
   );
 }

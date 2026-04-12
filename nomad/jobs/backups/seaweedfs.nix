@@ -109,7 +109,7 @@ in
         vault = { };
 
         meta = helpers.mkNebula {
-          groups = [ "weed-filer-client" ];
+          groups = [ "weed-mount" ];
         };
 
         env = {

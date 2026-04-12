@@ -49,20 +49,7 @@ in
       flip map (attrValues cfg) (backupCfg: {
         "backup-${backupCfg.name}" = {
           secrets = {
-            ssh-private-key.generator.script =
-              {
-                lib,
-                name,
-                pkgs,
-                ...
-              }:
-              ''
-                TMPFILE=$(mktemp)
-                ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C ${lib.escapeShellArg "${name}"} -f "$TMPFILE" <<<y >/dev/null 2>&1
-                cat "$TMPFILE"
-                rm "$TMPFILE" "$TMPFILE.pub"
-              '';
-
+            ssh-private-key.generator.script = "ssh-ed25519";
             restic-password.generator.script = "alnum";
           };
         };

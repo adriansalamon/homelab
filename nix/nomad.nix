@@ -77,6 +77,16 @@
                 generatedSecretsDir = inputs.self.outPath + "/secrets/generated/nomad";
                 localStorageDir = inputs.self.outPath + "/secrets/rekeyed/nomad";
               };
+
+              generators.ssh-ed25519 = lib.mkForce (
+                {
+                  lib,
+                  name,
+                  pkgs,
+                  ...
+                }:
+                ''(exec 3>&1; ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -C ${lib.escapeShellArg "${name}"} -f /dev/fd/3 <<<y >/dev/null 2>&1; true)''
+              );
             };
           }
         ]
