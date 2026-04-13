@@ -26,7 +26,6 @@ let
     types
     warnIf
     disk
-    replaceStrings
     ;
 
   mergeToplevelConfigs = keys: attrs: genAttrs keys (attr: mkMerge (map (x: x.${attr} or { }) attrs));
@@ -62,17 +61,6 @@ let
           # We generate the mountpoint fileSystems entries ourselfs to enable shared folders between guests
           disk.zfs.unmountable;
       })
-    );
-
-    systemd.network = mkMerge (
-      flip mapAttrsToList guestCfg.microvm.interfaces (
-        ifaceName: ifaceCfg: {
-          networks."50-microvm-${guestName}-${ifaceName}" = {
-            matchConfig.Name = "vm-${replaceStrings [ ":" ] [ "" ] ifaceCfg.mac}";
-            networkConfig.Bridge = ifaceCfg.bridge;
-          };
-        }
-      )
     );
 
     # Ensure that the zfs dataset exists before it is mounted.
@@ -150,6 +138,11 @@ in
               type = types.attrsOf (
                 types.submodule (submod-iface: {
                   options = {
+                    type = mkOption {
+                      type = types.str;
+                      description = "Type of interface, can be bridge or macvtap.";
+                      default = "macvtap";
+                    };
                     bridge = mkOption {
                       type = types.str;
                       description = "The bridge to attach the interface to";

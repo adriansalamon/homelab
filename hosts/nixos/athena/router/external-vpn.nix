@@ -62,7 +62,7 @@ in
           PublicKey = "PyLCXAQT8KkM4T+dUsOQfn+Ub3pGxfGlxkIApuig+hk=";
           PresharedKeyFile = config.age.secrets.vpn-psk.path;
           AllowedIPs = "0.0.0.0/0";
-          Endpoint = "37.46.199.52:1637"; # ashlesha
+          Endpoint = "94.185.80.228:1637"; # segin
           RouteTable = "1000";
           PersistentKeepalive = 15;
         }

@@ -41,12 +41,22 @@ in
 
       interfaces = flip mapAttrsToList guestCfg.microvm.interfaces (
         _:
-        { mac, ... }:
         {
-          type = "tap";
+          type,
+          mac,
+          bridge,
+          ...
+        }:
+        {
           id = "vm-${replaceStrings [ ":" ] [ "" ] mac}";
-          inherit mac;
+          inherit mac type;
         }
+        // (lib.optionalAttrs (type == "macvtap") {
+          macvtap = {
+            link = bridge;
+            mode = "bridge";
+          };
+        })
       );
 
       shares = [
