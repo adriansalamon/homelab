@@ -155,6 +155,7 @@ in
           publish_allocation_metrics = true;
           publish_node_metrics = true;
           prometheus_metrics = true;
+          disable_hostname = true;
         };
 
         plugin.docker.config = {
@@ -178,7 +179,8 @@ in
       ];
     };
 
-    consul.services.nomad-client = {
+    consul.services.nomad-metrics = {
+      name = "nomad-client";
       port = 4646;
       tags = [
         "prometheus.scrape=true"

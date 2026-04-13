@@ -222,16 +222,19 @@ in
     };
   };
 
-  globals.nebula.mesh.hosts.${host}.firewall.inbound = [
-    {
-      inherit (config.services.redis.servers.server) port;
-      proto = "tcp";
-      group = "redis-client";
-    }
-    {
-      inherit (config.services.redis.servers.sentinel) port;
-      proto = "tcp";
-      group = "redis-client";
-    }
-  ];
+  globals.nebula.mesh.hosts.${host} = {
+    groups = [ "redis-client" ];
+    firewall.inbound = [
+      {
+        inherit (config.services.redis.servers.server) port;
+        proto = "tcp";
+        group = "redis-client";
+      }
+      {
+        inherit (config.services.redis.servers.sentinel) port;
+        proto = "tcp";
+        group = "redis-client";
+      }
+    ];
+  };
 }

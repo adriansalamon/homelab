@@ -60,13 +60,19 @@ in
     credentials.secrets = config.age.secrets."nomad-secrets.json".path;
   };
 
-  consul.services.nomad-ui = {
+  consul.services.nomad-server = {
+    name = "nomad";
     port = 4646;
     tags = [
       "traefik.enable=true"
       "traefik.http.routers.nomad-ui.rule=Host(`nomad.local.${globals.domains.main}`)"
       "traefik.http.services.nomad-ui.loadbalancer.server.scheme=https"
       "traefik.http.services.nomad-ui.loadbalancer.serversTransport=insecure@file"
+
+      "prometheus.scrape=true"
+      "prometheus.path=/v1/metrics"
+      "prometheus.scheme=https"
+      "prometheus.query.format=prometheus"
     ];
   };
 

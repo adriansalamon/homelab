@@ -61,6 +61,13 @@ in
         acl = {
           enabled = true;
         };
+
+        telemetry = {
+          publish_allocation_metrics = true;
+          publish_node_metrics = true;
+          prometheus_metrics = true;
+          disable_hostname = true;
+        };
       };
     };
 
@@ -75,6 +82,11 @@ in
           port = "4646";
           proto = "tcp";
           group = "nomad-client";
+        }
+        {
+          port = "4646";
+          proto = "tcp";
+          group = "metrics-collector";
         }
       ];
     };

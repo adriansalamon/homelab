@@ -133,6 +133,7 @@ in
 
         config = {
           image = "ghcr.io/adriansalamon/rustic-exporter:latest-alpine";
+          force_pull = true;
           args = [
             "--config"
             "/local/config.toml"
