@@ -86,8 +86,8 @@ let
 
         modules = [
           inputs.agenix-rekey-to-sops.sopsModules.default
-          ../modules/global.nix
-          ../modules/nomad/secrets.nix
+          ../modules/common/global.nix
+          ../modules/nomad/default.nix
         ]
         ++ modules;
       };

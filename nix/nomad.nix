@@ -55,6 +55,7 @@
         };
 
         modules = [
+          ../modules/nomad
           {
             age = {
               sops = {

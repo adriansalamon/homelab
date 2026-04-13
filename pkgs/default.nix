@@ -5,7 +5,7 @@ inputs: [
     rustic-exporter = prev.callPackage ./rustic-exporter { };
     nixos-auto-updater = prev.callPackage ./nixos-auto-updater { };
     vault-plugins = prev.callPackage ./vault-plugins {
-      plugins = [ inputs.nebula-vault-plugin.packages.${prev.system}.default ];
+      plugins = [ inputs.nebula-vault-plugin.packages.${prev.stdenv.hostPlatform.system}.default ];
     };
   })
 ]

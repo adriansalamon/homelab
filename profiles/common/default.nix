@@ -13,7 +13,8 @@
     inputs.impermanence.nixosModules.impermanence
     inputs.nixos-nftables-firewall.nixosModules.default
     inputs.nebula-nomad-cni.nixosModules.default
-    ../../modules
+    ../../modules/common
+    ../../modules/nixos
   ]
   ++ lib.collect builtins.isPath (lib.filterAttrs (n: _: n != "default") (lib.rakeLeaves ./.));
 

@@ -60,15 +60,14 @@
             system = "x86_64-linux";
             specialArgs = {
               inherit (inputs) agenix;
-              inherit inputs;
+              inherit inputs profiles;
               inherit (pkgs) lib;
               inherit (config) nodes globals;
-              inherit profiles;
               nomadCfg = config.nomadConfigurations.homelab;
             };
             modules = [
               inputs.microvm.nixosModules.host
-              ../modules/guests
+              ../modules/nixos/guests
               ../hosts/nixos/${name}
               {
                 nixpkgs.config.allowUnfree = true;
@@ -88,33 +87,24 @@
         name: nixpkgsVersion: extraModules:
         let
           pkgs = config.pkgs.aarch64-darwin;
+          profiles = pkgs.lib.rakeLeaves ../profiles;
         in
         {
           darwinConfigurations.${name} = inputs.nix-darwin.lib.darwinSystem {
             system = "aarch64-darwin";
             specialArgs = {
-              inherit inputs;
+              inherit inputs profiles;
               inherit (inputs) agenix;
               inherit (pkgs) lib;
               inherit (config) nodes globals;
             };
             modules = [
-              inputs.agenix.darwinModules.default
-              inputs.agenix-rekey.darwinModules.default
-              { nix.linux-builder.enable = true; }
-              #inputs.nix-rosetta-builder.darwinModules.default
-              #{
-              #  nix-rosetta-builder.onDemand = true;
-              #  nix-rosetta-builder.enable = false;
-              #}
-              ../hosts/darwin
               ../hosts/darwin/${name}
-              inputs.home-manager.darwinModules.home-manager
               {
-                home-manager.users.asalamon.imports = [
-                  inputs.agenix.homeManagerModules.default
-                  ../users/asalamon/darwin
-                ];
+                node = {
+                  name = name;
+                  secretsDir = ../hosts/darwin/${name}/secrets;
+                };
 
                 nixpkgs.overlays = (import ../pkgs/default.nix inputs) ++ [ (import ../lib inputs) ];
               }
@@ -149,7 +139,7 @@
         )
       );
 
-      nodes = config.nixosConfigurations // config.guestConfigs;
+      nodes = config.nixosConfigurations // config.guestConfigs // config.darwinConfigurations;
 
       deploy.nodes =
         flip lib.mapAttrs

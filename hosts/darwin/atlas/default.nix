@@ -1,13 +1,29 @@
 {
   inputs,
   pkgs,
+  globals,
+  profiles,
   ...
 }:
 {
 
   imports = [
     ./paneru.nix
+
+    profiles.darwin
   ];
+
+  globals.nebula.mesh.hosts.atlas = {
+    id = 4609;
+    groups = [ "network-admin" ];
+
+    config.settings.tun.unsafe_routes = [
+      {
+        route = globals.sites.olympus.vlans.management.cidrv4;
+        via = globals.nebula.mesh.hosts.athena.ipv4;
+      }
+    ];
+  };
 
   environment.systemPackages = with pkgs; [
     age-plugin-yubikey
@@ -22,8 +38,8 @@
     git
     git-agecrypt
     gleam
-    inputs.agenix-rekey.packages."${system}".default
-    inputs.deploy-rs.packages."${system}".default
+    inputs.agenix-rekey.packages."${stdenv.hostPlatform.system}".default
+    inputs.deploy-rs.packages."${stdenv.hostPlatform.system}".default
     iperf3
     lazygit
     nebula
@@ -44,15 +60,6 @@
 
   launchd.user.agents.backrest = {
     serviceConfig.ProgramArguments = [ "${pkgs.backrest}/bin/backrest" ];
-    serviceConfig.KeepAlive = true;
-  };
-
-  launchd.user.agents.nebula = {
-    serviceConfig.ProgramArguments = [
-      "${pkgs.nebula}/bin/nebula"
-      "-config"
-      "/etc/nebula/config.yml"
-    ];
     serviceConfig.KeepAlive = true;
   };
 

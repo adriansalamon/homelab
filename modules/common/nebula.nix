@@ -3,6 +3,7 @@
   config,
   nodes,
   lib,
+  pkgs,
   globals,
   ...
 }:
@@ -103,7 +104,10 @@ in
     }
   );
 
-  networking.firewall.trustedInterfaces = flip mapAttrsToList memberNets (name: _: "nebula.${name}");
+  # Only set firewall trusted interfaces on NixOS (not Darwin)
+  networking = lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+    firewall.trustedInterfaces = flip mapAttrsToList memberNets (name: _: "nebula.${name}");
+  };
 
   services.nebula.networks = flip mapAttrs memberNets (
     name: cfg:

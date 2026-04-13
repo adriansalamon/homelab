@@ -15,7 +15,7 @@
               nomadCfg = config.nomadConfigurations.homelab;
             };
             modules = [
-              ../modules/global.nix
+              ../modules/common/global.nix
               ../global.nix
             ]
             ++ [

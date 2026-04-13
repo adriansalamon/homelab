@@ -32,10 +32,6 @@ let
   };
 in
 {
-  imports = [
-    ../../modules/backups/nomad-backups.nix
-  ];
-
   backups = {
     vault.subuser = "vault-snapshots";
     postgres.subuser = "postgres-dumps";
