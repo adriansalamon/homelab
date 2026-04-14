@@ -210,7 +210,15 @@ in
         roles = {
           admin = "admin";
         };
-        features.automatic_user_linking = true;
+        features = {
+          automatic_user_linking = true;
+          automatic_person_creation = true;
+        };
+        claims = {
+          display_name = "name";
+          username = "preferred_username";
+          groups = "groups";
+        };
       };
     };
   };

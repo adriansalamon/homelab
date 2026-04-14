@@ -49,8 +49,9 @@ result-*
 # Ignore automatically generated direnv output
 .direnv
 
-deploy.json
 .claude
+CLAUDE.md
+GEMINI.md
 
 *.tf.backup
 
