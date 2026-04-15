@@ -152,14 +152,4 @@ in
       group = "reverse-proxy";
     }
   ];
-
-  # we need posgres access
-  # TODO: remove
-  globals.nebula.mesh.hosts.zeus.firewall.inbound = [
-    {
-      port = "5432";
-      proto = "tcp";
-      host = "zeus-paperless";
-    }
-  ];
 }

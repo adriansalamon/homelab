@@ -2,22 +2,25 @@
   lib,
   buildHomeAssistantComponent,
   fetchFromGitHub,
+  fetchNpmDeps,
   aiofiles,
   bcrypt,
   jinja2,
   joserfc,
+  nodejs,
+  npmHooks,
 }:
 
 buildHomeAssistantComponent rec {
   owner = "christaangoossens";
   domain = "auth_oidc";
-  version = "1.0.0-rc2"; # use alpha rc version
+  version = "1.0.0-rc3"; # use alpha rc version
 
   src = fetchFromGitHub {
     owner = "christiaangoossens";
     repo = "hass-oidc-auth";
     tag = "v${version}";
-    hash = "sha256-HnmMPz5eQoIOQ/QOLrf00hmH0x0cJhXDOgXUQ76zUTE=";
+    hash = "sha256-TKbzBKDI+pA+aNqnEmhiQZojnD/91fwHT4k939kh8Q0=";
   };
 
   dependencies = [
@@ -26,6 +29,21 @@ buildHomeAssistantComponent rec {
     jinja2
     joserfc
   ];
+
+  env.npmDeps = fetchNpmDeps {
+    name = "${domain}-npm-deps";
+    inherit src;
+    hash = "sha256-R5i4o2VnaXwgX72r6cBJULxSKadkU22vriMMWoMc5As=";
+  };
+
+  nativeBuildInputs = [
+    npmHooks.npmConfigHook
+    nodejs
+  ];
+
+  postBuild = ''
+    npm run css
+  '';
 
   meta = {
     changelog = "https://github.com/christiaangoossens/hass-oidc-auth/releases/tag/v${version}";
