@@ -82,6 +82,5 @@ in
         name: { mac, ... }: ''ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="${mac}", NAME="${name}"''
       )
     );
-
   };
 }

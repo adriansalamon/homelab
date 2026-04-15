@@ -22,6 +22,7 @@ let
     attrNames
     mapAttrs'
     nameValuePair
+    recursiveUpdate
     ;
 
   memberNets = filterAttrs (
@@ -117,7 +118,7 @@ in
 
       externalAddrs = name: [ "${nodes.${name}.config.node.publicIp}:4242" ];
     in
-    {
+    recursiveUpdate {
       enable = true;
       enableReload = true;
 
@@ -134,6 +135,11 @@ in
       staticHostMap = mkIf (!hostCfg.lighthouse) (
         mapAttrs' (name: lighthouseCfg: nameValuePair (lighthouseCfg.ipv4) (externalAddrs name)) lighthouses
       );
+
+      settings.lighthouse.remote_allow_list = {
+        # we don't use ipv6 generally
+        "::/0" = false;
+      };
 
       # Default to allow all outbound
       firewall.outbound = [
@@ -162,7 +168,6 @@ in
         }
       ]
       ++ hostCfg.firewall.inbound;
-    }
-    // hostCfg.config
+    } hostCfg.config
   );
 }

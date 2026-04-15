@@ -135,7 +135,7 @@ resource "hcloud_ssh_key" "main" {
 
 resource "hcloud_server" "icarus" {
   name        = "icarus"
-  server_type = "cx22"
+  server_type = "cx23"
   image       = "debian-12"
   public_net {
     ipv4_enabled = true

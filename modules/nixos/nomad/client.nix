@@ -227,6 +227,11 @@ in
           lighthouse = {
             am_lighthouse = false;
             hosts = lightHouseIps;
+
+            remote_allow_list = {
+              # we don't use ipv6 generally
+              "::/0" = false;
+            };
           };
 
           listen = {
