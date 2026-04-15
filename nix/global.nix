@@ -42,6 +42,7 @@
         {
 
           inherit (eval.config.globals)
+            admin-user
             sites
             nebula
             loki-secrets

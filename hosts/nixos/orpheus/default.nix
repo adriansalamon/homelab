@@ -13,7 +13,7 @@
     ./services.nix
   ]
   ++ (with profiles; [
-    common
+    nixos
     zfs
     storage-users
     hardware

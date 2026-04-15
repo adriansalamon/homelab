@@ -19,6 +19,7 @@
     inputs.home-manager.darwinModules.home-manager
     ../../modules/common
     ../../modules/darwin
+    ../common
   ]
   ++ lib.collect builtins.isPath (lib.filterAttrs (n: _: n != "default") (lib.rakeLeaves ./.));
 
@@ -36,15 +37,6 @@
       inputs.agenix.homeManagerModules.default
       ../../users/asalamon/darwin
     ];
-  };
-
-  age.rekey = {
-    inherit (inputs.self.secretsConfig) masterIdentities;
-
-    storageMode = "local";
-    hostPubkey = config.node.secretsDir + "/host.pub";
-    generatedSecretsDir = inputs.self.outPath + "/secrets/generated/${config.node.name}";
-    localStorageDir = inputs.self.outPath + "/secrets/rekeyed/${config.node.name}";
   };
 
   nixpkgs.config = {

@@ -10,7 +10,7 @@
     ./disk-config.nix
     ./hw.nix
     ./net.nix
-    common
+    nixos
     zfs
     impermanence
     hardware

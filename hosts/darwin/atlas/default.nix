@@ -25,6 +25,13 @@
     ];
   };
 
+  # for restic backups
+  age.secrets.adrian-ssh-key = {
+    rekeyFile = inputs.self.outPath + "/secrets/restic/adrian-ssh-key.age";
+    generator.script = "ssh-ed25519";
+    owner = "asalamon";
+  };
+
   environment.systemPackages = with pkgs; [
     age-plugin-yubikey
     alejandra
@@ -55,6 +62,7 @@
     typst
     vim
     yubikey-personalization
+    yubikey-manager
     uv
   ];
 

@@ -11,7 +11,7 @@ in
     ./dns.nix
   ]
   ++ (with profiles; [
-    common
+    nixos
     impermanence
     services.consul-client
     auto-update

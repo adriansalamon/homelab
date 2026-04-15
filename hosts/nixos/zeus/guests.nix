@@ -22,7 +22,7 @@
           dataset = "safe/guests/${guestName}";
         };
         modules = with profiles; [
-          common
+          nixos
           impermanence
           ./guests/common.nix
           ./guests/${guestName}.nix

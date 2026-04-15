@@ -17,7 +17,7 @@ in
     ./nfs.nix
     ./smb.nix
     ./metrics.nix
-    common
+    nixos
     zfs
     impermanence
     hardware

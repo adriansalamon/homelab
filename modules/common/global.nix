@@ -305,6 +305,21 @@ in
         options = {
           inherit sites nebula monitoring;
 
+          admin-user = mkOption {
+            type = types.submodule {
+              options = {
+                hashedPassword = mkOption {
+                  type = types.str;
+                  description = "Hashed password for the admin user";
+                };
+                pubkeys = mkOption {
+                  type = types.listOf types.str;
+                  description = "Public ssh keys for admin access";
+                };
+              };
+            };
+          };
+
           loki-secrets = mkOption {
             default = [ ];
             description = "Secrets to be aggregated for loki basic auth";

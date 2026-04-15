@@ -6,7 +6,7 @@
     ./traefik.nix
     ./headscale.nix
     ./net.nix
-    common
+    nixos
     zfs
     impermanence
     services.consul-client

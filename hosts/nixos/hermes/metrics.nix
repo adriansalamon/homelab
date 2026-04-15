@@ -26,6 +26,10 @@ let
       repository = "/data/tank02/backups/restic-christian/repo";
       secretKey = "christian-hermes";
     };
+    # "anna-hermes" = {
+    #   repository = "/data/tank02/backups/restic-anna/repo";
+    #   secretKey = "anna-hermes";
+    # };
   };
 
   # Helper to create rustic backup config for local repos

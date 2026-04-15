@@ -5,7 +5,7 @@
 {
   # Router at Erebus
   imports = with profiles; [
-    common
+    nixos
     zfs
     impermanence
     hardware

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, globals, ... }:
 {
   system.stateVersion = "24.11";
   nix.extraOptions = ''
@@ -9,9 +9,7 @@
 
   users.users.root = {
     password = "nixos";
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICOfx4SWN/ygsiUkWWWRCFcTz/SBBRO0qKirHiYuvr3x"
-    ];
+    openssh.authorizedKeys.keys = globals.admin-user.pubkeys;
   };
 
   environment = {

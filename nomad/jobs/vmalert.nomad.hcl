@@ -158,13 +158,13 @@ groups:
     interval: 5h
     rules:
       - alert: StaleResticBackup
-        expr: time() - topk(1, rustic_snapshot_timestamp) by (repo_id) > 604800
+        expr: time() - topk(1, rustic_snapshot_timestamp) by (repo_id) > 1209600
         for: 5h
         labels:
           severity: warning
         annotations:
           summary: Restic backup stale for repo {{ $labels.repo_name }}
-          description: "No backup taken for repo {{ $labels.repo_name }} in the last 7 days. Last backup was {{ $value | humanizeDuration }} ago."
+          description: "No backup taken for repo {{ $labels.repo_name }} in the last 14 days. Last backup was {{ $value | humanizeDuration }} ago."
 EOF
         destination = "${NOMAD_ALLOC_DIR}/rules/rules.yaml"
       }

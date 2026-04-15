@@ -2,6 +2,7 @@
   config,
   lib,
   globals,
+  pkgs,
   ...
 }:
 let
@@ -131,6 +132,9 @@ in
       ];
     };
   };
+
+  # make sure we have rclone so we can do `rclone serve restic --stdio`
+  environment.systemPackages = [ pkgs.rclone ];
 
   # Backup to Hezner
   meta.backups.storageboxes."cloud-backups" = {

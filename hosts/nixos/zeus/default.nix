@@ -18,7 +18,7 @@
     ./net.nix
   ]
   ++ (with profiles; [
-    common
+    nixos
     zfs
     impermanence
     hardware

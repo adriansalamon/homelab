@@ -17,7 +17,7 @@ in
     ./router
     ./hardware-config.nix
     ./disk-config.nix
-    common
+    nixos
     zfs
     hardware
     impermanence

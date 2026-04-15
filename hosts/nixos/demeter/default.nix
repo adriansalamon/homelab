@@ -12,7 +12,7 @@
     ./atticd.nix
     ./db.nix
     ./net.nix
-    common
+    nixos
     zfs
     impermanence
     hardware

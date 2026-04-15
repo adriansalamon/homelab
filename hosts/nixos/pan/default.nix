@@ -17,7 +17,7 @@ in
   age.rekey.hostPubkey = lib.mkForce "age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs3290gq";
 
   imports = with profiles; [
-    common
+    nixos
     router.nebula
   ];
 
