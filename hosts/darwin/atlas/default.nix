@@ -203,6 +203,7 @@
       "balenaetcher"
       "calibre"
       "cmake-app"
+      "claude-code"
       "discord"
       "docker-desktop"
       "dotnet-sdk"
