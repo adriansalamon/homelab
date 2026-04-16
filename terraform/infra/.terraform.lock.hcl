@@ -2,18 +2,25 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.opentofu.org/cloudflare/cloudflare" {
-  version     = "5.19.0-beta.3"
-  constraints = "5.19.0-beta.3"
+  version     = "5.19.0-beta.5"
+  constraints = "5.19.0-beta.5"
   hashes = [
-    "h1:+TRFwl5Q0+I6yxiWXREKf2ukdebhQx75EyhczoArTVc=",
-    "zh:09da19cd02050f39272188388899bc3729de45a46ef80356d8f7644de7bce03f",
-    "zh:1f97b53381a8b6b4f5c56e42beb371c2fe0f79efee290dc2425cc216e18b3b66",
-    "zh:296f813c6c3fa635f07d39710c072a8104b6cdee1816d0ca902d70bd4cf01918",
-    "zh:2ce36a32b206acf2e2e3551851259ee5d4cb56c81f467aebd9dfd1ecb841e346",
-    "zh:3a6ff51ca1eb6f3dbed78e13de1bff8d6e5f36d18e025c120ee8d3ec37507340",
-    "zh:d7486e59b5613e1722d4135d803108cff98b40c72bc2f9862010dedc187a14a7",
-    "zh:e0753bee58a121aac95015e6f1e5f2a85011a987d3f359a15036d42fec6a0654",
-    "zh:f4fe1fdd1da7854501abf9490da0f078a07300c1f9658f9daf3ea0f806e139e4",
+    "h1:4rstGGKpl5t9Wk+YtuCMHj0sGOeq2NgX6Pc/EtUgPcA=",
+    "h1:6armalNI5/Y+Pe8jzEsUwyaB7T1Kb2OcX/gS/p69zPg=",
+    "h1:Le5fynklOzvDybCbneophUo6k0fj3tESwhQ379YtxiA=",
+    "h1:SZ8tW/CJbcHREggUjC6coaUQD20j7tbNg9WybFtM+OQ=",
+    "h1:ThCudaaa+NWYSiFaanu4NcHxxX4jjs6ISfBziZ7H+FM=",
+    "h1:eFK5y52tCj3BbjFUG9jCeZXtFp+w7SziOWo1rfsz6Ck=",
+    "h1:flgKteB/6aRaaOh3/XTOrZuyDdO6XIG0PuWWFTsIBMU=",
+    "h1:wiNhqLcmXf1LnLuFlCCy7MYHzR8kMOlL0RaYDzqMTJg=",
+    "zh:2fd2a0a682e9ab6231a259f60c4fe9613cd48d8ce6127ff0b2ade4b57de931de",
+    "zh:34051a27c10af4e247bb79bc691b8ddfb70ac9f79bd322c9d6208f15f3f35f02",
+    "zh:37e84f04364c301b7070b9aa339a04ba08bce4696fbd3a9f529625439b5a24e0",
+    "zh:386479011c6a1ca077f3e219bae3f5cd20245dbacb1e979d33b06ac008619016",
+    "zh:42ed890163ab63a1fd2bbf2f95d851baaf490c916e7ca06cbdd2162476c37027",
+    "zh:9eb7ebe86fe5ac5646fc5d6301bea4a0d5f9417b19715e131da74b459bb7a905",
+    "zh:a30c8ee8b2deb1774b15e07f6ec297b7d5969caa51590305369abbb8888e318c",
+    "zh:f17aea344230e03abcc337f118284499ee00254fd7ae81ca21a1c435acde36a5",
     "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
   ]
 }
