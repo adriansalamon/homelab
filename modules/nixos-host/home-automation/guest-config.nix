@@ -1,9 +1,13 @@
+# NixOS config that runs inside the home-assistant microVM guest.
+# homeAutomationCfg is passed via extraSpecialArgs from the host module.
 {
   config,
   pkgs,
   nomadCfg,
   lib,
   globals,
+  profiles,
+  homeAutomationCfg,
   ...
 }:
 let
@@ -15,50 +19,55 @@ let
     ;
 
   passwdSecretName = "authelia-hass-oidc-client-secret";
+  mqttUsers = homeAutomationCfg.mqttUsers;
 
-  mqttUsers = {
-    home-assistant = {
-      acl = [
-        "readwrite #"
-      ];
+  hassComponents =
+    let
+      callPackage = pkgs.home-assistant.python.pkgs.callPackage;
+    in
+    {
+      auth_oidc = callPackage ./hass-components/auth_oidc.nix { };
+      hass-plejd = callPackage ./hass-components/hass-plejd.nix {
+        pyplejd = callPackage ./hass-components/pyplejd.nix { };
+      };
+      wiim = callPackage ./hass-components/wiim.nix {
+        pywiim = callPackage ./hass-components/pywiim.nix { };
+      };
     };
-    tasmota = {
-      acl = [
-        "write tasmota/discovery/#"
-        "read cmnd/#"
-        "write stat/#"
-        "write tele/#"
-      ];
-    };
-    zigbee2mqtt = {
-      acl = [
-        "readwrite zigbee2mqtt/#"
-        "readwrite homeassistant/#"
-      ];
-    };
-    husdata-olympus = {
-      acl = [
-        "read +/HP/CMD/#"
-        "readwrite +/HP/#"
-        "readwrite homeassistant/#"
-      ];
-    };
-    husdata-arcadia = {
-      acl = [
-        "read +/HP/CMD/#"
-        "readwrite +/HP/#"
-        "readwrite homeassistant/#"
-      ];
-    };
-  };
-
 in
 {
+  imports = [
+    profiles.services.consul-client
+  ];
+
+  networking.hostName = config.node.name;
+  meta.vector.enable = true;
+  system.stateVersion = "24.11";
+
+  globals.nebula.mesh.hosts.${config.node.name} = {
+    inherit (config.node) id;
+    firewall.inbound = [
+      # todo: remove
+      {
+        port = 1883;
+        proto = "tcp";
+        group = "reverse-proxy";
+      }
+      {
+        port = 8123;
+        proto = "tcp";
+        group = "reverse-proxy";
+      }
+    ];
+  };
 
   age.secrets = {
     "home-assistant-secrets.yaml" = {
       generator = {
-        dependencies = [ nomadCfg.config.age.secrets.${passwdSecretName} ];
+        dependencies = [
+          nomadCfg.config.age.secrets.${passwdSecretName}
+        ]
+        ++ mapAttrsToList (name: _: config.age.secrets."mosquitto-${name}-pass") mqttUsers;
         script =
           {
             lib,
@@ -75,7 +84,7 @@ in
     };
   }
   // flip mapAttrs' mqttUsers (
-    name: cfg: {
+    name: _: {
       name = "mosquitto-${name}-pass";
       value = {
         mode = "440";
@@ -86,7 +95,7 @@ in
     }
   );
 
-  # Mosquitto for MQTT
+  # Mosquitto
 
   environment.persistence."/state".directories = lib.singleton {
     directory = config.services.mosquitto.dataDir;
@@ -112,6 +121,8 @@ in
     };
   };
 
+  networking.firewall.allowedTCPPorts = [ 1883 ];
+
   # Home Assistant
 
   environment.persistence."/persist".directories = lib.singleton {
@@ -121,9 +132,7 @@ in
     mode = "0700";
   };
 
-  services.avahi = {
-    enable = true;
-  };
+  services.avahi.enable = true;
 
   services.home-assistant = {
     enable = true;
@@ -167,21 +176,12 @@ in
       weather-chart-card
     ];
 
-    customComponents =
-      let
-        inherit (pkgs.home-assistant.python.pkgs) callPackage;
-      in
-      with pkgs.home-assistant-custom-components;
-      [
-        (callPackage ./hass-components/auth_oidc.nix { })
-        (callPackage ./hass-components/hass-plejd.nix {
-          pyplejd = (callPackage ./hass-components/pyplejd.nix { });
-        })
-        (callPackage ./hass-components/wiim.nix {
-          pywiim = (callPackage ./hass-components/pywiim.nix { });
-        })
-        prometheus_sensor
-      ];
+    customComponents = with pkgs.home-assistant-custom-components; [
+      hassComponents.auth_oidc
+      hassComponents.hass-plejd
+      hassComponents.wiim
+      prometheus_sensor
+    ];
 
     config = {
       default_config = { };
@@ -195,9 +195,7 @@ in
 
       lovelace.resource_mode = "yaml";
 
-      frontend = {
-        themes = "!include_dir_merge_named themes";
-      };
+      frontend.themes = "!include_dir_merge_named themes";
 
       "automation ui" = "!include automations.yaml";
       "scene ui" = "!include scenes.yaml";
@@ -207,9 +205,7 @@ in
         client_id = "hass";
         client_secret = "!secret ${passwdSecretName}";
         discovery_url = "https://auth.${globals.domains.main}/.well-known/openid-configuration";
-        roles = {
-          admin = "admin";
-        };
+        roles.admin = "admin";
         features = {
           automatic_user_linking = true;
           automatic_person_creation = true;
@@ -240,10 +236,11 @@ in
       port = 8123;
       tags = [
         "traefik.enable=true"
-        "traefik.http.routers.hass.rule=Host(`home-assistant.local.${globals.domains.main}`)"
-        "traefik.http.routers.hass.entrypoints=websecure"
+        "traefik.http.routers.hass-${config.node.site}.rule=Host(`${homeAutomationCfg.subdomain}.${globals.domains.main}`)"
+        "traefik.http.routers.hass-${config.node.site}.entrypoints=websecure"
       ];
     };
+    # todo: remove
     mqtt = {
       port = 1883;
       tags = [
@@ -254,24 +251,4 @@ in
     };
   };
 
-  globals.nebula.mesh.hosts.orpheus.firewall.inbound = [
-    {
-      port = 1705; # Snapcast tcp
-      proto = "tcp";
-      host = "zeus-home-assistant";
-    }
-  ];
-
-  globals.nebula.mesh.hosts.zeus-home-assistant.firewall.inbound = [
-    {
-      port = 1883; # MQTT
-      proto = "tcp";
-      group = "reverse-proxy";
-    }
-    {
-      port = 8123; # Home Assistant
-      proto = "tcp";
-      group = "reverse-proxy";
-    }
-  ];
 }

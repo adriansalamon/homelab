@@ -66,8 +66,7 @@
               nomadCfg = config.nomadConfigurations.homelab;
             };
             modules = [
-              inputs.microvm.nixosModules.host
-              ../modules/nixos/guests
+              ../modules/nixos-host
               ../hosts/nixos/${name}
               {
                 nixpkgs.config.allowUnfree = true;

@@ -9,6 +9,49 @@
   ...
 }:
 {
+
+  homeAutomation = {
+    enable = true;
+    subdomain = "home-assistant.local";
+    nodeId = 2051;
+    bridge = "lanBr";
+    secretsDir = ./secrets/home-assistant;
+    mqttUsers = {
+      home-assistant.acl = [ "readwrite #" ];
+      tasmota.acl = [
+        "write tasmota/discovery/#"
+        "read cmnd/#"
+        "write stat/#"
+        "write tele/#"
+      ];
+      zigbee2mqtt.acl = [
+        "readwrite zigbee2mqtt/#"
+        "readwrite homeassistant/#"
+      ];
+      husdata-olympus.acl = [
+        "read +/HP/CMD/#"
+        "readwrite +/HP/#"
+        "readwrite homeassistant/#"
+      ];
+      husdata-arcadia.acl = [
+        "read +/HP/CMD/#"
+        "readwrite +/HP/#"
+        "readwrite homeassistant/#"
+      ];
+    };
+    extraModules = [
+      {
+        globals.nebula.mesh.hosts.orpheus.firewall.inbound = [
+          {
+            port = 1705;
+            proto = "tcp";
+            host = "zeus-home-assistant";
+          }
+        ];
+      }
+    ];
+  };
+
   guests =
     let
       mkGuest = guestName: guestCfg: {
@@ -68,10 +111,6 @@
       (mkMicrovm "arr" {
         bridge = "vpnBr";
         id = 2050;
-      })
-      (mkMicrovm "home-assistant" {
-        id = 2051;
-        bridge = "lanBr";
       })
       (mkMicrovm "paperless" { id = 2053; })
       (mkMicrovm "forgejo" { id = 2057; })

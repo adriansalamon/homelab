@@ -1,14 +1,13 @@
 {
-  inputs,
   pkgs,
   profiles,
   ...
 }:
 {
   # Main VM host
+  node.site = "olympus";
 
   imports = [
-    inputs.microvm.nixosModules.host
     ./hardware-config.nix
     ./disk-config.nix
     ./jellyfin.nix

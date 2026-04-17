@@ -1,8 +1,7 @@
 { lib, ... }:
 let
   allModules = lib.rakeLeaves ./.;
-  # Filter out guests module - it will be imported conditionally by hosts that need it
-  modulesToImport = lib.filterAttrs (n: _: n != "default" && n != "guests") allModules;
+  modulesToImport = lib.filterAttrs (n: _: n != "default") allModules;
 in
 {
   imports = lib.collect builtins.isPath modulesToImport;
