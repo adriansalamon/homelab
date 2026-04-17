@@ -52,7 +52,7 @@
     {
       "customType": "regex",
       "datasourceTemplate": "docker",
-      "managerFilePatterns": ["\\.nomad\\.hcl$", "nomad/jobs/.*\\.nix$"],
+      "managerFilePatterns": ["/\\.nomad\\.hcl$/", "/^nomad/jobs/.*\\.nix$/"],
       "matchStrings": [
         "\\s*image\\s*=\\s*\\\"(?<depName>.*?):(?<currentValue>.*?)\\\""
       ]

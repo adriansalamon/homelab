@@ -168,7 +168,6 @@ in
         ENABLED = true;
         SMTP_ADDR = "email-smtp.eu-west-1.amazonaws.com";
         SMTP_PORT = 587;
-        IS_TLS_ENABLED = true;
         FROM = "Forgejo <forgejo@${globals.domains.main}>";
         USER = "AKIAT3JCT56DJVEYMR66";
       };
