@@ -8,7 +8,12 @@
       lib = pkgs.lib;
 
       terraformJobs = {
-        terraformWrapper.package = pkgs.opentofu;
+        terraformWrapper.package = pkgs.opentofu.withPlugins (p: [
+          p.hashicorp_consul
+          p.hashicorp_vault
+          p.hashicorp_nomad
+          p.carlpett_sops
+        ]);
 
         extraArgs = {
           inherit inputs system;
