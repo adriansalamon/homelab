@@ -38,5 +38,11 @@
       type = lib.types.bool;
       default = false;
     };
+
+    ci = lib.mkOption {
+      description = "Should this node be built in CI";
+      type = lib.types.bool;
+      default = true;
+    };
   };
 }

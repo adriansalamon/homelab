@@ -7,6 +7,7 @@
 {
   # Desktop workstation
   node.site = "olympus";
+  node.ci = false;
 
   imports = [
     ./disk-config.nix

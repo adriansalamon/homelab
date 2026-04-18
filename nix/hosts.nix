@@ -131,6 +131,17 @@
     in
     hosts
     // {
+      checks = lib.foldlAttrs (
+        acc: name: cfg:
+        let
+          system = cfg.config.nixpkgs.hostPlatform.system;
+        in
+        lib.recursiveUpdate acc {
+          ${system}.${name} = cfg.config.system.build.toplevel;
+        }
+      ) { } (lib.filterAttrs (_: cfg: !cfg.config.node.dummy && cfg.config.node.ci) config.nixosConfigurations);
+    }
+    // {
       guestConfigs = flip concatMapAttrs config.nixosConfigurations (
         _: node:
         flip mapAttrs' (node.config.guests or { }) (

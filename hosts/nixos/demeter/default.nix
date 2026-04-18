@@ -97,6 +97,8 @@
     };
   };
 
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   services.forgejo.runner.instances.nix = {
     enable = true;
     name = "nix_${config.node.name}";
