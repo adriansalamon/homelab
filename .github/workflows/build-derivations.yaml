@@ -72,6 +72,7 @@ jobs:
       - name: Check if build needed
         id: build-needed
         run: |
+          nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel --dry-run
           nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel --dry-run 2> dry-run-output
           echo "needs-build=$(cat dry-run-output | grep 'will be built' &> /dev/null && echo 1 || echo 0)" >> $GITHUB_OUTPUT
         shell: bash
