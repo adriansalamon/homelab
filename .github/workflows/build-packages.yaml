@@ -79,7 +79,6 @@ jobs:
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix={{branch}}-
-            type=ref,event=branch
 
       - name: Get build path
         id: build-path
