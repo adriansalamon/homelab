@@ -146,7 +146,7 @@ in
 
         templates = [
           {
-            data = builtins.readFile configFile;
+            source = "${configFile}";
             destination = "local/config.toml";
           }
           # SSH private key
