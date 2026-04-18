@@ -62,14 +62,14 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Initialize Terraform
-        run: nix run path:.#terraform-jobs.init
+        run: nix run --option allow-import-from-derivation true path:.#terraform-jobs.init
 
       - name: Plan Terraform changes
         id: plan
-        run: nix run path:.#terraform-jobs.terraform plan -- -out=plan.tfplan
+        run: nix run --option allow-import-from-derivation true path:.#terraform-jobs.terraform plan -- -out=plan.tfplan
 
       - name: Apply Terraform changes
-        run: nix run path:.#terraform-jobs.terraform apply -- plan.tfplan
+        run: nix run --option allow-import-from-derivation true path:.#terraform-jobs.terraform apply -- plan.tfplan
 
       - name: Cleanup plan file
         if: always()
