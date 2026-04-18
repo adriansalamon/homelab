@@ -69,7 +69,7 @@ jobs:
         with:
           registry: forgejo.salamon.xyz
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.PACKAGE_TOKEN }}
 
       - name: Extract metadata
         id: meta
@@ -134,7 +134,7 @@ jobs:
   # Commit all updates in a single commit
   commit:
     needs: [detect-changes, build]
-    if: always() && needs.detect-changes.outputs.services != '[]'
+    if: needs.detect-changes.outputs.services != '[]'
     runs-on: ubuntu-latest
     permissions:
       contents: write
