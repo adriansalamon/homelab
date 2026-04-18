@@ -206,6 +206,32 @@ in
     ];
   };
 
+  # JWT auth backend for Forgejo Actions
+  resource.vault_jwt_auth_backend.forgejo = {
+    path = "jwt-forgejo";
+    description = "JWT auth backend for Forgejo Actions";
+    oidc_discovery_url = "https://forgejo.${globals.domains.main}/api/actions";
+    bound_issuer = "https://forgejo.${globals.domains.main}/api/actions";
+    jwt_supported_algs = [ "RS256" ];
+  };
+
+  resource.vault_jwt_auth_backend_role.terraform_apply = {
+    backend = config.resource.vault_jwt_auth_backend.forgejo.path;
+    role_name = "terraform-apply";
+    role_type = "jwt";
+
+    bound_audiences = [ "https://forgejo.${globals.domains.main}/adrian" ];
+    bound_subject = "repo:adrian/homelab:ref:refs/heads/main";
+    bound_claims = {
+      workflow = "terraform-apply.yaml";
+    };
+
+    user_claim = "repository";
+    token_policies = [ config.resource.vault_policy.admin.name ];
+    token_ttl = 900;
+    token_max_ttl = 900;
+  };
+
   # We need a nomad vault backend to be able to request nomad management tokens
   resource.vault_nomad_secret_backend.config = {
     backend = "nomad";
@@ -221,6 +247,24 @@ in
     backend = lib.tf.ref "vault_nomad_secret_backend.config.backend";
     role = "admin";
     type = "management"; # specific token to be able to configure nomad
+  };
+
+  # Consul secrets backend to issue management tokens for terraform-apply
+  resource.vault_consul_secret_backend.config = {
+    path = "consul";
+    address = "consul.local.${globals.domains.main}";
+    scheme = "https";
+    token_wo = lib.tf.ref "data.consul_acl_token_secret_id.vault.secret_id";
+    token_wo_version = 1;
+
+    default_lease_ttl_seconds = 3600;
+    max_lease_ttl_seconds = 7200;
+  };
+
+  resource.vault_consul_secret_backend_role.terraform_apply = {
+    backend = config.resource.vault_consul_secret_backend.config.path;
+    name = "terraform-apply";
+    consul_policies = [ "global-management" ];
   };
 
   # Transit secrets engine for encrypting/decrypting secrets

@@ -3,7 +3,7 @@ name: Terraform Apply
 on:
   push:
     branches:
-      - "none"
+      - "main"
     paths:
       - "nomad/**"
       - "nix/terraform-jobs.nix"
@@ -17,14 +17,13 @@ concurrency:
 
 jobs:
   apply:
+    enable-openid-connect: true
     name: Apply Nomad Jobs
-    runs-on: [self-hosted, nomad]
-    steps:
-      - name: Install sops
-        run: |
-          curl -Lo sops https://github.com/getsops/sops/releases/download/v3.12.2/sops-v3.12.2.linux.amd64
-          chmod +x sops && sudo mv sops /usr/local/bin
+    runs-on: nix
+    env:
+      VAULT_ADDR: https://vault.local.salamon.xyz
 
+    steps:
       - name: Configure SOPS git filter
         run: |
           cat >> ~/.gitconfig <<EOF
@@ -34,27 +33,43 @@ jobs:
               required = true
           EOF
 
-      - name: Get nomad management token
+      - name: Get Vault token via Forgejo OIDC
+        run: |
+          OIDC_TOKEN=$(curl -sSf \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL" \
+            | jq -r .value)
+          VAULT_TOKEN=$(curl -sSf \
+            --request POST \
+            --data "{\"jwt\": \"$OIDC_TOKEN\", \"role\": \"terraform-apply\"}" \
+            "$VAULT_ADDR/v1/auth/jwt-forgejo/login" | jq -r .auth.client_token)
+          echo "VAULT_TOKEN=$VAULT_TOKEN" >> $GITHUB_ENV
+
+      - name: Get Nomad management token
         run: |
           NOMAD_TOKEN=$(curl -sSf \
-                 --header "X-Vault-Token: $VAULT_TOKEN" \
-                 "$VAULT_ADDR/v1/nomad/creds/admin" | jq -r .data.secret_id)
+            --header "X-Vault-Token: $VAULT_TOKEN" \
+            "$VAULT_ADDR/v1/nomad/creds/admin" | jq -r .data.secret_id)
           echo "NOMAD_TOKEN=$NOMAD_TOKEN" >> $GITHUB_ENV
 
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Get Consul management token
+        run: |
+          CONSUL_HTTP_TOKEN=$(curl -sSf \
+            --header "X-Vault-Token: $VAULT_TOKEN" \
+            "$VAULT_ADDR/v1/consul/creds/terraform-apply" | jq -r .data.token)
+          echo "CONSUL_HTTP_TOKEN=$CONSUL_HTTP_TOKEN" >> $GITHUB_ENV
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Initialize Terraform
         run: nix run path:.#terraform-jobs.init
 
       - name: Plan Terraform changes
         id: plan
-        run: |
-          nix run path:.#terraform-jobs.terraform plan -- -out=plan.tfplan
+        run: nix run path:.#terraform-jobs.terraform plan -- -out=plan.tfplan
 
       - name: Apply Terraform changes
-        run: |
-          nix run path:.#terraform-jobs.terraform apply -- plan.tfplan
+        run: nix run path:.#terraform-jobs.terraform apply -- plan.tfplan
 
       - name: Cleanup plan file
         if: always()

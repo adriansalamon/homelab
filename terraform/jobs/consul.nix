@@ -234,6 +234,10 @@ in
     };
   };
 
+  data.consul_acl_token_secret_id.vault = {
+    accessor_id = lib.tf.ref "resource.consul_acl_token.vault.id";
+  };
+
   # Module to setup Consul with Nomad Workload Identities
   module.consul_setup = {
     source = "hashicorp-modules/nomad-setup/consul";
