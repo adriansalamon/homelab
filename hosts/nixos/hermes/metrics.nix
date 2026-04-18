@@ -58,9 +58,6 @@ in
     port = 6780;
     host = globals.nebula.mesh.hosts.${host}.ipv4;
 
-    # Need root to read local backup repos
-    user = "root";
-
     settings = {
       backup = flip mapAttrsToList localBackups mkRusticBackup;
     };

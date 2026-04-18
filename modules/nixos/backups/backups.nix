@@ -60,6 +60,11 @@ in
     environment.systemPackages = with pkgs; [
       restic
     ];
+    users.users.restic = {
+      group = "restic";
+      isSystemUser = true;
+    };
+    users.groups.restic = { };
 
     services.restic.backups = mkMerge (
       flip map (attrValues config.meta.backups.storageboxes) (boxCfg: {
@@ -75,7 +80,7 @@ in
               sshSecretName = "restic-ssh-privkey";
             };
 
-          user = "root";
+          user = "restic";
 
           backupPrepareCommand = mkIf anyPostgres (
             lib.getExe (
@@ -115,6 +120,15 @@ in
             "--keep-yearly 75"
           ];
         };
+      })
+    );
+
+    # Allow unit to read all files in the system without root
+    systemd.services = mkMerge (
+      flip map (attrValues config.meta.backups.storageboxes) (boxCfg: {
+        "restic-backups-storage-box-${boxCfg.name}".serviceConfig.AmbientCapabilities = [
+          "CAP_DAC_READ_SEARCH"
+        ];
       })
     );
   };
