@@ -145,7 +145,7 @@ jobs:
             fi
 
             echo "Updating ${SERVICE} to ${TAG} in ${NOMAD_JOB}"
-            sed -i -E "s|(image[[:space:]]*=[[:space:]]*\"${IMAGE_NAME}:)[^\"]+|\1${TAG}|g" "${NOMAD_JOB}"
+            sed -i -E "s|(image[[:space:]]*=[[:space:]]*\")[^\"]+/${SERVICE}:[^\"]+|\1${IMAGE_NAME}:${TAG}|g" "${NOMAD_JOB}"
 
             if ! git diff --quiet "${NOMAD_JOB}" 2>/dev/null; then
               DEPLOYED_SERVICES="${DEPLOYED_SERVICES:+${DEPLOYED_SERVICES}, }${SERVICE}@${TAG}"
