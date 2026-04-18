@@ -95,8 +95,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=forgejo.salamon.xyz/${{ github.repository_owner }}/${{ matrix.service }}:cache
+          cache-to: type=registry,ref=forgejo.salamon.xyz/${{ github.repository_owner }}/${{ matrix.service }}:cache,mode=max
 
       - name: Get nomad job file
         id: job-file
