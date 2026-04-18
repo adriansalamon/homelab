@@ -37,16 +37,33 @@ jobs:
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
+      - name: Login to attic
+        run: attic login ci https://nix-cache.salamon.xyz ${{ secrets.ATTIC_TOKEN }}
+
       - name: Build systems
+        continue-on-error: true
         run: |
           nix run github:Mic92/nix-fast-build -- \
             --flake .#checks \
             --systems "x86_64-linux aarch64-linux" \
             --no-nom \
             --skip-cached \
+            --attic-cache homelab \
             --result-file result.json \
             --eval-workers 2
 
-      - name: Debug result format
+      - name: Build summary
         if: always()
-        run: cat result.json | jq . || echo "no result.json"
+        run: cat /var/run/act/workflow/SUMMARY.md || echo "no summary"
+
+      - name: Update key-val store
+        if: always() && github.ref == 'refs/heads/main'
+        run: |
+          jq -r '.results[] | select(.type == "BUILD" and .success == true) | .attr + " " + .outputs.out' result.json | \
+          while read -r attr store_path; do
+            host=$(echo "$attr" | cut -d. -f2)
+            curl -X POST -sS --fail-with-body \
+              --url "https://kv-proxy.salamon.xyz/builds/nixos-system-${host}" \
+              -H "Authorization: Bearer ${{ secrets.KV_PROXY_TOKEN }}" \
+              -d "$store_path"
+          done
