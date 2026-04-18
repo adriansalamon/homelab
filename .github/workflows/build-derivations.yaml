@@ -45,16 +45,6 @@ jobs:
       SOPS_AGE_SSH_PRIVATE_KEY_FILE: /tmp/git_id_ed25519
 
     steps:
-      - name: "Setup Nix cache"
-        run: |
-          sudo mkdir -p /etc/nix
-          echo "machine nix-cache.salamon.xyz password ${{ secrets.ATTIC_TOKEN }}" | sudo tee /etc/nix/netrc > /dev/null
-
-      - name: Install sops
-        run: |
-          curl -Lo sops https://github.com/getsops/sops/releases/download/v3.12.2/sops-v3.12.2.linux.amd64
-          chmod +x sops && sudo mv sops /usr/local/bin
-
       - name: Configure SOPS git filter
         run: |
           cat >> ~/.gitconfig <<EOF
@@ -63,6 +53,7 @@ jobs:
               clean = sops --encrypt --input-type binary --output-type binary /dev/stdin
               required = true
           EOF
+          which sops
 
       - name: Store SSH private key
         run: |
@@ -78,8 +69,6 @@ jobs:
       - name: Check if build needed
         id: build-needed
         run: |
-          which nix
-          nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel --dry-run
           nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel --dry-run 2> dry-run-output
           echo "needs-build=$(cat dry-run-output | grep 'will be built' &> /dev/null && echo 1 || echo 0)" >> $GITHUB_OUTPUT
         shell: bash
@@ -92,8 +81,8 @@ jobs:
       - name: Push system
         if: steps.build-needed.outputs.needs-build == '1'
         run: |
-          nix run nixpkgs#attic-client login ci https://nix-cache.salamon.xyz ${{ secrets.ATTIC_TOKEN }}
-          nix run nixpkgs#attic-client push homelab result -j 2
+          attic-client login ci https://nix-cache.salamon.xyz ${{ secrets.ATTIC_TOKEN }}
+          attic-client push homelab result -j 2
 
       - name: Update key-val store
         if: github.ref == 'refs/heads/main'

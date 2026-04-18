@@ -89,29 +89,32 @@
           "/nix/store"
           "/nix/var/nix/daemon-socket"
           "/run/current-system/sw/bin/nix"
+          "/etc/nix/ci-nix.conf"
+          config.age.secrets.nix-cache-netrc.path
         ];
         options = lib.concatStringsSep " " [
           "-v /nix/store:/nix/store:ro"
           "-v /nix/var/nix/daemon-socket:/nix/var/nix/daemon-socket"
           "-v /run/current-system/sw/bin/nix:/usr/local/bin/nix"
+          "-v ${pkgs.sops}/bin/sops:/usr/local/bin/sops"
+          "-v ${pkgs.attic-client}/bin/attic-client:/usr/local/bin/attic-client"
+          "-v /etc/nix/ci-nix.conf:/etc/nix/nix.conf:ro"
+          "-v ${config.age.secrets.nix-cache-netrc.path}:${config.age.secrets.nix-cache-netrc.path}:ro"
           "-e NIX_REMOTE=daemon"
         ];
       };
     };
-    hostPackages = with pkgs; [
-      bash
-      coreutils
-      curl
-      gawk
-      gitMinimal
-      gnused
-      nodejs
-      wget
-      nix
-      openssh
-      opentofu
-    ];
   };
+
+  environment.etc."nix/ci-nix.conf".text = ''
+    experimental-features = nix-command flakes
+    substituters = https://nix-cache.${globals.domains.main}/homelab https://cache.nixos.org
+    trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= homelab:leKffLkOCSfX8pPGaQltduLxJNNVmG5oGPt6w3fH4t0=
+    netrc-file = ${config.age.secrets.nix-cache-netrc.path}
+    always-allow-substitutes = true
+    allow-import-from-derivation = false
+    extra-platforms = aarch64-linux
+  '';
 
   services.nomad-client = {
     enable = true;
