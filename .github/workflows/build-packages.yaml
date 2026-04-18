@@ -114,9 +114,18 @@ jobs:
       contents: write
 
     steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          cat >> ~/.ssh/config <<EOF
+          Host forgejo.salamon.xyz
+            Port 2222
+          EOF
+
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ssh-key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          ssh-known-hosts: "[forgejo.salamon.xyz]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFEZLMz6hduphZCX1qeCAzUIG2fv2Qm0opTVvcQWXfgQ"
 
       - name: Apply all updates
         id: apply
