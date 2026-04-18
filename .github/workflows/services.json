@@ -6,13 +6,5 @@
   "homepage": {
     "path": "packages/homepage/**",
     "job_file": "nomad/jobs/homepage.nomad.hcl"
-  },
-  "github-runner-webhook": {
-    "path": "packages/github-runner/webhook/**",
-    "job_file": "nomad/jobs/github-webhook.nomad.hcl"
-  },
-  "github-runner": {
-    "path": "packages/github-runner/runner/**",
-    "job_file": "nomad/jobs/github-runner.nomad.hcl"
   }
 }

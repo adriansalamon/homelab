@@ -48,10 +48,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4
 
-      - name: Login to GitHub Container Registry
+      - name: Login to Forgejo Container Registry
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
-          registry: ghcr.io
+          registry: forgejo.salamon.xyz
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -59,7 +59,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}
+          images: forgejo.salamon.xyz/${{ github.repository_owner }}/${{ matrix.service }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix={{branch}}-
@@ -92,9 +92,7 @@ jobs:
 
       - name: Set short commit SHA
         id: sha
-        run: |
-          sha=$(git rev-parse --short ${{ github.sha }})
-          echo "SHORT_SHA=$sha" >> $GITHUB_ENV
+        run: echo "SHORT_SHA=$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
 
       - name: Create build result artifact
         if: steps.build-push.outcome == 'success'
@@ -103,10 +101,9 @@ jobs:
           cat <<EOF > build-results/${{ matrix.service }}.json
           {
             "service": "${{ matrix.service }}",
-            "tag": "$(echo '${{ steps.meta.outputs.tag-names }}' | tail -1)",
+            "tag": "${{ github.ref_name }}-${{ env.SHORT_SHA }}",
             "job_file": "${{ steps.job-file.outputs.value }}",
-            "image": "ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}",
-            "digest": "${{ steps.build-push.outputs.digest }}"
+            "image": "forgejo.salamon.xyz/${{ github.repository_owner }}/${{ matrix.service }}"
           }
           EOF
 
@@ -144,7 +141,6 @@ jobs:
           DEPLOYED_SERVICES=""
           UPDATED_FILES=""
 
-          # Process each successful build result
           for result_file in build-results/*.json; do
             if [ ! -f "$result_file" ]; then
               echo "No build results found"
