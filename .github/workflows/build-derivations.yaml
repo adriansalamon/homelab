@@ -50,15 +50,6 @@ jobs:
           sudo mkdir -p /etc/nix
           echo "machine nix-cache.salamon.xyz password ${{ secrets.ATTIC_TOKEN }}" | sudo tee /etc/nix/netrc > /dev/null
 
-      - uses: cachix/install-nix-action@616559265b40713947b9c190a8ff4b507b5df49b # v31
-        with:
-          extra_nix_config: |
-            substituters = https://nix-cache.salamon.xyz/homelab https://cache.nixos.org
-            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= homelab:leKffLkOCSfX8pPGaQltduLxJNNVmG5oGPt6w3fH4t0=
-            always-allow-substitutes = true
-            allow-import-from-derivation = false
-            extra-platforms = aarch64-linux
-
       - name: Install sops
         run: |
           curl -Lo sops https://github.com/getsops/sops/releases/download/v3.12.2/sops-v3.12.2.linux.amd64
@@ -78,9 +69,6 @@ jobs:
           echo "${{ secrets.AGECRYPT_KEY }}" | base64 -d > $SOPS_AGE_SSH_PRIVATE_KEY_FILE
           chmod 600 $SOPS_AGE_SSH_PRIVATE_KEY_FILE
 
-          echo "${{ secrets.AGECRYPT_KEY }}"
-          cat "$SOPS_AGE_SSH_PRIVATE_KEY_FILE"
-
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - if: matrix.machine.system == 'aarch64-linux'
@@ -90,6 +78,8 @@ jobs:
       - name: Check if build needed
         id: build-needed
         run: |
+          which nix
+          nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel --dry-run
           nix build .#nixosConfigurations.${{ matrix.machine.host }}.config.system.build.toplevel --dry-run 2> dry-run-output
           echo "needs-build=$(cat dry-run-output | grep 'will be built' &> /dev/null && echo 1 || echo 0)" >> $GITHUB_OUTPUT
         shell: bash

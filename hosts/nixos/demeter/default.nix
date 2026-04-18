@@ -1,5 +1,5 @@
 {
-
+  lib,
   inputs,
   config,
   modulesPath,
@@ -85,7 +85,17 @@
         network = "bridge";
         privileged = true;
         docker_host = "automount";
-        valid_volumes = [ ];
+        valid_volumes = [
+          "/nix/store"
+          "/nix/var/nix/daemon-socket"
+          "/run/current-system/sw/bin/nix"
+        ];
+        options = lib.concatStringsSep " " [
+          "-v /nix/store:/nix/store:ro"
+          "-v /nix/var/nix/daemon-socket:/nix/var/nix/daemon-socket"
+          "-v /run/current-system/sw/bin/nix:/usr/local/bin/nix"
+          "-e NIX_REMOTE=daemon"
+        ];
       };
     };
     hostPackages = with pkgs; [
