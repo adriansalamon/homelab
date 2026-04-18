@@ -53,6 +53,9 @@ jobs:
     permissions:
       packages: write
 
+    outputs:
+      tag: ${{ steps.sha.outputs.tag }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -60,6 +63,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Set tag
+        id: sha
+        run: echo "tag=${{ github.ref_name }}-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4
@@ -98,42 +105,10 @@ jobs:
           cache-from: type=registry,ref=forgejo.salamon.xyz/${{ github.repository_owner }}/${{ matrix.service }}:cache
           cache-to: type=registry,ref=forgejo.salamon.xyz/${{ github.repository_owner }}/${{ matrix.service }}:cache,mode=max
 
-      - name: Get nomad job file
-        id: job-file
-        uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
-        with:
-          cmd: |
-            jq '."${{ matrix.service }}".job_file' .github/workflows/services.json -r -c
-
-      - name: Set short commit SHA
-        id: sha
-        run: echo "SHORT_SHA=$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
-
-      - name: Create build result artifact
-        if: steps.build-push.outcome == 'success'
-        run: |
-          mkdir -p build-results
-          cat <<EOF > build-results/${{ matrix.service }}.json
-          {
-            "service": "${{ matrix.service }}",
-            "tag": "${{ github.ref_name }}-${{ env.SHORT_SHA }}",
-            "job_file": "${{ steps.job-file.outputs.value }}",
-            "image": "forgejo.salamon.xyz/${{ github.repository_owner }}/${{ matrix.service }}"
-          }
-          EOF
-
-      - name: Upload build result
-        if: steps.build-push.outcome == 'success'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: build-result-${{ matrix.service }}
-          path: build-results/${{ matrix.service }}.json
-          retention-days: 1
-
   # Commit all updates in a single commit
   commit:
     needs: [detect-changes, build]
-    if: needs.detect-changes.outputs.services != '[]'
+    if: always() && needs.detect-changes.outputs.services != '[]' && needs.build.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -143,29 +118,17 @@ jobs:
         with:
           ssh-key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
 
-      - name: Download all build results
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
-        with:
-          pattern: build-result-*
-          path: build-results
-          merge-multiple: true
-
       - name: Apply all updates
         id: apply
         run: |
+          SERVICES='${{ needs.detect-changes.outputs.services }}'
+          TAG='${{ needs.build.outputs.tag }}'
           DEPLOYED_SERVICES=""
           UPDATED_FILES=""
 
-          for result_file in build-results/*.json; do
-            if [ ! -f "$result_file" ]; then
-              echo "No build results found"
-              continue
-            fi
-
-            SERVICE=$(jq -r '.service' "$result_file")
-            TAG=$(jq -r '.tag' "$result_file")
-            NOMAD_JOB=$(jq -r '.job_file' "$result_file")
-            IMAGE_NAME=$(jq -r '.image' "$result_file")
+          for SERVICE in $(echo "$SERVICES" | jq -r '.[]'); do
+            NOMAD_JOB=$(jq -r '."'"$SERVICE"'".job_file' .github/workflows/services.json)
+            IMAGE_NAME="forgejo.salamon.xyz/${{ github.repository_owner }}/${SERVICE}"
 
             if [ ! -f "${NOMAD_JOB}" ]; then
               echo "Warning: ${NOMAD_JOB} not found, skipping ${SERVICE}"
@@ -176,13 +139,8 @@ jobs:
             sed -i -E "s|(image[[:space:]]*=[[:space:]]*\"${IMAGE_NAME}:)[^\"]+|\1${TAG}|g" "${NOMAD_JOB}"
 
             if ! git diff --quiet "${NOMAD_JOB}" 2>/dev/null; then
-              if [ -z "$DEPLOYED_SERVICES" ]; then
-                DEPLOYED_SERVICES="${SERVICE}@${TAG}"
-                UPDATED_FILES="${NOMAD_JOB}"
-              else
-                DEPLOYED_SERVICES="${DEPLOYED_SERVICES}, ${SERVICE}@${TAG}"
-                UPDATED_FILES="${UPDATED_FILES} ${NOMAD_JOB}"
-              fi
+              DEPLOYED_SERVICES="${DEPLOYED_SERVICES:+${DEPLOYED_SERVICES}, }${SERVICE}@${TAG}"
+              UPDATED_FILES="${UPDATED_FILES:+${UPDATED_FILES} }${NOMAD_JOB}"
             fi
           done
 
