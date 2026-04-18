@@ -734,6 +734,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-forgejo-runner": {
+      "locked": {
+        "lastModified": 1775571735,
+        "narHash": "sha256-3kFFlR7Af8xDVY8F9LFdcsnIP3o+n8LPLjUSw08LEyY=",
+        "owner": "adamcstephens",
+        "repo": "nixpkgs",
+        "rev": "a34ccd5fb5ae0c5bbcd042f21be85f61fb2d7286",
+        "type": "github"
+      },
+      "original": {
+        "owner": "adamcstephens",
+        "ref": "push-kpxuoykptuty",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1774748309,
@@ -937,6 +953,7 @@
         "nixos-generators": "nixos-generators",
         "nixos-nftables-firewall": "nixos-nftables-firewall",
         "nixpkgs": "nixpkgs_4",
+        "nixpkgs-forgejo-runner": "nixpkgs-forgejo-runner",
         "paneru": "paneru",
         "terranix": "terranix"
       }

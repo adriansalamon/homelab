@@ -64,6 +64,7 @@
     yubikey-personalization
     yubikey-manager
     uv
+    yq
   ];
 
   launchd.user.agents.backrest = {

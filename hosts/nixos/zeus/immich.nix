@@ -61,6 +61,10 @@ in
   services.immich = {
     inherit port;
     enable = true;
+    database = {
+      enable = true;
+      createDB = true;
+    };
     host = "0.0.0.0";
     mediaLocation = "/media/immich-data";
   };

@@ -4,4 +4,5 @@ creation_rules:
       - age1yubikey1qw8ddwxjsp2zdrajc5kk2m3ccv83f74yu3cjujfs8kfq823vqv6k2zyta6a
       - age1yubikey1q0wmqzjaxwgndf94hd7t37dx7wd45qwwk0r7zfytkasd6f5lvc70w89lwgg
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM57ZfhM1owRUZHYBqYBb28h5CdlrwVYrr6SdE9Qr0DM
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQhMIc56S82P/SaXfCBq0WyUf6kVOG4CSboPmFqJq+q
     hc_vault_transit_uri: https://vault.local.salamon.xyz/v1/transit/keys/sops-key

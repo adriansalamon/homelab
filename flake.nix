@@ -80,6 +80,9 @@
       url = "github:karinushka/paneru";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # https://github.com/NixOS/nixpkgs/pull/496325
+    nixpkgs-forgejo-runner.url = "github:adamcstephens/nixpkgs/push-kpxuoykptuty";
   };
 
   outputs =

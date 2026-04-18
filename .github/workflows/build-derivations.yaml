@@ -22,24 +22,24 @@ jobs:
         machine:
           - host: athena
             system: x86_64-linux
-          - host: callisto
-            system: aarch64-linux
-          - host: charon
-            system: x86_64-linux
-          - host: demeter
-            system: x86_64-linux
-          - host: hermes
-            system: x86_64-linux
-          - host: icarus
-            system: x86_64-linux
-          - host: orpheus
-            system: x86_64-linux
-          - host: penelope
-            system: x86_64-linux
-          - host: pythia
-            system: x86_64-linux
-          - host: zeus
-            system: x86_64-linux
+          # - host: callisto
+          #   system: aarch64-linux
+          # - host: charon
+          #   system: x86_64-linux
+          # - host: demeter
+          #   system: x86_64-linux
+          # - host: hermes
+          #   system: x86_64-linux
+          # - host: icarus
+          #   system: x86_64-linux
+          # - host: orpheus
+          #   system: x86_64-linux
+          # - host: penelope
+          #   system: x86_64-linux
+          # - host: pythia
+          #   system: x86_64-linux
+          # - host: zeus
+          #   system: x86_64-linux
 
     env:
       SOPS_AGE_SSH_PRIVATE_KEY_FILE: /tmp/git_id_ed25519
