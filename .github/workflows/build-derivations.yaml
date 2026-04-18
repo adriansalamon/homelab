@@ -53,7 +53,6 @@ jobs:
               clean = sops --encrypt --input-type binary --output-type binary /dev/stdin
               required = true
           EOF
-          which sops
 
       - name: Store SSH private key
         run: |
@@ -64,6 +63,10 @@ jobs:
 
       - if: matrix.machine.system == 'aarch64-linux'
         uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4
+
+      - name: time eval
+        run: |
+          time nix flake show
 
       # TODO: this does not work reliably
       - name: Check if build needed
@@ -81,8 +84,8 @@ jobs:
       - name: Push system
         if: steps.build-needed.outputs.needs-build == '1'
         run: |
-          attic-client login ci https://nix-cache.salamon.xyz ${{ secrets.ATTIC_TOKEN }}
-          attic-client push homelab result -j 2
+          attic login ci https://nix-cache.salamon.xyz ${{ secrets.ATTIC_TOKEN }}
+          attic push homelab result -j 2
 
       - name: Update key-val store
         if: github.ref == 'refs/heads/main'

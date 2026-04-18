@@ -90,14 +90,16 @@
           "/nix/var/nix/daemon-socket"
           "/run/current-system/sw/bin/nix"
           "/etc/nix/ci-nix.conf"
+          "${pkgs.sops}/bin/sops"
+          "${pkgs.attic-client}/bin/attic"
           config.age.secrets.nix-cache-netrc.path
         ];
         options = lib.concatStringsSep " " [
           "-v /nix/store:/nix/store:ro"
           "-v /nix/var/nix/daemon-socket:/nix/var/nix/daemon-socket"
-          "-v /run/current-system/sw/bin/nix:/usr/local/bin/nix"
-          "-v ${pkgs.sops}/bin/sops:/usr/local/bin/sops"
-          "-v ${pkgs.attic-client}/bin/attic-client:/usr/local/bin/attic-client"
+          "-v /run/current-system/sw/bin/nix:/usr/local/bin/nix:ro"
+          "-v ${pkgs.sops}/bin/sops:/usr/local/bin/sops:ro"
+          "-v ${pkgs.attic-client}/bin/attic:/usr/local/bin/attic:ro"
           "-v /etc/nix/ci-nix.conf:/etc/nix/nix.conf:ro"
           "-v ${config.age.secrets.nix-cache-netrc.path}:${config.age.secrets.nix-cache-netrc.path}:ro"
           "-e NIX_REMOTE=daemon"
