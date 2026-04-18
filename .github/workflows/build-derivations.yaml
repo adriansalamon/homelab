@@ -44,7 +44,9 @@ jobs:
             --systems "x86_64-linux aarch64-linux" \
             --no-nom \
             --skip-cached \
-            --result-file result.json
+            --result-file result.json \
+            --eval-workers 2
 
       - name: Debug result format
-        run: cat result.json | jq .
+        if: always()
+        run: cat result.json | jq . || echo "no result.json"
