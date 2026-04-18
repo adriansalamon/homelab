@@ -9,25 +9,41 @@ on:
       - ".github/workflows/build-packages.yaml"
       - ".github/workflows/services.json"
   workflow_dispatch:
+    inputs:
+      force_all:
+        description: "Build all services regardless of changes"
+        type: boolean
+        default: false
 
 jobs:
   # Detect which services have changed
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      services: ${{ steps.filter.outputs.changes }}
+      services: ${{ steps.output.outputs.services }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
         id: filter-rules
+        if: inputs.force_all != true
         with:
           cmd: "jq 'map_values([.path])' .github/workflows/services.json -r -c"
 
       - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
         id: filter
+        if: inputs.force_all != true
         with:
           filters: ${{ steps.filter-rules.outputs.value }}
+
+      - name: Set services output
+        id: output
+        run: |
+          if [ "${{ inputs.force_all }}" = "true" ]; then
+            echo "services=$(jq 'keys' .github/workflows/services.json -c)" >> $GITHUB_OUTPUT
+          else
+            echo "services=${{ steps.filter.outputs.changes }}" >> $GITHUB_OUTPUT
+          fi
 
   # Build matrix of services
   build:
