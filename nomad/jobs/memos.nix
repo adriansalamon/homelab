@@ -22,7 +22,7 @@ in
         vault = { };
 
         config = {
-          image = "neosmemo/memos:0.26.2";
+          image = "neosmemo/memos:0.27.1";
         };
 
         meta = helpers.mkNebula {

@@ -50,7 +50,7 @@ job "vmauth" {
       }
 
       config {
-        image = "victoriametrics/vmauth:v1.139.0"
+        image = "victoriametrics/vmauth:v1.140.0"
         ports = ["http", "internal_http"]
         args = [
           "-auth.config=${NOMAD_ALLOC_DIR}/vmauth.yaml",
