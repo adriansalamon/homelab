@@ -95,7 +95,7 @@ in
 
         config = {
           # Use PostgreSQL image that includes pg_dumpall
-          image = "postgres:16-alpine";
+          image = "postgres:18-alpine";
           entrypoint = [ "/bin/sh" ];
           args = [
             "-c"
