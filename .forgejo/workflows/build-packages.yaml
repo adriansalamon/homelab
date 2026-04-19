@@ -108,7 +108,7 @@ jobs:
   # Commit all updates in a single commit
   commit:
     needs: [detect-changes, build]
-    if: always() && needs.detect-changes.outputs.services != '[]' && needs.build.result == 'success'
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -24,6 +24,7 @@
     storage-users
     services.consul-client
     auto-update
+    services.forgejo-runner
   ]);
 
   networking.hostId = "49e32584";
