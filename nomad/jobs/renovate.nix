@@ -24,7 +24,7 @@
         env = {
           RENOVATE_PLATFORM = "forgejo";
           RENOVATE_ENDPOINT = "https://forgejo.${globals.domains.main}";
-          RENOVATE_GIT_AUTHOR = "'Renovate Bot <renovate@${globals.domains.main}>'";
+          RENOVATE_GIT_AUTHOR = "Renovate Bot <renovate@${globals.domains.main}>";
           RENOVATE_REPOSITORIES = "adrian/homelab";
           LOG_LEVEL = "info";
         };
