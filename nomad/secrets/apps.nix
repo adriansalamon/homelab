@@ -44,14 +44,16 @@ in
     };
   };
 
+  # Renovate
+  nomadJobs.renovate.secrets = {
+    forgejo-token.rekeyFile = localSecretsDir + "/renovate-forgejo-token.age";
+    github-token.rekeyFile = localSecretsDir + "/renovate-github-token.age";
+  };
+
   # Github Webhook
   nomadJobs.github-webhook.secrets = {
-    webhook-secret = {
-      rekeyFile = localSecretsDir + "/github-webhook-secret.age";
-    };
-    pat = {
-      rekeyFile = localSecretsDir + "/github-pat.age";
-    };
+    webhook-secret.rekeyFile = localSecretsDir + "/github-webhook-secret.age";
+    pat.rekeyFile = localSecretsDir + "/github-pat.age";
   };
 
   # Linkding
@@ -64,9 +66,8 @@ in
 
   # Memos
   nomadJobs.memos.secrets = {
-    postgres-password = {
-      rekeyFile = inputs.self.outPath + "/secrets/generated/postgres/memos-postgres-password.age";
-    };
+    postgres-password.rekeyFile =
+      inputs.self.outPath + "/secrets/generated/postgres/memos-postgres-password.age";
   };
 
   # Opengist
