@@ -6,8 +6,8 @@ on:
       - "main"
     paths:
       - "packages/**"
-      - ".github/workflows/build-packages.yaml"
-      - ".github/workflows/services.json"
+      - ".forgejo/workflows/build-packages.yaml"
+      - ".forgejo/workflows/services.json"
   workflow_dispatch:
     inputs:
       force_all:
@@ -28,7 +28,7 @@ jobs:
         id: filter-rules
         if: inputs.force_all != true
         with:
-          cmd: "jq 'map_values([.path])' .github/workflows/services.json -r -c"
+          cmd: "jq 'map_values([.path])' .forgejo/workflows/services.json -r -c"
 
       - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
         id: filter
@@ -40,7 +40,7 @@ jobs:
         id: output
         run: |
           if [ "${{ inputs.force_all }}" = "true" ]; then
-            echo "services=$(jq 'keys' .github/workflows/services.json -c)" >> $GITHUB_OUTPUT
+            echo "services=$(jq 'keys' .forgejo/workflows/services.json -c)" >> $GITHUB_OUTPUT
           else
             echo "services=${{ steps.filter.outputs.changes }}" >> $GITHUB_OUTPUT
           fi
@@ -92,7 +92,7 @@ jobs:
         uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
         with:
           cmd: |
-            jq '."${{ matrix.service }}".path | split("/") | .[0:-1] | "./" + join("/") + "/"' .github/workflows/services.json -r -c
+            jq '."${{ matrix.service }}".path | split("/") | .[0:-1] | "./" + join("/") + "/"' .forgejo/workflows/services.json -r -c
 
       - name: Build and push
         id: build-push
@@ -136,7 +136,7 @@ jobs:
           UPDATED_FILES=""
 
           for SERVICE in $(echo "$SERVICES" | jq -r '.[]'); do
-            NOMAD_JOB=$(jq -r '."'"$SERVICE"'".job_file' .github/workflows/services.json)
+            NOMAD_JOB=$(jq -r '."'"$SERVICE"'".job_file' .forgejo/workflows/services.json)
             IMAGE_NAME="forgejo.salamon.xyz/${{ github.repository_owner }}/${SERVICE}"
 
             if [ ! -f "${NOMAD_JOB}" ]; then

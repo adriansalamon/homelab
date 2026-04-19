@@ -8,7 +8,7 @@ on:
       - "nomad/**"
       - "nix/terraform-jobs.nix"
       - "terraform/jobs/**"
-      - ".github/workflows/terraform-apply.yaml"
+      - ".forgejo/workflows/terraform-apply.yaml"
   workflow_dispatch:
 
 concurrency:

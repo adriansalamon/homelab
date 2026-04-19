@@ -1,6 +1,6 @@
 job "kv-proxy" {
   group "kv-proxy" {
-    count = 1
+    count = 2
 
     network {
       port "http" {

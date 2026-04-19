@@ -1,5 +1,6 @@
 {
   inputs,
+  config,
   pkgs,
   lib,
   ...
@@ -37,4 +38,9 @@
     vim
     gitMinimal
   ];
+
+  system.activationScripts.nvd = ''
+    ${lib.getExe pkgs.nvd} --color=always --nix-bin-dir=${config.nix.package}/bin \
+           diff /run/current-system "$systemConfig"
+  '';
 }

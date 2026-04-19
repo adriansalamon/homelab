@@ -9,8 +9,8 @@ on:
       - "nomad/**"
       - "packages/**"
       - "terraform/**"
-      - ".github/workflows/build-packages.yaml"
-      - ".github/workflows/terraform-apply.yaml"
+      - ".forgejo/workflows/build-packages.yaml"
+      - ".forgejo/workflows/terraform-apply.yaml"
   workflow_dispatch:
 
 jobs:
@@ -51,10 +51,8 @@ jobs:
             --attic-cache homelab \
             --result-file result.json \
             --eval-workers 2
-
-      - name: Build summary
-        if: always()
-        run: cat /var/run/act/workflow/SUMMARY.md || echo "no summary"
+          echo "=== Build Summary ==="
+          cat /var/run/act/workflow/SUMMARY.md || echo "no summary"
 
       - name: Update key-val store
         if: always() && github.ref == 'refs/heads/main'
@@ -62,8 +60,10 @@ jobs:
           jq -r '.results[] | select(.type == "BUILD" and .success == true) | .attr + " " + .outputs.out' result.json | \
           while read -r attr store_path; do
             host=$(echo "$attr" | cut -d. -f2)
+            echo "Updating ${host}: ${store_path}"
             curl -X POST -sS --fail-with-body \
               --url "https://kv-proxy.salamon.xyz/builds/nixos-system-${host}" \
               -H "Authorization: Bearer ${{ secrets.KV_PROXY_TOKEN }}" \
               -d "$store_path"
+            echo "Updated ${host}"
           done
