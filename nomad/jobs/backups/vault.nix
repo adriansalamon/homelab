@@ -98,7 +98,7 @@ in
 
         config = {
           # Use Vault image that includes vault CLI
-          image = "hashicorp/vault:1.18";
+          image = "hashicorp/vault:1.21";
           entrypoint = [ "/bin/sh" ];
           args = [
             "-c"
