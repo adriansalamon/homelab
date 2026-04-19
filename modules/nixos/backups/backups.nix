@@ -82,27 +82,10 @@ in
 
           user = "restic";
 
-          backupPrepareCommand = mkIf anyPostgres (
-            lib.getExe (
-              pkgs.writeShellApplication {
-                name = "backup-postgres";
-                runtimeInputs = [
-                  config.services.postgresql.package
-                  pkgs.util-linux
-                ];
-                text = ''
-                  umask 0077
-                  mkdir -p /var/cache/postgresql_backups
-                  runuser -u postgres pg_dumpall > /var/cache/postgresql_backups/database.sql
-                '';
-              }
-            )
-          );
-
           paths =
             boxCfg.paths
             ++ optionals boxCfg.withPostgres [
-              "/var/cache/postgresql_backups"
+              "/var/lib/postgresql_backups"
             ];
 
           timerConfig = {
@@ -130,6 +113,40 @@ in
           "CAP_DAC_READ_SEARCH"
         ];
       })
+      ++ optionals anyPostgres [
+        # Dump all postgres databases as the postgres user into a cache directory
+        # that restic can then back up. Runs as postgres to avoid needing root or
+        # CAP_SETUID in the restic service.
+        {
+          postgresql-dump = mkIf anyPostgres {
+            description = "Dump all PostgreSQL databases for backup";
+            requiredBy = map (boxCfg: "restic-backups-storage-box-${boxCfg.name}.service") (
+              attrValues config.meta.backups.storageboxes
+            );
+            before = map (boxCfg: "restic-backups-storage-box-${boxCfg.name}.service") (
+              attrValues config.meta.backups.storageboxes
+            );
+            after = [ "postgresql.service" ];
+            requires = [ "postgresql.service" ];
+            serviceConfig = {
+              Type = "oneshot";
+              User = "postgres";
+              StateDirectory = "postgresql_backups";
+              StateDirectoryMode = "0700";
+              ExecStart = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "postgresql-dump";
+                  runtimeInputs = [ config.services.postgresql.package ];
+                  text = ''
+                    umask 0077
+                    pg_dumpall > /var/lib/postgresql_backups/database.sql
+                  '';
+                }
+              );
+            };
+          };
+        }
+      ]
     );
   };
 }
