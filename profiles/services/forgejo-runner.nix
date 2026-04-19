@@ -66,7 +66,7 @@
       };
 
       container = {
-        network = "bridge";
+        network = "host";
         privileged = true;
         docker_host = "automount";
         valid_volumes = [ ];
@@ -107,7 +107,7 @@
       };
 
       container = {
-        network = "bridge";
+        network = "host";
         privileged = true;
         docker_host = "automount";
         valid_volumes = [
