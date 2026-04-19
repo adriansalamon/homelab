@@ -67,33 +67,6 @@
         }
       '';
     };
-
-    github_runner_dispatch = {
-      name = "github-runner-dispatch";
-      description = "Policy for GitHub webhook to dispatch runner jobs";
-      rules_hcl = ''
-        namespace "*" {
-          policy       = "read"
-          capabilities = ["dispatch-job"]
-        }
-      '';
-
-      job_acl = {
-        namespace = "default";
-        job_id = "github-webhook";
-      };
-    };
-
-    github_runner_terraform = {
-      name = "github-runner-terraform";
-      description = "Policy for GitHub Actions runner to manage Nomad ACL configuration via Terraform";
-      inherit (config.resource.nomad_acl_policy.admin) rules_hcl;
-
-      job_acl = {
-        namespace = "default";
-        job_id = "github-runner";
-      };
-    };
   };
 
   # ACL Tokens

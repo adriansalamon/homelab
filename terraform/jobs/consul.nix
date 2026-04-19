@@ -264,16 +264,7 @@ in
     bind_name = "nomad-job-\$\${value.nomad_namespace}-\$\${value.nomad_job_id}";
   };
 
-  # Role for github-runner job with Terraform management permissions
-  # Gets bound via the dynamic binding rule above
   resource.consul_acl_role = {
-    nomad_job_default_github_runner = {
-      name = "nomad-job-default-github-runner";
-      description = "Role for GitHub Actions runner doing Terraform applies";
-
-      policies = [ "global-management" ];
-    };
-
     nomad_job_default_vmalert = mkNomadRole "vmalert" "for consul service discovery" [
       consul_acl_policy.base_agent.name
     ];

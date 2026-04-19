@@ -50,12 +50,6 @@ in
     github-token.rekeyFile = localSecretsDir + "/renovate-github-token.age";
   };
 
-  # Github Webhook
-  nomadJobs.github-webhook.secrets = {
-    webhook-secret.rekeyFile = localSecretsDir + "/github-webhook-secret.age";
-    pat.rekeyFile = localSecretsDir + "/github-pat.age";
-  };
-
   # Linkding
   nomadJobs.linkding.secrets = {
     postgres-password = {

@@ -159,13 +159,6 @@ in
     policies = [ config.resource.vault_policy.nomad_workloads.name ];
   };
 
-  # Nomad workload role for the github-runner job
-  resource.vault_jwt_auth_backend_role.github_runner = mkNomadRoleMapping {
-    name = "github-runner";
-    job_id = "github-runner";
-    policies = [ config.resource.vault_policy.admin.name ];
-  };
-
   resource.vault_policy.postgres_backup = {
     name = "postgres-backup";
     policy = ''

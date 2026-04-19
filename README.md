@@ -140,16 +140,16 @@ nix run #terraform-jobs.<init|plan|apply>
 
 Automated builds and deployments via GitHub Actions:
 
-**NixOS system builds** (`.github/workflows/build-derivations.yaml`):
+**NixOS system builds** (`.forgejo/workflows/build-derivations.yaml`):
 
-- Builds all NixOS system derivations on GitHub-hosted runners
+- Builds all NixOS system derivations on Forgejo runner
 - Pushes to Attic binary cache
 - Updates deployment pointer in Consul KV store (via consul-kv-proxy)
 - Hosts poll Consul KV and pull new system closures when available
 
-**Cluster configuration** (`.github/workflows/terraform-apply.yaml`):
+**Cluster configuration** (`.forgejo/workflows/terraform-apply.yaml`):
 
-- Runs on self-hosted runner with access to internal cluster
+- Runs on Forgejo runner with access to internal cluster
 - Applies Terranix-generated Terraform for Nomad/Consul/Vault
 - Automatically deploys all Nomad jobs
 
@@ -163,7 +163,7 @@ partitioning.
 Build custom live ISO with SSH keys:
 
 ```bash
-nix build --print-out-paths --no-link github:adriansalamon/homelab#live-iso
+nix build --print-out-paths --no-link \#live-iso
 ```
 
 Deploy to new host:
