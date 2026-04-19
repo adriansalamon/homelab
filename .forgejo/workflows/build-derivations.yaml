@@ -50,7 +50,7 @@ jobs:
             --skip-cached \
             --attic-cache homelab \
             --result-file result.json \
-            --eval-workers 2
+            --eval-workers 4
           echo "=== Build Summary ==="
           cat /var/run/act/workflow/SUMMARY.md || echo "no summary"
 

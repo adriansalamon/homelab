@@ -78,4 +78,6 @@ in
   );
 
   networking.nftables.firewall.zones.untrusted.interfaces = [ "serverBr" ];
+
+  networking.firewall.trustedInterfaces = [ "docker0" ];
 }
