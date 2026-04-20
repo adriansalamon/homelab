@@ -3,9 +3,12 @@
   "nix": {
     "enabled": true
   },
+  "timezone": "Europe/Stockholm",
+  "schedule": [
+    "* 0-9 * * 1"
+  ],
   "extends": [
     "config:recommended",
-    "schedule:earlyMondays",
     "helpers:pinGitHubActionDigests",
     "group:allDigest"
   ],
