@@ -48,6 +48,7 @@ jobs:
   # Build matrix of services
   build:
     needs: detect-changes
+    if: needs.detect-changes.outputs.services != '[]'
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -106,7 +107,8 @@ jobs:
 
   # Commit all updates in a single commit
   commit:
-    needs: [build]
+    needs: [detect-changes, build]
+    if: always() && needs.detect-changes.outputs.services != '[]' && needs.build.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
