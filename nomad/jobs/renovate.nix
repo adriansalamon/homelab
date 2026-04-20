@@ -42,8 +42,7 @@
 
         resources = {
           cpu = 500;
-          memory = 512;
-          memoryMax = 1024;
+          memory = 3072;
         };
 
         restart = {
