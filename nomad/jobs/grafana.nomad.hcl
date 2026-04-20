@@ -150,8 +150,8 @@ EOF
       }
 
       resources {
-        cpu    = 200
-        memory = 256
+        cpu    = 400
+        memory = 512
       }
 
       service {
