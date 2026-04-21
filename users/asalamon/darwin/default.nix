@@ -5,9 +5,35 @@ in
 {
   # Import shared configs
   imports = [
-    ../common/shell.nix
+    ../common/git.nix
     ../common/nvim.nix
+    ../common/shell.nix
   ];
+
+  services.ssh-agent = {
+    enable = true;
+    pkcs11Whitelist = [ "${pkgs.yubico-piv-tool}/lib/*" ];
+  };
+
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+    matchBlocks."*".extraOptions = {
+      PKCS11Provider = "${pkgs.yubico-piv-tool}/lib/libykcs11.dylib";
+      AddKeysToAgent = "yes";
+    };
+  };
+
+  programs.ghostty = {
+    package = pkgs.ghostty-bin;
+    enable = true;
+    settings = {
+      macos-titlebar-style = "tabs";
+      window-padding-x = "0";
+      window-padding-y = "0";
+    };
+    installVimSyntax = true;
+  };
 
   home = {
     username = "asalamon";
@@ -15,12 +41,17 @@ in
     stateVersion = "25.05";
 
     packages = with pkgs; [
-      rustup
-      tex
       consul
-      vault-bin
+      rustup
       sops
+      tex
+      vault-bin
+      yubico-piv-tool
     ];
+
+    shellAliases = {
+      ykload = "ssh-add -s ${pkgs.yubico-piv-tool}/lib/libykcs11.dylib";
+    };
 
     # Add Homebrew to PATH for Darwin
     sessionPath = [

@@ -3,6 +3,7 @@
   globals,
   inputs,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -10,7 +11,6 @@
   imports = [
     inputs.agenix.darwinModules.default
     inputs.agenix-rekey.darwinModules.default
-    { nix.linux-builder.enable = true; }
     #inputs.nix-rosetta-builder.darwinModules.default
     #{
     #  nix-rosetta-builder.onDemand = true;
@@ -28,7 +28,7 @@
   networking.hostName = config.node.name;
 
   home-manager = {
-    extraSpecialArgs = { inherit inputs; };
+    extraSpecialArgs = { inherit inputs globals; };
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "bak";
@@ -47,7 +47,8 @@
 
   nix = {
 
-    linux-builder.enable = true;
+    # does not seem to work
+    # linux-builder.enable = true;
 
     settings = {
       max-jobs = "auto";

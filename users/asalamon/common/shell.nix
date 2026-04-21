@@ -38,6 +38,16 @@
       enableZshIntegration = true;
     };
 
+    tmux = {
+      enable = true;
+      terminal = "tmux-256color";
+      historyLimit = 50000;
+      keyMode = "vi";
+      mouse = true;
+      prefix = "C-a";
+      escapeTime = 0;
+    };
+
     zsh = {
       enable = true;
       dotDir = "${config.xdg.configHome}/zsh";  # Use XDG config directory
