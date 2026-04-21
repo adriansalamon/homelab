@@ -126,6 +126,7 @@
         (mkHost "pan" { })
         (mkHost "theia" { })
         (mkDarwin "atlas" inputs.nixpkgs [ ])
+        (mkDarwin "eos" inputs.nixpkgs [ ])
         (mkRpi "callisto" { })
       ];
     in
