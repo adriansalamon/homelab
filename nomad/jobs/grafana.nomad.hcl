@@ -150,8 +150,9 @@ EOF
       }
 
       resources {
-        cpu    = 400
-        memory = 512
+        cpu        = 800
+        memory     = 1024
+        memory_max = 2048
       }
 
       service {
