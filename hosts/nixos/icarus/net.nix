@@ -1,6 +1,4 @@
-_:
-{
-
+_: {
   node.publicIp = "135.181.152.36";
 
   networking.nftables.firewall.zones.untrusted.interfaces = [ "enp1s0" ];

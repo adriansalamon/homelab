@@ -1,13 +1,15 @@
 { inputs, ... }:
-
 {
-
   imports = [
     inputs.home-manager.flakeModules.home-manager
   ];
 
   flake =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      ...
+    }:
     let
       inherit (lib)
         concatMapAttrs
@@ -79,7 +81,6 @@
               }
             ];
           };
-
         };
 
       mkDarwin =
@@ -157,8 +158,7 @@
       nodes = config.nixosConfigurations // config.guestConfigs // config.darwinConfigurations;
 
       deploy.nodes =
-        flip lib.mapAttrs
-          (lib.filterAttrs (_n: cfg: !cfg.config.node.dummy) config.nixosConfigurations)
+        flip lib.mapAttrs (lib.filterAttrs (_n: cfg: !cfg.config.node.dummy) config.nixosConfigurations)
           (
             name: cfg:
             let

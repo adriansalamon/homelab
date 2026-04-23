@@ -1,5 +1,4 @@
-_:
-{
+_: {
   networking.nftables.enable = false;
 
   networking.useNetworkd = true;
@@ -48,7 +47,6 @@ _:
         DHCP = "yes";
       };
     };
-
   };
 
   # networking.nftables.firewall.zones.untrusted.interfaces = [ "serverBr" ];

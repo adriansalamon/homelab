@@ -1,5 +1,4 @@
-_:
-{
+_: {
   boot.kernel.sysctl = {
     # we are a router, yay!
     "net.ipv4.ip_forward" = 1;

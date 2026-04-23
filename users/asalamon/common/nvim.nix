@@ -47,6 +47,7 @@
         nix = {
           enable = true;
           lsp.servers = [ "nixd" ];
+          format.type = [ "nixfmt" ];
         };
 
         markdown.enable = true;

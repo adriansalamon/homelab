@@ -1,5 +1,4 @@
-_:
-{
+_: {
   # Simple network configuration for desktop
   # NetworkManager is already enabled in the desktop profile
   # This provides a simple GUI for managing network connections
