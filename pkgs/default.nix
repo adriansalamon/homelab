@@ -7,5 +7,6 @@ inputs: [
     vault-plugins = prev.callPackage ./vault-plugins {
       plugins = [ inputs.nebula-vault-plugin.packages.${prev.stdenv.hostPlatform.system}.default ];
     };
+    nomad_2_0 = prev.callPackage ./nomad.nix { };
   })
 ]

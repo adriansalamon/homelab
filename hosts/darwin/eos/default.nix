@@ -97,7 +97,7 @@
     nebula
     beam.packages.erlang_27.elixir
     nodejs
-    # nomad_1_11
+    nomad_2_0
     rage
     restic
     tldr
@@ -110,6 +110,10 @@
 
   homebrew = {
     enable = true;
+
+    brews = [
+      "ollama"
+    ];
 
     casks = [
       "betterdisplay"
