@@ -7,6 +7,7 @@
 let
   host = config.node.name;
   nomadSecretDir = inputs.self.outPath + "/secrets/nomad/";
+  nebulaIp = globals.nebula.mesh.hosts.${host}.ipv4;
 in
 {
   services.nomad-common.enable = true;
@@ -74,6 +75,14 @@ in
       "prometheus.scheme=https"
       "prometheus.query.format=prometheus"
     ];
+
+    check = {
+      http = "https://${nebulaIp}:${toString 4646}/v1/status/leader";
+      interval = "10s";
+      timeout = "5s";
+      tls_skip_verify = true;
+    };
+
   };
 
   globals.nebula.mesh.hosts.${host} = {
