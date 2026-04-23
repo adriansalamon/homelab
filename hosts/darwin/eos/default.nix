@@ -14,6 +14,7 @@
   globals.nebula.mesh.hosts.eos = {
     id = 4610;
     groups = [ "network-admin" ];
+    monitor = false;
 
     config.settings.tun.unsafe_routes = [
       {
@@ -116,6 +117,7 @@
       "firefox"
       "hiddenbar"
       "karabiner-elements"
+      "spotify"
       "ukelele"
       "unnaturalscrollwheels"
       "zed"

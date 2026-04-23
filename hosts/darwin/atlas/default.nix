@@ -6,7 +6,6 @@
   ...
 }:
 {
-
   imports = [
     ./paneru.nix
 
@@ -16,6 +15,7 @@
   globals.nebula.mesh.hosts.atlas = {
     id = 4609;
     groups = [ "network-admin" ];
+    monitor = false;
 
     config.settings.tun.unsafe_routes = [
       {

@@ -1,6 +1,9 @@
-{ lib, options, ... }:
+{
+  lib,
+  options,
+  ...
+}:
 let
-
   inherit (lib) mkOption types;
 
   networkOptions = netSubmod: {
@@ -139,6 +142,12 @@ let
                             };
                           };
                         };
+                      };
+
+                      monitor = mkOption {
+                        default = true;
+                        type = types.bool;
+                        description = "Enable automatic ping uptime montiroring of this host";
                       };
 
                       # gets passed to services.nebula.<name> options
@@ -294,10 +303,8 @@ let
       );
     };
   };
-
 in
 {
-
   options = {
     globals = mkOption {
       default = { };
