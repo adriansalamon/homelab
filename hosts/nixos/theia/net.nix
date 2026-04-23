@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   # Simple network configuration for desktop
   # NetworkManager is already enabled in the desktop profile

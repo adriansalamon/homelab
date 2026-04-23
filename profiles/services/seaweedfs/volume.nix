@@ -35,7 +35,7 @@ in
 
       masters = map (peer: {
         ip = globals.nebula.mesh.hosts.${peer}.ipv4;
-        port = config.services.seaweedfs.master.port;
+        inherit (config.services.seaweedfs.master) port;
       }) masters;
 
       dataCenter = config.node.site;
@@ -54,7 +54,7 @@ in
       map
         (group: [
           {
-            port = config.services.seaweedfs.volume.port;
+            inherit (config.services.seaweedfs.volume) port;
             proto = "tcp";
             inherit group;
           }
@@ -76,7 +76,7 @@ in
   consul.services = {
     seaweedfs-http-volume = {
       name = "seaweedfs-volume";
-      port = config.services.seaweedfs.volume.port;
+      inherit (config.services.seaweedfs.volume) port;
       tags = [ "http" ];
     };
 

@@ -3,11 +3,9 @@
   globals,
   inputs,
   lib,
-  pkgs,
   ...
 }:
 {
-
   imports = [
     inputs.agenix.darwinModules.default
     inputs.agenix-rekey.darwinModules.default
@@ -35,6 +33,7 @@
 
     users.asalamon.imports = [
       inputs.agenix.homeManagerModules.default
+      inputs.nvf.homeManagerModules.default
       ../../users/asalamon/darwin
     ];
   };
@@ -46,9 +45,7 @@
   };
 
   nix = {
-
-    # does not seem to work
-    # linux-builder.enable = true;
+    linux-builder.enable = true;
 
     settings = {
       max-jobs = "auto";

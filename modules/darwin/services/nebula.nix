@@ -4,7 +4,6 @@
   pkgs,
   ...
 }:
-
 let
   inherit (lib)
     concatStringsSep
@@ -22,15 +21,13 @@ let
     ;
 
   cfg = config.services.nebula;
-  enabledNetworks = filterAttrs (n: v: v.enable) cfg.networks;
+  enabledNetworks = filterAttrs (_n: v: v.enable) cfg.networks;
 
   genSettings =
     netName: netCfg:
     recursiveUpdate {
       pki = {
-        ca = netCfg.ca;
-        cert = netCfg.cert;
-        key = netCfg.key;
+        inherit (netCfg) ca cert key;
       };
       static_host_map = netCfg.staticHostMap;
       lighthouse = {
@@ -42,11 +39,11 @@ let
       };
       relay = {
         am_relay = netCfg.isRelay;
-        relays = netCfg.relays;
+        inherit (netCfg) relays;
         use_relays = true;
       };
       listen = {
-        host = netCfg.listen.host;
+        inherit (netCfg.listen) host;
         port = resolveFinalPort netCfg;
       };
       tun = {
@@ -54,8 +51,7 @@ let
         dev = if (netCfg.tun.device != null) then netCfg.tun.device else "nebula.${netName}";
       };
       firewall = {
-        inbound = netCfg.firewall.inbound;
-        outbound = netCfg.firewall.outbound;
+        inherit (netCfg.firewall) inbound outbound;
       };
     } netCfg.settings;
 
@@ -115,7 +111,7 @@ in
               };
 
               staticHostMap = mkOption {
-                type = types.attrsOf (types.listOf (types.str));
+                type = types.attrsOf (types.listOf types.str);
                 default = { };
                 description = ''
                   The static host map defines a set of hosts with fixed IP addresses on the internet (or any network).
@@ -239,7 +235,7 @@ in
               };
 
               settings = mkOption {
-                type = format.type;
+                inherit (format) type;
                 default = { };
                 description = ''
                   Nebula configuration. Refer to
@@ -271,7 +267,7 @@ in
 
     # Create launchd services for each network
     launchd.user.agents = mapAttrs' (
-      netName: netCfg:
+      netName: _netCfg:
       nameValuePair "nebula-${netName}" {
         serviceConfig = {
           ProgramArguments = [
@@ -300,7 +296,7 @@ in
     # Add sudo rules for each network
     security.sudo.extraConfig = concatStringsSep "\n" (
       mapAttrsToList (
-        netName: netCfg:
+        netName: _netCfg:
         "%admin ALL=(root) NOPASSWD: ${pkgs.nebula}/bin/nebula -config /etc/nebula/${netName}.yml"
       ) enabledNetworks
     );

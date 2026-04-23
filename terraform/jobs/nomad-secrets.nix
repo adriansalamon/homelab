@@ -7,7 +7,7 @@
 let
   inherit (lib) foldlAttrs;
 
-  secrets = inputs.self.nomadConfigurations."homelab".config.age.secrets;
+  inherit (inputs.self.nomadConfigurations."homelab".config.age) secrets;
 
   grouped = foldlAttrs (
     acc: name: secret:

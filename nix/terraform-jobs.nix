@@ -5,7 +5,7 @@
   perSystem =
     { pkgs, system, ... }:
     let
-      lib = pkgs.lib;
+      inherit (pkgs) lib;
 
       terraformJobs = {
         terraformWrapper.package = pkgs.opentofu.withPlugins (p: [
@@ -21,7 +21,7 @@
           helpers = { inherit (lib) iso8601ToUnix; };
         };
 
-        modules = [ ] ++ lib.collect builtins.isPath (lib.rakeLeaves ../terraform/jobs);
+        modules = lib.collect builtins.isPath (lib.rakeLeaves ../terraform/jobs);
       };
     in
     {

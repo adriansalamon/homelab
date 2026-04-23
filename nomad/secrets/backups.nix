@@ -13,7 +13,7 @@ let
     ;
 
   nodeBackupConfigs = flip filterAttrs nodes (
-    name: hostCfg: hostCfg.config.meta.backups.storageboxes != { }
+    _name: hostCfg: hostCfg.config.meta.backups.storageboxes != { }
   );
 
   manualBackups = {
@@ -49,7 +49,7 @@ in
     };
   }
   // flip concatMapAttrs manualBackups (
-    name: backupCfg: {
+    _name: backupCfg: {
       "${backupCfg.secretKey}-repo-key" = {
         rekeyFile = inputs.self.outPath + "/secrets/restic/${backupCfg.secretKey}-encryption-key.age";
       };
@@ -65,7 +65,7 @@ in
   )
   # From all nomad backups defined above
   // flip concatMapAttrs config.backups (
-    name: cfg: {
+    name: _cfg: {
       "${name}-repo-key" = {
         inherit (config.nomadJobs."backup-${name}".secrets.restic-password) rekeyFile;
       };

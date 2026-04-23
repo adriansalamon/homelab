@@ -60,7 +60,7 @@ in
     };
   }
   // flip concatMapAttrs vlans (
-    vlan: id: {
+    vlan: _id: {
       "20-${vlan}" = {
         matchConfig.Name = vlan;
         networkConfig = {

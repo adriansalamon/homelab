@@ -197,7 +197,7 @@ in
         lighthouses = filterAttrs (_: v: v.lighthouse) globals.nebula.mesh.hosts;
         lightHouseIps = mapAttrsToList (_: lightHouseCfg: lightHouseCfg.ipv4) lighthouses;
         staticHostMap = mapAttrs' (
-          name: lighthouseCfg: nameValuePair (lighthouseCfg.ipv4) (externalAddrs name)
+          name: lighthouseCfg: nameValuePair lighthouseCfg.ipv4 (externalAddrs name)
         ) lighthouses;
       in
       {

@@ -18,7 +18,7 @@
         ]
         ++ (cfg.firewall.outbound or [ ]);
 
-        inbound = (cfg.firewall.inbound or [ ]);
+        inbound = cfg.firewall.inbound or [ ];
       };
     in
     {
@@ -37,7 +37,7 @@
     map (group: {
       inherit port;
       proto = "tcp";
-      group = group;
+      inherit group;
     }) groups;
 
   # Helper for standard postgres DSN secret template

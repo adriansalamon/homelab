@@ -1,4 +1,4 @@
-_inputs: final: prev: {
+_inputs: _final: prev: {
   lib = prev.lib // {
     nebula-firewall = {
       consul-server = [

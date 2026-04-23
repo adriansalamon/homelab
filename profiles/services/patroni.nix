@@ -33,7 +33,7 @@ in
   services.patroni = {
     enable = true;
     scope = "homelab-cluster";
-    name = config.node.name;
+    inherit (config.node) name;
     postgresqlPackage = pkgs.postgresql_16;
 
     nodeIp = nebulaIp;

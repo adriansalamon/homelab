@@ -15,7 +15,7 @@
     id = 4610;
     groups = [ "network-admin" ];
 
-   config.settings.tun.unsafe_routes = [
+    config.settings.tun.unsafe_routes = [
       {
         route = globals.sites.olympus.vlans.management.cidrv4;
         via = globals.nebula.mesh.hosts.athena.ipv4;
@@ -23,8 +23,60 @@
     ];
   };
 
+  system.defaults = {
+    NSGlobalDomain = {
+      ApplePressAndHoldEnabled = false; # enable key repeat (essential for vim)
+      InitialKeyRepeat = 15; # delay before repeat starts (lower = faster)
+      KeyRepeat = 2; # repeat rate (lower = faster)
+    };
+
+    dock = {
+      autohide = true;
+      autohide-delay = 0.0;
+      autohide-time-modifier = 0.0;
+      show-recents = false;
+    };
+
+    finder = {
+      ShowPathbar = true;
+      ShowStatusBar = true;
+    };
+  };
+
+  launchd.user.agents.colima = {
+    serviceConfig = {
+      ProgramArguments = [
+        "${pkgs.colima}/bin/colima"
+        "start"
+        "--foreground"
+      ];
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "/tmp/colima.log";
+      StandardErrorPath = "/tmp/colima.log";
+      EnvironmentVariables = {
+        PATH = "${pkgs.colima}/bin:${pkgs.docker}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+      };
+    };
+  };
+
+  launchd.user.agents.raycast = {
+    serviceConfig = {
+      ProgramArguments = [ "${pkgs.raycast}/Applications/Raycast.app/Contents/MacOS/Raycast" ];
+      RunAtLoad = true;
+      KeepAlive = false;
+    };
+  };
+
   # Bootstrap essentials: secrets management, core dev tools
   environment.systemPackages = with pkgs; [
+    raycast
+    bat
+    colima
+    docker
+    docker-compose
+    fd
+    ripgrep
     age-plugin-yubikey
     alejandra
     attic-client
@@ -42,29 +94,35 @@
     nixd
     nixfmt
     nebula
+    beam.packages.erlang_27.elixir
     nodejs
     # nomad_1_11
     rage
     restic
     tldr
     vault-bin
-    vim
     uv
     yq
   ];
-  
+
+  fonts.packages = [ pkgs.nerd-fonts.lilex ];
+
   homebrew = {
     enable = true;
 
     casks = [
+      "betterdisplay"
       "claude-code"
       "firefox"
       "hiddenbar"
+      "karabiner-elements"
       "ukelele"
+      "unnaturalscrollwheels"
       "zed"
     ];
-	};
+  };
 
+  security.pam.services.sudo_local.touchIdAuth = true;
 
   system.stateVersion = 5;
 }

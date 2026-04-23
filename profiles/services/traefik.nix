@@ -63,7 +63,7 @@
             certResolver = "default";
             domains = [
               {
-                main = globals.domains.main;
+                inherit (globals.domains) main;
                 sans = [
                   "*.${globals.domains.main}"
                   "*.local.${globals.domains.main}"

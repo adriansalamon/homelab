@@ -1,4 +1,4 @@
-_inputs: final: prev:
+_inputs: _final: prev:
 let
   # From https://github.com/divnix/digga/blob/baa54f8641ee9128cdda8b508553284c331fc9f1/src/importers.nix#L61-L114
   rakeLeaves =
@@ -56,7 +56,7 @@ let
 
       files = lib.filterAttrs seive (builtins.readDir dirPath);
     in
-    lib.filterAttrs (n: v: v != { }) (lib.mapAttrs' collect files);
+    lib.filterAttrs (_n: v: v != { }) (lib.mapAttrs' collect files);
 
   time = rec {
     nanosecond = 1;

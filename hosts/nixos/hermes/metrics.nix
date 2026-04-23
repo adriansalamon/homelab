@@ -46,7 +46,7 @@ in
   ];
 
   age.secrets = flip concatMapAttrs localBackups (
-    name: backupCfg: {
+    _name: backupCfg: {
       "${backupCfg.secretKey}-repo-key" = {
         rekeyFile = inputs.self.outPath + "/secrets/restic/${backupCfg.secretKey}-encryption-key.age";
       };

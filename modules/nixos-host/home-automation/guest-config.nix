@@ -19,11 +19,11 @@ let
     ;
 
   passwdSecretName = "authelia-hass-oidc-client-secret";
-  mqttUsers = homeAutomationCfg.mqttUsers;
+  inherit (homeAutomationCfg) mqttUsers;
 
   hassComponents =
     let
-      callPackage = pkgs.home-assistant.python.pkgs.callPackage;
+      inherit (pkgs.home-assistant.python.pkgs) callPackage;
     in
     {
       auth_oidc = callPackage ./hass-components/auth_oidc.nix { };
@@ -110,10 +110,10 @@ in
     listeners = lib.singleton {
       users = flip mapAttrs' mqttUsers (
         name: cfg: {
-          name = (builtins.replaceStrings [ "-" ] [ "_" ] name);
+          name = builtins.replaceStrings [ "-" ] [ "_" ] name;
           value = {
             passwordFile = config.age.secrets."mosquitto-${name}-pass".path;
-            acl = cfg.acl;
+            inherit (cfg) acl;
           };
         }
       );

@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   networking.nftables.enable = false;
 

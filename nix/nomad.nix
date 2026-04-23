@@ -7,7 +7,7 @@
       ...
     }:
     let
-      lib = pkgs.lib;
+      inherit (pkgs) lib;
       jobsConfig = inputs.nix-nomad.lib.mkNomadJobs {
         inherit pkgs;
 
@@ -43,7 +43,7 @@
     { config, ... }:
     let
       pkgs = config.pkgs.x86_64-linux;
-      lib = pkgs.lib;
+      inherit (pkgs) lib;
     in
     {
       nomadConfigurations."homelab" = lib.mkNomadConfiguration {
@@ -64,7 +64,7 @@
                   {
                     # Encrypt everything with age + vault
                     path_regex = ".*";
-                    age = (map (cfg: cfg.pubkey) inputs.self.secretsConfig.masterIdentities);
+                    age = map (cfg: cfg.pubkey) inputs.self.secretsConfig.masterIdentities;
                     hc_vault_transit_uri = "https://vault.local.${config.globals.domains.main}/v1/transit/keys/sops-key";
                   }
                 ];

@@ -4,7 +4,7 @@
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     openssh.authorizedKeys.keys = globals.admin-user.pubkeys;
-    hashedPassword = globals.admin-user.hashedPassword;
+    inherit (globals.admin-user) hashedPassword;
 
   };
 

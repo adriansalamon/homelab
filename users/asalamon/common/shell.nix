@@ -38,6 +38,11 @@
       enableZshIntegration = true;
     };
 
+    zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
     tmux = {
       enable = true;
       terminal = "tmux-256color";
@@ -50,7 +55,7 @@
 
     zsh = {
       enable = true;
-      dotDir = "${config.xdg.configHome}/zsh";  # Use XDG config directory
+      dotDir = "${config.xdg.configHome}/zsh"; # Use XDG config directory
 
       zplug = {
         enable = true;

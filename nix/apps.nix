@@ -1,11 +1,19 @@
 { inputs, ... }:
 {
+  imports = [ inputs.treefmt-nix.flakeModule ];
+
   perSystem =
+    { pkgs, ... }:
     {
-      pkgs,
-      ...
-    }:
-    {
+      treefmt = {
+        projectRootFile = "flake.nix";
+        programs = {
+          deadnix.enable = true;
+          statix.enable = true;
+          nixfmt.enable = true;
+        };
+      };
+
       apps.setupHetznerStorageBoxes = import ../apps/setup-hetzner-storage-boxes.nix {
         inherit pkgs;
         inherit (inputs.self) globals nixosConfigurations nomadConfigurations;

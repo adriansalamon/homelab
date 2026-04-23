@@ -19,7 +19,7 @@ let
     types
     ;
 
-  name = config.node.name;
+  inherit (config.node) name;
   cfg = config.meta.telegraf;
 
   mkIfNotEmpty = xs: mkIf (xs != [ ]) xs;

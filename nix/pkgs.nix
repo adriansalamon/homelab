@@ -2,7 +2,11 @@
 {
   imports = [
     (
-      { lib, flake-parts-lib, ... }:
+      {
+        lib,
+        flake-parts-lib,
+        ...
+      }:
       flake-parts-lib.mkTransposedPerSystemModule {
         name = "pkgs";
         file = ./pkgs.nix;
@@ -12,7 +16,11 @@
   ];
 
   perSystem =
-    { pkgs, system, ... }:
+    {
+      pkgs,
+      system,
+      ...
+    }:
     {
       # Apply overlay to perSystem pkgs
       _module.args.pkgs = import inputs.nixpkgs {
@@ -23,10 +31,6 @@
         config.allowUnfree = true;
       };
 
-      formatter = pkgs.nixfmt;
-
       inherit pkgs;
-
-      packages.git-agecrypt = pkgs.git-agecrypt;
     };
 }

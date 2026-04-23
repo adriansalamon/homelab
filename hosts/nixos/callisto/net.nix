@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   networking.nftables.firewall.zones.untrusted.interfaces = [ "enu1u1u1" ];
 

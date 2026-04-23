@@ -127,7 +127,7 @@ in
                 socket_path = cfg.socketPath;
                 consul_addr = cfg.consulAddr;
                 nomad_addr = cfg.nomadAddr;
-                nebula_config_path = yamlFormat.generate "nebula-config.yaml" (cfg.defaultNebulaConfig);
+                nebula_config_path = yamlFormat.generate "nebula-config.yaml" cfg.defaultNebulaConfig;
                 worker_binary_path = "${cfg.package}/bin/nebula-nomad-worker";
                 cert_ttl = cfg.certTTL;
                 ip_pool = {

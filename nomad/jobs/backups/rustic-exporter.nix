@@ -59,14 +59,14 @@ let
       map (boxCfg: {
         name = "${node}-${boxCfg.name}-${boxCfg.subuser}";
         secretKey = "${node}_repo_key";
-        subuser = boxCfg.subuser;
+        inherit (boxCfg) subuser;
       }) (attrValues nodes.${node}.config.meta.backups.storageboxes)
     ) (attrNames (filterAttrs (_: hostCfg: hostCfg.config.meta.backups.storageboxes != { }) nodes))
     # Nomad backup jobs
     ++ mapAttrsToList (name: cfg: {
       inherit name;
       secretKey = "${name}_repo_key";
-      subuser = cfg.subuser;
+      inherit (cfg) subuser;
     }) secretsConfig.config.backups;
 
   # Generate all backup configs and deduplicate secret keys

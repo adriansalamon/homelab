@@ -6,7 +6,7 @@
   ...
 }:
 let
-  site = config.node.site;
+  inherit (config.node) site;
   mkInternalRules = import profiles.router.coredns.internal-rules { inherit config lib globals; };
 in
 {

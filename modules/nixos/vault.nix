@@ -101,7 +101,7 @@ in
       };
 
       settings = mkOption {
-        type = format.type;
+        inherit (format) type;
         default = { };
         description = ''
           Configuration for Vault. See the [documentation](https://developer.hashicorp.com/vault/docs/configuration)
@@ -199,7 +199,7 @@ in
         StateDirectory = "vault";
 
         # In `dev` mode vault will put its token here
-        Environment = (optional cfg.dev "HOME=/var/lib/vault");
+        Environment = optional cfg.dev "HOME=/var/lib/vault";
         EnvironmentFile = cfg.environmentFiles;
 
         # Hardening

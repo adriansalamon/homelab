@@ -25,7 +25,7 @@ in
     };
 
     settings = lib.mkOption {
-      type = (pkgs.formats.toml { }).type;
+      inherit ((pkgs.formats.toml { })) type;
       default = { };
     };
   };

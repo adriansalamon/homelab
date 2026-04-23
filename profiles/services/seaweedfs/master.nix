@@ -37,7 +37,7 @@ in
 
       peers = map (peer: {
         ip = globals.nebula.mesh.hosts.${peer}.ipv4;
-        port = config.services.seaweedfs.master.port;
+        inherit (config.services.seaweedfs.master) port;
       }) peers;
     };
   };
@@ -48,7 +48,7 @@ in
       map
         (group: [
           {
-            port = config.services.seaweedfs.master.port;
+            inherit (config.services.seaweedfs.master) port;
             proto = "tcp";
             inherit group;
           } # gRPC port (defaults to port + 10000)
@@ -69,7 +69,7 @@ in
   consul.services = {
     seaweedfs-http-master = {
       name = "seaweedfs-master";
-      port = config.services.seaweedfs.master.port;
+      inherit (config.services.seaweedfs.master) port;
       tags = [ "http" ];
     };
 

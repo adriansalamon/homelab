@@ -12,7 +12,7 @@ in
     enable = lib.mkEnableOption "Vector pushes logs to Loki";
   };
 
-  config = lib.mkIf (cfg.enable) {
+  config = lib.mkIf cfg.enable {
     age.secrets.vector-loki-basic-auth-password = {
       # we don't need this file on the server
       intermediary = true;
@@ -62,7 +62,7 @@ in
         # Accessable as "SECRET[basic-auth.<json key>]"
         secret.basic_auth = {
           type = "file";
-          path = config.age.secrets.vector-loki-auth-json.path;
+          inherit (config.age.secrets.vector-loki-auth-json) path;
         };
 
         sources = {

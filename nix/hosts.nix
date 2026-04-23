@@ -17,7 +17,7 @@
         ;
 
       mkRpi =
-        name: hostConfig:
+        name: _hostConfig:
         let
           system = "aarch64-linux";
           pkgs = config.pkgs.${system};
@@ -39,7 +39,7 @@
               {
                 nixpkgs.config.allowUnfree = true;
                 node = {
-                  name = name;
+                  inherit name;
                   secretsDir = ../hosts/nixos/${name}/secrets;
                 };
                 networking.hostName = name;
@@ -50,7 +50,7 @@
         };
 
       mkHost =
-        name: hostConfig:
+        name: _hostConfig:
         let
           pkgs = config.pkgs.x86_64-linux;
           profiles = pkgs.lib.rakeLeaves ../profiles;
@@ -71,7 +71,7 @@
               {
                 nixpkgs.config.allowUnfree = true;
                 node = {
-                  name = name;
+                  inherit name;
                   secretsDir = ../hosts/nixos/${name}/secrets;
                 };
                 networking.hostName = name;
@@ -83,7 +83,7 @@
         };
 
       mkDarwin =
-        name: nixpkgsVersion: extraModules:
+        name: _nixpkgsVersion: _extraModules:
         let
           pkgs = config.pkgs.aarch64-darwin;
           profiles = pkgs.lib.rakeLeaves ../profiles;
@@ -101,7 +101,7 @@
               ../hosts/darwin/${name}
               {
                 node = {
-                  name = name;
+                  inherit name;
                   secretsDir = ../hosts/darwin/${name}/secrets;
                 };
 
@@ -132,15 +132,19 @@
     in
     hosts
     // {
-      checks = lib.foldlAttrs (
-        acc: name: cfg:
-        let
-          system = cfg.config.nixpkgs.hostPlatform.system;
-        in
-        lib.recursiveUpdate acc {
-          ${system}.${name} = cfg.config.system.build.toplevel;
-        }
-      ) { } (lib.filterAttrs (_: cfg: !cfg.config.node.dummy && cfg.config.node.ci) config.nixosConfigurations);
+      checks =
+        lib.foldlAttrs
+          (
+            acc: name: cfg:
+            let
+              inherit (cfg.config.nixpkgs.hostPlatform) system;
+            in
+            lib.recursiveUpdate acc {
+              ${system}.${name} = cfg.config.system.build.toplevel;
+            }
+          )
+          { }
+          (lib.filterAttrs (_: cfg: !cfg.config.node.dummy && cfg.config.node.ci) config.nixosConfigurations);
     }
     // {
       guestConfigs = flip concatMapAttrs config.nixosConfigurations (
@@ -154,11 +158,11 @@
 
       deploy.nodes =
         flip lib.mapAttrs
-          (lib.filterAttrs (n: cfg: cfg.config.node.dummy == false) config.nixosConfigurations)
+          (lib.filterAttrs (_n: cfg: !cfg.config.node.dummy) config.nixosConfigurations)
           (
             name: cfg:
             let
-              system = cfg.config.nixpkgs.hostPlatform.system;
+              inherit (cfg.config.nixpkgs.hostPlatform) system;
               deployCfg = config.globals.deploy.${name};
             in
             {

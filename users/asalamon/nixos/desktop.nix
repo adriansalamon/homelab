@@ -70,7 +70,7 @@
   # Rofi launcher
   programs.rofi = {
     enable = true;
-    package = pkgs.rofi;  # rofi-wayland has been merged into rofi
+    package = pkgs.rofi; # rofi-wayland has been merged into rofi
     theme = "Arc-Dark";
     terminal = "${pkgs.kitty}/bin/kitty";
     extraConfig = {

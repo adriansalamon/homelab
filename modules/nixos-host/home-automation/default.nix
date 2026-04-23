@@ -82,7 +82,7 @@ in
       };
       microvm.system = "x86_64-linux";
       microvm.interfaces.eth0 = {
-        bridge = cfg.bridge;
+        inherit (cfg) bridge;
       };
       extraSpecialArgs = {
         inherit (inputs.self.pkgs.x86_64-linux) lib;
@@ -103,7 +103,7 @@ in
             guest = true;
             inherit (config.node) site;
             id = cfg.nodeId;
-            secretsDir = cfg.secretsDir;
+            inherit (cfg) secretsDir;
           };
           networking.nftables.firewall.zones.untrusted.interfaces = [ "eth0" ];
         }

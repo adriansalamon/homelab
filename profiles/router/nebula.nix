@@ -27,14 +27,14 @@ in
       tun.use_system_route_table = true;
       # We do our own routing below, setting the src to be
       # able to use this route for the router itself
-      tun.unsafe_routes = mapAttrsToList (hostName: hostCfg: {
+      tun.unsafe_routes = mapAttrsToList (_hostName: hostCfg: {
         route = builtins.head hostCfg.routeSubnets;
         via = hostCfg.ipv4;
         install = false;
       }) otherRouters;
 
       # don't try to connect to other remote nodes via remote local IPs
-      lighthouse.remote_allow_list = mapAttrs' (hostName: hostCfg: {
+      lighthouse.remote_allow_list = mapAttrs' (_hostName: hostCfg: {
         name = builtins.head hostCfg.routeSubnets;
         value = false;
       }) otherRouters;
@@ -48,7 +48,7 @@ in
         group = "router";
       }
     ]
-    ++ mapAttrsToList (hostName: hostCfg: {
+    ++ mapAttrsToList (_hostName: hostCfg: {
       port = "any";
       proto = "any";
       cidr = builtins.head hostCfg.routeSubnets;
@@ -69,7 +69,7 @@ in
     linkConfig = {
       MTUBytes = 1300;
     };
-    routes = mapAttrsToList (hostName: hostCfg: {
+    routes = mapAttrsToList (_hostName: hostCfg: {
       # assume that the first subnet is to be routed
       Destination = builtins.head hostCfg.routeSubnets;
       # set source to be the lan addres of the router, so that

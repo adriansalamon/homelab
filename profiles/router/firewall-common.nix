@@ -33,7 +33,7 @@ let
   internetZones = builtins.attrNames vlanZones ++ lib.optional (lib.hasAttr "lan" cfg.zones) "lan";
 
   otherSitesLans = mapAttrsToList (_: siteCfg: siteCfg.vlans.lan.cidrv4) (
-    filterAttrs (siteName: siteCfg: siteName != config.node.site) globals.sites
+    filterAttrs (siteName: _siteCfg: siteName != config.node.site) globals.sites
   );
 in
 {

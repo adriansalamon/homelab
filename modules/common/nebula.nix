@@ -133,7 +133,7 @@ in
       );
 
       staticHostMap = mkIf (!hostCfg.lighthouse) (
-        mapAttrs' (name: lighthouseCfg: nameValuePair (lighthouseCfg.ipv4) (externalAddrs name)) lighthouses
+        mapAttrs' (name: lighthouseCfg: nameValuePair lighthouseCfg.ipv4 (externalAddrs name)) lighthouses
       );
 
       settings.lighthouse.remote_allow_list = {

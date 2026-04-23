@@ -14,6 +14,8 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # github.com/oddlama/agenix-rekey/pull/147
     agenix-rekey = {
       url = "github:sini/agenix-rekey";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -81,8 +83,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nvf = {
+      url = "github:NotAShelf/nvf";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # https://github.com/NixOS/nixpkgs/pull/496325
     nixpkgs-forgejo-runner.url = "github:adamcstephens/nixpkgs/push-kpxuoykptuty";
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
