@@ -34,6 +34,12 @@
     id = 2;
   };
 
+  boot.initrd.remoteUnlock = {
+    enable = true;
+    nebula = true;
+    notify = true;
+  };
+
   services.nomad-client = {
     enable = true;
     isMicrovm = false;

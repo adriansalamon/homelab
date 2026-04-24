@@ -26,5 +26,11 @@
         inherit (inputs.self.nodes.demeter.config.age) secrets;
         decryptIdentity = (builtins.head inputs.self.secretsConfig.masterIdentities).identity;
       };
+
+      apps.unlock-initrd = import ../apps/unlock-initrd.nix {
+        inherit pkgs;
+        inherit (inputs.self) globals nixosConfigurations;
+        decryptIdentity = (builtins.head inputs.self.secretsConfig.masterIdentities).identity;
+      };
     };
 }

@@ -15,6 +15,7 @@
     "usb_storage"
     "sd_mod"
     "rtsx_usb_sdmmc"
+    "r8169"
   ];
   boot.initrd.kernelModules = [ "dm-snapshot" ];
   boot.kernelModules = [ "kvm-amd" ];

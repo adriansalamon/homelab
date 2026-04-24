@@ -144,6 +144,20 @@ let
                         };
                       };
 
+                      initrd = mkOption {
+                        default = { };
+                        type = types.submodule {
+                          options.enable = mkOption {
+                            type = types.bool;
+                            default = false;
+                            description = ''
+                              Generate a separate Nebula cert for initrd boot (no groups).
+                              Used to provide Nebula VPN connectivity during early boot for remote ZFS unlock.
+                            '';
+                          };
+                        };
+                      };
+
                       monitor = mkOption {
                         default = true;
                         type = types.bool;

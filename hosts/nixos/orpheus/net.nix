@@ -67,6 +67,30 @@ in
     };
   };
 
+  # initrd needs its own network config — runtime systemd.network is not carried over.
+  # Use server VLAN (20) with DHCP directly — no bridge needed in initrd.
+  boot.initrd.availableKernelModules = [ "8021q" ];
+  boot.initrd.systemd.network = {
+    netdevs."30-server" = {
+      netdevConfig = {
+        Kind = "vlan";
+        Name = "server";
+      };
+      vlanConfig.Id = 20;
+    };
+    networks."10-physical" = {
+      matchConfig.Name = "enp2s0";
+      networkConfig = {
+        VLAN = [ "server" ];
+        DHCP = "no";
+      };
+    };
+    networks."30-server" = {
+      matchConfig.Name = "server";
+      networkConfig.DHCP = "yes";
+    };
+  };
+
   networking.nftables.firewall.zones.untrusted.interfaces = (builtins.attrNames vlans) ++ [
     "serverBr"
   ];

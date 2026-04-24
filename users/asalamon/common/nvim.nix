@@ -4,6 +4,12 @@
   ...
 }:
 {
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+  };
+
   programs.nvf = {
     enable = true;
 

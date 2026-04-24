@@ -22,6 +22,20 @@ _inputs: _final: prev: {
           };
         };
 
+        encryptedImpermanenceDatasets =
+          encOpts:
+          impermanenceDatasets
+          // {
+            "local" = {
+              type = "zfs_fs";
+              options = unmountable.options // encOpts;
+            };
+            "safe" = {
+              type = "zfs_fs";
+              options = unmountable.options // encOpts;
+            };
+          };
+
         impermanenceDatasets = {
           "local" = unmountable;
           "local/root" = filesystem "/" // {

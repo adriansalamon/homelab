@@ -22,6 +22,10 @@
     groups = [ "reverse-proxy" ];
   };
 
+  boot.initrd.remoteUnlock = {
+    enable = false;
+  };
+
   meta.vector.enable = true;
   meta.telegraf = {
     enable = true;

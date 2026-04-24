@@ -103,6 +103,43 @@ in
         };
       };
     }
+    // lib.optionalAttrs hostCfg.initrd.enable {
+      # Separate cert for initrd boot: same IP, no groups/permissions.
+      # Used by boot.initrd.network.nebula to bring up Nebula before ZFS unlock.
+      # symlink = false so the key lands at a static path embeddable in the initrd cpio.
+      "nebula-${name}-initrd.key" = {
+        owner = "root";
+        group = "root";
+        symlink = false;
+        path = "/boot/initrd-nebula.key";
+        generator = {
+          tags = [ "nebula-cert" ];
+          script =
+            {
+              pkgs,
+              file,
+              decrypt,
+              ...
+            }:
+            let
+              pubkeyPath = lib.escapeShellArg (lib.removeSuffix ".key.age" file + ".crt");
+            in
+            ''
+              pub_path=$(mktemp)
+              priv=$(${pkgs.nebula-keygen-age}/bin/nebula-keygen-age genkey -out-pub $pub_path) 
+              ${decrypt} ${lib.escapeShellArg caKeyPath} \
+                | ${pkgs.nebula-keygen-age}/bin/nebula-keygen-age sign \
+                  -name ${lib.escapeShellArg "${config.node.name}-initrd"} \
+                  -ip "${ipv4cidr}" \
+                  -subnets "" \
+                  -groups "" \
+                  -ca-crt ${lib.escapeShellArg caCertPath} -version 2 -in-pub $pub_path -out-crt ${pubkeyPath}
+              rm $pub_path
+              echo "$priv"
+            '';
+        };
+      };
+    }
   );
 
   # Only set firewall trusted interfaces on NixOS (not Darwin)

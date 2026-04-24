@@ -42,6 +42,7 @@
         home.stateVersion = "26.05";
       }
       inputs.agenix.homeManagerModules.default
+      inputs.nvf.homeManagerModules.default
       ../../../users/asalamon/nixos
     ];
   };

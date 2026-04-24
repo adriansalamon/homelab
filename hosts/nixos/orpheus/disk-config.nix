@@ -54,10 +54,16 @@
     };
 
     zpool.zroot = lib.disk.zfs.mkZpool {
-      datasets = lib.disk.zfs.impermanenceDatasets // {
-        "safe/guests" = lib.disk.zfs.unmountable;
-        "safe/seaweedfs" = lib.disk.zfs.filesystem "/data/seaweedfs";
-      };
+      datasets =
+        (lib.disk.zfs.encryptedImpermanenceDatasets {
+          encryption = "aes-256-gcm";
+          keyformat = "passphrase";
+          keylocation = "prompt";
+        })
+        // {
+          "safe/guests" = lib.disk.zfs.unmountable;
+          "safe/seaweedfs" = lib.disk.zfs.filesystem "/data/seaweedfs";
+        };
     };
   };
 
