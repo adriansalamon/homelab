@@ -21,6 +21,11 @@ in
     rekeyFile = "${nomadSecretDir}/server.json.age";
   };
 
+  environment.etc."nomad/global-server-nomad.pem" = {
+    source = "${nomadSecretDir}/global-server-nomad.pem";
+    mode = "0444";
+  };
+
   services.nomad = {
     enableDocker = false;
 
@@ -53,7 +58,7 @@ in
       };
 
       tls = {
-        cert_file = "${nomadSecretDir}/global-server-nomad.pem";
+        cert_file = "/etc/nomad/global-server-nomad.pem";
         key_file = config.age.secrets."server-nomad-key.pem".path;
       };
     };

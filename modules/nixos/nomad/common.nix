@@ -32,6 +32,11 @@ in
       }
     ];
 
+    environment.etc."nomad/nomad-agent-ca.pem" = {
+      source = inputs.self.outPath + "/secrets/nomad/nomad-agent-ca.pem";
+      mode = "0444";
+    };
+
     services.nomad = {
       enable = true;
       package = pkgs.nomad_1_11;
@@ -53,7 +58,7 @@ in
         tls = {
           http = true;
           rpc = true;
-          ca_file = inputs.self.outPath + "/secrets/nomad/nomad-agent-ca.pem";
+          ca_file = "/etc/nomad/nomad-agent-ca.pem";
           verify_server_hostname = true;
           verify_https_client = false;
         };

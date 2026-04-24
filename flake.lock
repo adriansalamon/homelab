@@ -620,11 +620,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776030383,
-        "narHash": "sha256-33HByVztjaY9jJRIKEjl4h5CUbUs7aX1WCtSwUWSG20=",
+        "lastModified": 1777069842,
+        "narHash": "sha256-XzCwIGRXt2uglKKf72HR5HjOA0bGE9tUuz0qVAyQ9Es=",
         "owner": "adriansalamon",
         "repo": "nebula-nomad-cni",
-        "rev": "22b8cdb2c408ada425a0e1e8dc7cd1bd68ce803b",
+        "rev": "800fe9435680c651dda6dd4448f8531aabb7ebbb",
         "type": "github"
       },
       "original": {

@@ -101,6 +101,11 @@ in
       "d /var/run/seaweedfs-csi/staging 0700 root root"
     ];
 
+    environment.etc."nomad/global-client-nomad.pem" = {
+      source = "${nomadSecretDir}/global-client-nomad.pem";
+      mode = "0444";
+    };
+
     services.nomad = {
       enableDocker = true;
 
@@ -143,7 +148,7 @@ in
         };
 
         tls = {
-          cert_file = "${nomadSecretDir}/global-client-nomad.pem";
+          cert_file = "/etc/nomad/global-client-nomad.pem";
           key_file = config.age.secrets."nomad-client-key.pem".path;
         };
 
