@@ -7,10 +7,21 @@
     {
       treefmt = {
         projectRootFile = "flake.nix";
+        flakeCheck = false;
+        settings.global.excludes = [
+          "packages/homepage/package-lock.json"
+          "*.yaml"
+          "*.yml"
+        ];
+
         programs = {
           deadnix.enable = true;
           statix.enable = true;
           nixfmt.enable = true;
+          gofmt.enable = true;
+          hclfmt.enable = true;
+          prettier.enable = true;
+          terraform.enable = true;
         };
       };
 

@@ -62,7 +62,7 @@ job "vmalert" {
       }
 
       template {
-        data = <<EOF
+        data        = <<EOF
 consul_sd_configs:
   - server: consul.local.{{ key "config/domains/main" }}
     scheme: "https"

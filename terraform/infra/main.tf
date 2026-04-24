@@ -134,7 +134,7 @@ resource "hcloud_ssh_key" "main" {
 }
 
 resource "hcloud_ssh_key" "yubikey" {
-  name = "yubikey piv"
+  name       = "yubikey piv"
   public_key = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDmOgdi09i0CnGRAaXDzkOCJ+XAVDvF3jFKgWMl5yfrxeqczLqk0wB9xqVr4I4TQEYJNkM6TiYzh/e9alknR9apD49m68cB3Jl4CuR4Nygcrl51pw8lSzE9JmtIBhsG1tA=="
 }
 

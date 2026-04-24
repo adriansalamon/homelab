@@ -4,9 +4,7 @@
     "enabled": true
   },
   "timezone": "Europe/Stockholm",
-  "schedule": [
-    "* 0-9 * * 1"
-  ],
+  "schedule": ["* 0-9 * * 1"],
   "extends": [
     "config:recommended",
     "helpers:pinGitHubActionDigests",
