@@ -138,18 +138,19 @@ nix run #terraform-jobs.<init|plan|apply>
 
 ### CI/CD
 
-Automated builds and deployments via GitHub Actions:
+Automated builds and deployments via self-hosted Forgejo Actions:
 
 **NixOS system builds** (`.forgejo/workflows/build-derivations.yaml`):
 
-- Builds all NixOS system derivations on Forgejo runner
+- Builds all NixOS system derivations on self-hosted Forgejo runner
 - Pushes to Attic binary cache
 - Updates deployment pointer in Consul KV store (via consul-kv-proxy)
 - Hosts poll Consul KV and pull new system closures when available
 
 **Cluster configuration** (`.forgejo/workflows/terraform-apply.yaml`):
 
-- Runs on Forgejo runner with access to internal cluster
+- Runs on self-hosted Forgejo runner with access to internal cluster (via Nebula)
+- Authenticates to Vault via Forgejo OIDC — no long-lived CI secrets
 - Applies Terranix-generated Terraform for Nomad/Consul/Vault
 - Automatically deploys all Nomad jobs
 
