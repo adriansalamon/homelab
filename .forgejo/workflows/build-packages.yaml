@@ -23,26 +23,23 @@ jobs:
       services: ${{ steps.output.outputs.services }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - uses: sergeysova/jq-action@a3f0d4ff59cc1dddf023fc0b325dd75b10deec58 # v2
-        id: filter-rules
-        if: inputs.force_all != true
         with:
-          cmd: "jq 'map_values([.path])' .forgejo/workflows/services.json -r -c"
+          fetch-depth: 0
 
-      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
-        id: filter
-        if: inputs.force_all != true
-        with:
-          filters: ${{ steps.filter-rules.outputs.value }}
-
-      - name: Set services output
+      - name: Detect changed services
         id: output
         run: |
           if [ "${{ inputs.force_all }}" = "true" ]; then
-            echo "services=$(jq 'keys' .forgejo/workflows/services.json -c)" >> $GITHUB_OUTPUT
+            echo "services=$(jq -c 'keys' .forgejo/workflows/services.json)" >> $GITHUB_OUTPUT
           else
-            echo "services=${{ steps.filter.outputs.changes }}" >> $GITHUB_OUTPUT
+            SERVICES='[]'
+            while IFS= read -r service; do
+              prefix=$(jq -r ".[\"$service\"].path" .forgejo/workflows/services.json | sed 's/\*\*$//' | sed 's|/$||')
+              if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^${prefix}"; then
+                SERVICES=$(echo "$SERVICES" | jq -c --arg s "$service" '. + [$s]')
+              fi
+            done < <(jq -r 'keys[]' .forgejo/workflows/services.json)
+            echo "services=$SERVICES" >> $GITHUB_OUTPUT
           fi
 
   # Build matrix of services

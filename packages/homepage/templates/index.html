@@ -6,6 +6,7 @@
     <title>Home</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
+
   <body
     class="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200"
   >
@@ -31,7 +32,7 @@
           </h2>
 
           <ul class="space-y-1 grid md:grid-cols-2">
-            {{range (index $.Services .)}}
+            {{ range (index $.Services .) }}
             <li>
               <a
                 href="{{.URL}}{{.Path}}"
@@ -126,7 +127,7 @@
             (index $.Services .))}}{{end}}{{$total}} services
           </span>
           <span>•</span>
-          <span>{{len .Categories}} categories </span>
+          <span>{{len .Categories}} categories</span>
           <span>•</span>
           <a
             href="https://github.com/adriansalamon/homelab/tree/main/packages/homepage"
