@@ -130,7 +130,12 @@ resource "hcloud_network_subnet" "main_subnet" {
 
 resource "hcloud_ssh_key" "main" {
   name       = "main-ssh-key"
-  public_key = file("~/.ssh/id_ed25519.pub")
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICOfx4SWN/ygsiUkWWWRCFcTz/SBBRO0qKirHiYuvr3x asalamon@kth.se\n"
+}
+
+resource "hcloud_ssh_key" "yubikey" {
+  name = "yubikey piv"
+  public_key = "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBDmOgdi09i0CnGRAaXDzkOCJ+XAVDvF3jFKgWMl5yfrxeqczLqk0wB9xqVr4I4TQEYJNkM6TiYzh/e9alknR9apD49m68cB3Jl4CuR4Nygcrl51pw8lSzE9JmtIBhsG1tA=="
 }
 
 resource "hcloud_server" "icarus" {
@@ -146,6 +151,28 @@ resource "hcloud_server" "icarus" {
     ip         = "10.88.0.2"
   }
   ssh_keys = [hcloud_ssh_key.main.id]
+
+  lifecycle {
+    ignore_changes = [ssh_keys]
+  }
+
+  depends_on = [hcloud_network_subnet.main_subnet]
+}
+
+
+resource "hcloud_server" "daedalus" {
+  name        = "daedalus"
+  server_type = "cx23"
+  image       = "debian-12"
+  public_net {
+    ipv4_enabled = true
+    ipv6_enabled = true
+  }
+  network {
+    network_id = hcloud_network.main.id
+    ip         = "10.88.0.3"
+  }
+  ssh_keys = [hcloud_ssh_key.yubikey.id]
 
   lifecycle {
     ignore_changes = [ssh_keys]

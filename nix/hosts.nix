@@ -120,6 +120,7 @@
         (mkHost "zeus" { })
         (mkHost "demeter" { })
         (mkHost "icarus" { })
+        (mkHost "daedalus" { })
         (mkHost "charon" { })
         (mkHost "pythia" { })
         (mkHost "hermes" { })
