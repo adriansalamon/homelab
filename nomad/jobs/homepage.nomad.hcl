@@ -13,7 +13,7 @@ job "homepage" {
       driver = "docker"
 
       config {
-        image = "forgejo.salamon.xyz/adrian/homepage:main-f0f38cd"
+        image = "forgejo.salamon.xyz/adrian/homepage:main-e6b0170"
         ports = ["http"]
       }
 
