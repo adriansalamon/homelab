@@ -7,6 +7,7 @@
 }@inputs:
 let
   inherit (lib)
+    attrsToList
     attrValues
     escapeShellArg
     flatten
@@ -15,10 +16,12 @@ let
     groupBy
     hasInfix
     hasPrefix
+    listToAttrs
     literalExpression
     makeBinPath
     mapAttrsToList
     genAttrs
+    mapAttrs
     mkIf
     mkMerge
     mkOption
@@ -29,6 +32,15 @@ let
     ;
 
   mergeToplevelConfigs = keys: attrs: genAttrs keys (attr: mkMerge (map (x: x.${attr} or { }) attrs));
+
+  backends = [
+    "microvm"
+    "container"
+  ];
+
+  guestsByBackend =
+    genAttrs backends (_: { })
+    // mapAttrs (_: listToAttrs) (groupBy (x: x.value.backend) (attrsToList config.guests));
 
   # List the necessary mount units for the given guest
   fsMountUnitsFor =
@@ -53,7 +65,7 @@ let
     in
     mac;
 
-  defineGuest = guestName: guestCfg: {
+  defineGuest = _guestName: guestCfg: {
     # Add the required datasets to the disko configuration of the machine
     disko.devices.zpool = mkMerge (
       flip map (attrValues guestCfg.zfs) (zfsCfg: {
@@ -93,19 +105,53 @@ let
               '';
           };
 
-          "microvm@${guestName}" = {
-            requires = fsMountUnitsFor guestCfg;
-            after = fsMountUnitsFor guestCfg;
-          };
         }
       )
     );
 
+  };
+
+  defineMicrovm = guestName: guestCfg: {
+    systemd.services."microvm@${guestName}" = {
+      requires = fsMountUnitsFor guestCfg;
+      after = fsMountUnitsFor guestCfg;
+    };
+
     microvm.vms.${guestName} = import ./microvm.nix guestName guestCfg inputs;
   };
 
+  defineContainer = guestName: guestCfg: {
+    systemd.services."container@${guestName}" = {
+      requires = fsMountUnitsFor guestCfg;
+      after = fsMountUnitsFor guestCfg;
+      # Don't use the notify service type. Using exec will always consider containers
+      # started immediately and donesn't wait until the container is fully booted.
+      # Containers should behave like independent machines, and issues inside the container
+      # will unnecessarily lock up the service on the host otherwise.
+      # This causes issues on system activation or when containers take longer to start
+      # than TimeoutStartSec.
+      serviceConfig.Type = lib.mkForce "exec";
+    };
+
+    containers.${guestName} = import ./container.nix guestName guestCfg inputs;
+  };
 in
 {
+
+  options.containers = mkOption {
+    type = types.attrsOf (
+      types.submodule (submod: {
+        options.nixosConfiguration = mkOption {
+          type = types.unspecified;
+          default = null;
+        };
+
+        config = mkIf (submod.config.nixosConfiguration != null) {
+          path = submod.config.nixosConfiguration.config.system.build.toplevel;
+        };
+      })
+    );
+  };
 
   options.guests = mkOption {
     default = { };
@@ -116,6 +162,11 @@ in
             type = types.str;
             default = "${config.node.name}-${submod.config._module.args.name}";
             description = "Name of the guest";
+          };
+
+          backend = mkOption {
+            type = types.enum backends;
+            default = "microvm";
           };
 
           extraSpecialArgs = mkOption {
@@ -156,6 +207,19 @@ in
                 })
               );
               default = { };
+            };
+          };
+
+          container = {
+            bridge = mkOption {
+              type = types.str;
+              default = "serverBr";
+              description = "Host bridge to attach the container to via a veth pair";
+            };
+
+            address = mkOption {
+              type = types.str;
+              description = "Static IP/prefix for the container's internal interface (e.g. 172.16.0.2/24)";
             };
           };
 
@@ -280,8 +344,14 @@ in
         )
       );
     }
-    (mergeToplevelConfigs [ "disko" "systemd" "microvm" "fileSystems" ] (
+    (mergeToplevelConfigs [ "disko" "systemd" "fileSystems" ] (
       mapAttrsToList defineGuest config.guests
+    ))
+    (mergeToplevelConfigs [ "containers" "systemd" ] (
+      mapAttrsToList defineContainer guestsByBackend.container
+    ))
+    (mergeToplevelConfigs [ "microvm" "systemd" ] (
+      mapAttrsToList defineMicrovm guestsByBackend.microvm
     ))
   ]);
 }

@@ -152,7 +152,13 @@
       guestConfigs = flip concatMapAttrs config.nixosConfigurations (
         _: node:
         flip mapAttrs' (node.config.guests or { }) (
-          guestName: guestDef: nameValuePair guestDef.name node.config.microvm.vms.${guestName}.config
+          guestName: guestDef:
+          nameValuePair guestDef.name (
+            if guestDef.backend == "microvm" then
+              node.config.microvm.vms.${guestName}.config
+            else
+              node.config.containers.${guestName}.nixosConfiguration
+          )
         )
       );
 

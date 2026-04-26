@@ -8,5 +8,8 @@ inputs: [
       plugins = [ inputs.nebula-vault-plugin.packages.${prev.stdenv.hostPlatform.system}.default ];
     };
     nomad_2_0 = prev.callPackage ./nomad.nix { };
+    slackify-markdown-python = prev.callPackage ./slackify-markdown-py.nix { };
+    oauth-cli-kit = prev.callPackage ./oauth-cli-kit.nix { };
+    nanobot = prev.callPackage ./nanobot.nix { };
   })
 ]

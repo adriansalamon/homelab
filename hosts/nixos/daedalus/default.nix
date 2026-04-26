@@ -2,10 +2,12 @@
 {
   # Test VPS on Hetzner Cloud for experimenting with ZFS encryption + Nebula initrd unlock.
   # Use the Hetzner KVM console as out-of-band access if networking breaks during initrd.
+  # Now also hosting microVMs for AI agent sandboxes (claude-code and nanobot).
   imports = with profiles; [
     ./disk-config.nix
     ./hw.nix
     ./net.nix
+    ./guests.nix
     nixos
     zfs
     impermanence
