@@ -57,7 +57,7 @@ job "stalwart" {
       }
 
       config {
-        image = "stalwartlabs/stalwart:v0.15.5"
+        image = "stalwartlabs/stalwart:v0.16.1"
         ports = ["submission", "imaps", "http", "management"]
 
         volumes = [
