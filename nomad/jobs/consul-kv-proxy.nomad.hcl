@@ -19,7 +19,7 @@ job "kv-proxy" {
       }
 
       config {
-        image = "forgejo.salamon.xyz/adrian/consul-kv-proxy:main-95adbdb"
+        image = "forgejo.salamon.xyz/adrian/consul-kv-proxy:main-6522d44"
         ports = ["http"]
       }
 
