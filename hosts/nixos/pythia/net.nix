@@ -52,8 +52,6 @@ in
       matchConfig.Name = "lan0";
       linkConfig.RequiredForOnline = "carrier";
       vlan = builtins.attrNames site.vlans;
-
-      address = lib.optional (site.default.cidrv4 != null) (lib.net.cidr.hostCidr 1 site.default.cidrv4);
     };
   }
   // flip concatMapAttrs site.vlans (
@@ -69,13 +67,7 @@ in
 
   networking.nftables = {
     enable = true;
-
-    firewall = {
-      zones = {
-        wan.interfaces = [ "wan0" ];
-        lan.interfaces = [ "lan0" ];
-      };
-    };
+    firewall.zones.wan.interfaces = [ "wan0" ];
   };
 
   globals.nebula.mesh.hosts.pythia = {

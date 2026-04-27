@@ -27,10 +27,12 @@ let
 
   trustedZones =
     builtins.attrNames (filterAttrs (_: cfg: cfg.trusted) vlanZones)
-    ++ lib.optional (lib.hasAttr "lan" cfg.zones) "lan"
+    ++ lib.optional (lib.hasAttr "extra-trusted" cfg.zones) "extra-trusted"
     ++ [ "tailscale" ];
 
-  internetZones = builtins.attrNames vlanZones ++ lib.optional (lib.hasAttr "lan" cfg.zones) "lan";
+  internetZones =
+    builtins.attrNames vlanZones
+    ++ lib.optional (lib.hasAttr "extra-trusted" cfg.zones) "extra-trusted";
 
   otherSitesLans = mapAttrsToList (_: siteCfg: siteCfg.vlans.lan.cidrv4) (
     filterAttrs (siteName: _siteCfg: siteName != config.node.site) globals.sites

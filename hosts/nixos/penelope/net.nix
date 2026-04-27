@@ -34,17 +34,31 @@ in
     ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="e0:51:d8:1b:ab:e2", NAME="lan0"
   '';
 
-  systemd.network.netdevs = flip concatMapAttrs site.vlans (
-    name: vlanCfg: {
-      "30-vlan-${name}" = {
-        netdevConfig = {
-          Kind = "vlan";
-          Name = name;
+  systemd.network.netdevs =
+    flip concatMapAttrs site.vlans (
+      name: vlanCfg: {
+        "30-vlan-${name}" = {
+          netdevConfig = {
+            Kind = "vlan";
+            Name = name;
+          };
+          vlanConfig.Id = vlanCfg.id;
         };
-        vlanConfig.Id = vlanCfg.id;
+      }
+    )
+    // {
+      # Management network for devices that don't support tagged VLANs. We use a
+      # macvlan instead of assigning an IP directly to lan0, because Kea will
+      # receive all frames on the parent interface. If Kea would listen on lan0,
+      # it would generate duplicate DHCP offers
+      "20-macvlan-mgmt" = {
+        netdevConfig = {
+          Kind = "macvlan";
+          Name = "mgmt";
+        };
+        macvlanConfig.Mode = "bridge";
       };
-    }
-  );
+    };
 
   systemd.network.networks = {
     "10-wan" = {
@@ -56,8 +70,13 @@ in
       matchConfig.Name = "lan0";
       linkConfig.RequiredForOnline = "carrier";
       vlan = builtins.attrNames site.vlans;
+      macvlan = [ "mgmt" ];
+    };
 
+    "20-mgmt" = {
+      matchConfig.Name = "mgmt";
       address = optional (site.default.cidrv4 != null) (net.cidr.hostCidr 1 site.default.cidrv4);
+      linkConfig.RequiredForOnline = "routable";
     };
   }
   // flip concatMapAttrs site.vlans (
@@ -71,12 +90,11 @@ in
     }
   );
 
-  # add kea to default untagged
   services.kea.dhcp4.settings = {
-    interfaces-config.interfaces = [ "lan0" ];
+    interfaces-config.interfaces = [ "mgmt" ];
     subnet4 = singleton {
       id = 1;
-      interface = "lan0";
+      interface = "mgmt";
       subnet = site.default.cidrv4;
       pools = [
         { pool = "${net.cidr.host 100 site.default.cidrv4} - ${net.cidr.host 200 site.default.cidrv4}"; }
@@ -100,7 +118,7 @@ in
     firewall = {
       zones = {
         wan.interfaces = [ "wan0" ];
-        lan.interfaces = [ "lan0" ];
+        extra-trusted.interfaces = [ "mgmt" ];
       };
     };
   };

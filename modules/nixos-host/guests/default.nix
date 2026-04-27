@@ -46,25 +46,6 @@ let
   fsMountUnitsFor =
     guestCfg: map (x: "${utils.escapeSystemdPath x.hostMountpoint}.mount") (attrValues guestCfg.zfs);
 
-  genMac =
-    string:
-    let
-      hash = builtins.hashString "sha256" string;
-      # Ensure locally administered MAC by forcing first byte to 02
-      mac =
-        "02:"
-        + lib.substring 2 2 hash
-        + ":"
-        + lib.substring 4 2 hash
-        + ":"
-        + lib.substring 6 2 hash
-        + ":"
-        + lib.substring 8 2 hash
-        + ":"
-        + lib.substring 10 2 hash;
-    in
-    mac;
-
   defineGuest = _guestName: guestCfg: {
     # Add the required datasets to the disko configuration of the machine
     disko.devices.zpool = mkMerge (
@@ -201,7 +182,7 @@ in
                     mac = mkOption {
                       type = types.str;
                       description = "The local MAC address of the interface";
-                      default = genMac "${config.node.name}-${submod.config._module.args.name}-${submod-iface.config._module.args.name}";
+                      default = lib.net.mac.genLocalMac "${config.node.name}-${submod.config._module.args.name}-${submod-iface.config._module.args.name}";
                     };
                   };
                 })

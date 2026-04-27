@@ -30,9 +30,10 @@ in
       };
 
       subnet4 = flip mapAttrsToList site.vlans (
-        _name: vlanCfg: {
+        name: vlanCfg: {
           inherit (vlanCfg) id;
           subnet = vlanCfg.cidrv4;
+          interface = name;
           pools = [ { pool = "${net.cidr.host 100 vlanCfg.cidrv4} - ${net.cidr.host 200 vlanCfg.cidrv4}"; } ];
 
           option-data =

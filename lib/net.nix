@@ -284,6 +284,26 @@ in
         isv6 = hasInfix ":";
       };
       mac = {
+        # Generates a locally administered mac based on hash of a string value
+        genLocalMac =
+          string:
+          let
+            hash = builtins.hashString "sha256" string;
+            # Ensure locally administered MAC by forcing first byte to 02
+            mac =
+              "02:"
+              + substring 2 2 hash
+              + ":"
+              + substring 4 2 hash
+              + ":"
+              + substring 6 2 hash
+              + ":"
+              + substring 8 2 hash
+              + ":"
+              + substring 10 2 hash;
+          in
+          mac;
+
         # Adds offset to the given base address and ensures the result is in
         # a locally administered range by replacing the second nibble with a 2.
         addPrivate =
