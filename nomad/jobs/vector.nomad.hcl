@@ -46,7 +46,7 @@ job "vector" {
       vault {}
 
       config {
-        image = "timberio/vector:0.54.0-alpine"
+        image = "timberio/vector:0.55.0-alpine"
       }
 
       meta {

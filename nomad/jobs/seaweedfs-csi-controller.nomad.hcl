@@ -31,7 +31,7 @@ job "seaweedfs-csi-controller" {
       }
 
       config {
-        image = "chrislusf/seaweedfs-csi-driver:v1.4.9"
+        image = "chrislusf/seaweedfs-csi-driver:v1.4.10"
         args = [
           "--endpoint=unix:///csi-sock/csi.sock",
           "--filer=seaweedfs-filer.service.consul:20090",
