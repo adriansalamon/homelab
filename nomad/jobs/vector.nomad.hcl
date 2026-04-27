@@ -100,7 +100,6 @@ job "vector" {
           [api]
             enabled = true
             address = "[[ env "NOMAD_ALLOC_IP_api" ]]:[[ env "NOMAD_PORT_api" ]]"
-            playground = false
           [sources.logs]
             type = "docker_logs"
             exclude_containers = ["vector"]

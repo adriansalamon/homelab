@@ -19,6 +19,7 @@ job "stalwart" {
 
       tags = [
         "traefik.enable=true",
+        "traefik.external=true",
         "traefik.http.routers.stalwart.rule=Host(`mail.salamon.xyz`)",
         "traefik.http.routers.stalwart.entrypoints=websecure",
       ]
