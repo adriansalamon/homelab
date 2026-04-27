@@ -8,7 +8,7 @@ terraform {
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "5.19.0"
+      version = "~> 5.19"
     }
     aws = {
       source  = "hashicorp/aws"
@@ -17,18 +17,6 @@ terraform {
     hcloud = {
       source  = "hetznercloud/hcloud"
       version = "~> 1.0"
-    }
-    consul = {
-      source  = "hashicorp/consul"
-      version = "~> 2.0"
-    }
-    nomad = {
-      source  = "hashicorp/nomad"
-      version = "~> 2.0"
-    }
-    vault = {
-      source  = "hashicorp/vault"
-      version = "~> 5.0"
     }
   }
 }
