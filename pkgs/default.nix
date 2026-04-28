@@ -11,5 +11,6 @@ inputs: [
     slackify-markdown-python = prev.callPackage ./slackify-markdown-py.nix { };
     oauth-cli-kit = prev.callPackage ./oauth-cli-kit.nix { };
     nanobot = prev.callPackage ./nanobot.nix { };
+    backrest = prev.callPackage ./backrest.nix { };
   })
 ]

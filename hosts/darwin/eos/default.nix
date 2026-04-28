@@ -7,6 +7,7 @@
 }:
 {
   imports = [
+    ./backrest.nix
     ./paneru.nix
     profiles.darwin
   ];
@@ -69,9 +70,9 @@
     };
   };
 
-  # Bootstrap essentials: secrets management, core dev tools
   environment.systemPackages = with pkgs; [
     raycast
+    backrest
     bat
     colima
     docker
