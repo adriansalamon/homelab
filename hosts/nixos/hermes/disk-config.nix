@@ -129,6 +129,35 @@ in
 
           root_fs = "tank02/backups";
         }
+        {
+          name = "snapshots";
+          type = "snap";
+
+          filesystems = {
+            "zroot/safe<" = true;
+            "tank02<" = true;
+            "tank02/backups<" = false;
+          };
+
+          snapshotting = {
+            type = "periodic";
+            prefix = "_zrepl";
+            interval = "30m";
+          };
+
+          pruning.keep = [
+            {
+              type = "regex";
+              negate = true;
+              regex = "^(_zrepl.*)|(auto-.*)$";
+            }
+            {
+              type = "grid";
+              regex = "^(_zrepl.*)|(auto-.*)$";
+              grid = "1x1h(keep=all) | 24x1h | 30x1d | 12x30d";
+            }
+          ];
+        }
       ];
     };
   };
