@@ -71,43 +71,44 @@
   };
 
   environment.systemPackages = with pkgs; [
-    raycast
+    age-plugin-yubikey
+    attic-client
+    atuin
     backrest
     bat
+    beam.packages.erlang_27.elixir
+    btop
     colima
+    coreutils
     docker
     docker-compose
     fd
-    ripgrep
-    age-plugin-yubikey
-    alejandra
-    attic-client
-    atuin
-    btop
-    coreutils
     fzf
-    git
     ghostty-bin
+    git
+    go
     inputs.agenix-rekey.packages."${stdenv.hostPlatform.system}".default
     inputs.deploy-rs.packages."${stdenv.hostPlatform.system}".default
     jq
     lazygit
+    nebula
     nil
     nixd
     nixfmt
-    nebula
-    beam.packages.erlang_27.elixir
     nodejs
     nomad_2_0
+    opentofu
     rage
+    raycast
     restic
+    ripgrep
     tldr
-    vault-bin
     uv
+    vault-bin
     yq
   ];
 
-  fonts.packages = [ pkgs.nerd-fonts.lilex ];
+  fonts.packages = with pkgs; [ nerd-fonts.lilex ];
 
   homebrew = {
     enable = true;
