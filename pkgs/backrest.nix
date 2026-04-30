@@ -130,7 +130,7 @@ buildGoModule {
     export HOME=$(pwd)
     ${gzip}/bin/gzip -c /dev/null > webui/dist/index.html.gz
   ''
-  + lib.optionalString (stdenv.hostPlatform.isDarwin) ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
     export NIX_REDIRECTS=/etc/protocols=${iana-etc}/etc/protocols:/etc/services=${iana-etc}/etc/services
   '';
 

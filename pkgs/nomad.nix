@@ -77,4 +77,5 @@ generic {
   preCheck = ''
     export PATH="$PATH:$NIX_BUILD_TOP/go/bin"
   '';
+  __structuredAttrs = true;
 }

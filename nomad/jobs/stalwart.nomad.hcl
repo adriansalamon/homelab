@@ -13,8 +13,8 @@ job "stalwart" {
     }
 
     service {
-      name    = "stalwart-http"
-      port    = "8080"
+      name         = "stalwart-http"
+      port         = "8080"
       address_mode = "alloc"
 
       tags = [
@@ -31,7 +31,7 @@ job "stalwart" {
       vault {}
 
       meta {
-        nebula_roles = jsonencode(["postgres-client"])
+        nebula_roles = jsonencode(["postgres-client", "ldap-client"])
 
         nebula_config = yamlencode({
           firewall = {

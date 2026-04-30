@@ -359,6 +359,7 @@ identity_providers:
         grant_types:
           - 'authorization_code'
         token_endpoint_auth_method: 'client_secret_post'
+
       - client_id: 'vault'
         client_name: 'HashiCorp Vault'
         client_secret: {{ .Data.data.vault_oidc_client_secret }}

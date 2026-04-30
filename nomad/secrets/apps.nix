@@ -105,6 +105,9 @@ in
       rekeyFile = localSecretsDir + "/stalwart-admin-password.age";
       generator.script = "alnum";
     };
+    ldap-password = {
+      rekeyFile = localSecretsDir + "/stalwart-ldap-password.age";
+    };
     cloudflare-dns-api-token = {
       inherit (nodes.athena.config.age.secrets.cloudflare-dns-api-token) rekeyFile;
     };
