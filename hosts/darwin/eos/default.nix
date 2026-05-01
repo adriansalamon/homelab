@@ -76,7 +76,8 @@
     atuin
     backrest
     bat
-    beam.packages.erlang_27.elixir
+    beam28Packages.elixir
+    beam28Packages.erlang
     btop
     colima
     coreutils

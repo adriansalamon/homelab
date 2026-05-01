@@ -18,4 +18,6 @@ variable "domain" {
   description = "Domain name"
 }
 
-
+variable "domain_me" {
+  type = string
+}

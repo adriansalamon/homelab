@@ -52,14 +52,16 @@
                 main = "${globals.domains.main}";
                 sans = [ "*.${globals.domains.main}" ];
               }
+              {
+                main = globals.domains.me;
+                sans = [ "*.${globals.domains.me}" ];
+              }
             ];
           };
         };
 
         unifi-inform.address = ":8080";
-
         forgejo-ssh.address = ":2222";
-
         traefik.address = ":1010"; # internal only
 
         # Mail

@@ -151,7 +151,7 @@ resource "hcloud_server" "icarus" {
 resource "hcloud_server" "daedalus" {
   name        = "daedalus"
   server_type = "cx23"
-  image       = "debian-12"
+  image       = "379804709"
   public_net {
     ipv4_enabled = true
     ipv6_enabled = true
