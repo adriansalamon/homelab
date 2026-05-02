@@ -19,7 +19,7 @@ in
         driver = "docker";
 
         config = {
-          image = "forgejo.salamon.xyz/adrian/website:a357420";
+          image = "forgejo.salamon.xyz/adrian/website:c79948b";
         };
 
         meta = helpers.mkNebula {
