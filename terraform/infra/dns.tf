@@ -12,8 +12,6 @@ resource "cloudflare_zone" "me" {
   }
 }
 
-
-
 resource "cloudflare_dns_record" "salamon-xyz" {
   zone_id = cloudflare_zone.salamon-xyz.id
   name    = var.domain
@@ -47,11 +45,20 @@ resource "cloudflare_dns_record" "icarus" {
   ttl     = 1
 }
 
+
+resource "cloudflare_dns_record" "mail" {
+  zone_id = cloudflare_zone.salamon-xyz.id
+  name    = "mail"
+  type    = "CNAME"
+  content = cloudflare_dns_record.salamon-xyz.name
+  ttl     = 1
+}
+
 resource "cloudflare_dns_record" "me" {
   zone_id = cloudflare_zone.me.id
-  name = var.domain_me
-  type = "A"
+  name    = var.domain_me
+  type    = "A"
   content = hcloud_server.icarus.ipv4_address
   proxied = true
-  ttl = 1
+  ttl     = 1
 }
